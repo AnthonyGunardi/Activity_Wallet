@@ -3,7 +3,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { MemoryRouter } from 'react-router-dom';
 import { BoothView } from '../../src/pages/BoothView';
 import { ToastProvider } from '../../src/context/ToastContext';
-import { AuthContext } from '../../src/context/AuthContextInstance';
+import { AuthContext } from '../../src/context/authContextInstance';
 
 describe('BoothView Page Integration Tests', () => {
   beforeEach(() => {
