@@ -14,7 +14,7 @@
   - [x] Task 4.2: Frontend Booth Scanner PWA View & Transaction Confirmation
 
 - [ ] **Checkpoint C: Administration & Audit Ledger**
-  - [ ] Task 5.1: Backend Admin Participant Management & QR Reissuance API
+  - [x] Task 5.1: Backend Admin Participant Management & QR Reissuance API
   - [ ] Task 5.2: Frontend Admin Participant Manager & QR Reissuance UI
   - [ ] Task 6.1: Backend Admin Activity CRUD API
   - [ ] Task 6.2: Frontend Admin Activity Manager UI
