@@ -8,7 +8,7 @@
   - [x] Task 2.2: Frontend Auth State, Login View & Protected Routes
 
 - [ ] **Checkpoint B: Core Operations - Participant & Booth**
-  - [ ] Task 3.1: Backend Participant Wallet Lookup API
+  - [x] Task 3.1: Backend Participant Wallet Lookup API
   - [ ] Task 3.2: Frontend Participant PWA View & QR Display
   - [ ] Task 4.1: Backend Booth Scan, Atomic Deduction & Concurrency Locking
   - [ ] Task 4.2: Frontend Booth Scanner PWA View & Transaction Confirmation
