@@ -5,6 +5,7 @@ import { Header } from './components/common/Header';
 import { ProtectedRoute } from './components/common/ProtectedRoute';
 import { LoginView } from './pages/LoginView';
 import { ParticipantView } from './pages/ParticipantView';
+import { BoothView } from './pages/BoothView';
 import { Wallet, QrCode, ShieldCheck, Waves } from 'lucide-react';
 
 const HomeView = () => {
@@ -167,7 +168,7 @@ export default function App() {
                 path="/booth/*"
                 element={
                   <ProtectedRoute allowedRoles={['STAFF', 'ADMIN']}>
-                    <PlaceholderView title="Booth Scanner (Task 4.2)" />
+                    <BoothView />
                   </ProtectedRoute>
                 }
               />
