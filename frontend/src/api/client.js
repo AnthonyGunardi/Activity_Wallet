@@ -7,7 +7,7 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
  * @param {RequestInit} [options]
  * @returns {Promise<any>} data payload on success
  */
-export async function apiClient(endpoint, options = {}) {
+export async function apiClient(endpoint, options = {}, returnFullEnvelope = false) {
   const token = localStorage.getItem('sepa_auth_token');
 
   const headers = {
@@ -36,6 +36,14 @@ export async function apiClient(endpoint, options = {}) {
     err.code = result?.error?.code || 'HTTP_ERROR';
     err.details = result?.error?.details;
     throw err;
+  }
+
+  if (returnFullEnvelope) {
+    return result;
+  }
+
+  if (result?.meta && result?.data && typeof result.data === 'object' && !Array.isArray(result.data)) {
+    return { ...result.data, meta: result.meta };
   }
 
   return result?.data;

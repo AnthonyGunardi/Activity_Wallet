@@ -15,7 +15,7 @@
 
 - [ ] **Checkpoint C: Administration & Audit Ledger**
   - [x] Task 5.1: Backend Admin Participant Management & QR Reissuance API
-  - [ ] Task 5.2: Frontend Admin Participant Manager & QR Reissuance UI
+  - [x] Task 5.2: Frontend Admin Participant Manager & QR Reissuance UI
   - [ ] Task 6.1: Backend Admin Activity CRUD API
   - [ ] Task 6.2: Frontend Admin Activity Manager UI
   - [ ] Task 7.1: Backend Admin Metrics, Audit Ledger & Refund Engine

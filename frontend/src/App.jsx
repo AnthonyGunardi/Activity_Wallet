@@ -6,6 +6,7 @@ import { ProtectedRoute } from './components/common/ProtectedRoute';
 import { LoginView } from './pages/LoginView';
 import { ParticipantView } from './pages/ParticipantView';
 import { BoothView } from './pages/BoothView';
+import { ParticipantManagerView } from './pages/admin/ParticipantManagerView';
 import { Wallet, QrCode, ShieldCheck, Waves } from 'lucide-react';
 
 const HomeView = () => {
@@ -173,10 +174,26 @@ export default function App() {
                 }
               />
               <Route
+                path="/admin"
+                element={
+                  <ProtectedRoute allowedRoles={['ADMIN']}>
+                    <ParticipantManagerView />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/admin/participants"
+                element={
+                  <ProtectedRoute allowedRoles={['ADMIN']}>
+                    <ParticipantManagerView />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
                 path="/admin/*"
                 element={
                   <ProtectedRoute allowedRoles={['ADMIN']}>
-                    <PlaceholderView title="Admin Dashboard (Task 5.2/7.2)" />
+                    <ParticipantManagerView />
                   </ProtectedRoute>
                 }
               />
