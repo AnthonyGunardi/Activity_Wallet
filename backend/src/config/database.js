@@ -22,7 +22,12 @@ function createDatabaseInstance(options = {}) {
     return new Sequelize({
       dialect: 'sqlite',
       storage: ':memory:',
-      logging: false
+      logging: false,
+      pool: {
+        max: 1,
+        min: 1,
+        idle: 10000
+      }
     });
   }
 
