@@ -2,7 +2,7 @@
 
 - [ ] **Checkpoint A: Core Foundation & Auth**
   - [x] Task 0.1: Backend Project Foundation & Scaffolding
-  - [ ] Task 0.2: Frontend Foundation & Design Tokens
+  - [x] Task 0.2: Frontend Foundation & Design Tokens
   - [ ] Task 1.1: Sequelize Models, Associations, Indexes & Seeders
   - [ ] Task 2.1: Backend Authentication API & Role Middleware
   - [ ] Task 2.2: Frontend Auth State, Login View & Protected Routes
