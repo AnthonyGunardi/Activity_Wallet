@@ -4,7 +4,7 @@
   - [x] Task 0.1: Backend Project Foundation & Scaffolding
   - [x] Task 0.2: Frontend Foundation & Design Tokens
   - [x] Task 1.1: Sequelize Models, Associations, Indexes & Seeders
-  - [ ] Task 2.1: Backend Authentication API & Role Middleware
+  - [x] Task 2.1: Backend Authentication API & Role Middleware
   - [ ] Task 2.2: Frontend Auth State, Login View & Protected Routes
 
 - [ ] **Checkpoint B: Core Operations - Participant & Booth**
