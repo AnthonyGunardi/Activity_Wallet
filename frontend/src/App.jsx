@@ -1,6 +1,9 @@
 import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
 import { ToastProvider } from './context/ToastContext';
+import { AuthProvider } from './context/AuthContext';
 import { Header } from './components/common/Header';
+import { ProtectedRoute } from './components/common/ProtectedRoute';
+import { LoginView } from './pages/LoginView';
 import { Wallet, QrCode, ShieldCheck, Waves } from 'lucide-react';
 
 const HomeView = () => {
@@ -146,18 +149,37 @@ export const PlaceholderView = ({ title }) => (
 export default function App() {
   return (
     <ToastProvider>
-      <BrowserRouter>
-        <Header />
-        <main style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-          <Routes>
-            <Route path="/" element={<HomeView />} />
-            <Route path="/participant/*" element={<PlaceholderView title="Participant View (Task 3.2)" />} />
-            <Route path="/booth/*" element={<PlaceholderView title="Booth Scanner (Task 4.2)" />} />
-            <Route path="/admin/*" element={<PlaceholderView title="Admin Dashboard (Task 5.2/7.2)" />} />
-            <Route path="/login" element={<PlaceholderView title="Login View (Task 2.2)" />} />
-          </Routes>
-        </main>
-      </BrowserRouter>
+      <AuthProvider>
+        <BrowserRouter>
+          <Header />
+          <main style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+            <Routes>
+              <Route path="/" element={<HomeView />} />
+              <Route path="/login" element={<LoginView />} />
+              <Route
+                path="/participant/*"
+                element={<PlaceholderView title="Participant View (Task 3.2)" />}
+              />
+              <Route
+                path="/booth/*"
+                element={
+                  <ProtectedRoute allowedRoles={['STAFF', 'ADMIN']}>
+                    <PlaceholderView title="Booth Scanner (Task 4.2)" />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/admin/*"
+                element={
+                  <ProtectedRoute allowedRoles={['ADMIN']}>
+                    <PlaceholderView title="Admin Dashboard (Task 5.2/7.2)" />
+                  </ProtectedRoute>
+                }
+              />
+            </Routes>
+          </main>
+        </BrowserRouter>
+      </AuthProvider>
     </ToastProvider>
   );
 }

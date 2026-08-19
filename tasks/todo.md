@@ -1,11 +1,11 @@
 # Task Checklist: Sepa Island Activity Wallet
 
-- [ ] **Checkpoint A: Core Foundation & Auth**
+- [x] **Checkpoint A: Core Foundation & Auth**
   - [x] Task 0.1: Backend Project Foundation & Scaffolding
   - [x] Task 0.2: Frontend Foundation & Design Tokens
   - [x] Task 1.1: Sequelize Models, Associations, Indexes & Seeders
   - [x] Task 2.1: Backend Authentication API & Role Middleware
-  - [ ] Task 2.2: Frontend Auth State, Login View & Protected Routes
+  - [x] Task 2.2: Frontend Auth State, Login View & Protected Routes
 
 - [ ] **Checkpoint B: Core Operations - Participant & Booth**
   - [ ] Task 3.1: Backend Participant Wallet Lookup API

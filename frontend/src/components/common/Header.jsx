@@ -1,8 +1,10 @@
-import { Compass, Wallet, QrCode, Shield } from 'lucide-react';
+import { Compass, Wallet, QrCode, Shield, LogOut, LogIn, User as UserIcon } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
+import { useAuth } from '../../hooks/useAuth';
 
 export const Header = () => {
   const location = useLocation();
+  const { user, isAuthenticated, logout } = useAuth();
 
   const navItems = [
     { label: 'Dompet Peserta', path: '/participant', icon: <Wallet size={18} /> },
@@ -65,7 +67,7 @@ export const Header = () => {
           </div>
         </Link>
 
-        <nav style={{ display: 'flex', gap: '0.5rem' }}>
+        <nav style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
           {navItems.map((item) => {
             const isActive = location.pathname.startsWith(item.path);
             return (
@@ -87,6 +89,60 @@ export const Header = () => {
               </Link>
             );
           })}
+
+          <div style={{ width: '1px', height: '24px', background: 'var(--color-border)', margin: '0 0.25rem' }} />
+
+          {isAuthenticated ? (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.375rem',
+                  padding: '0.25rem 0.625rem',
+                  background: 'var(--color-bg-surface)',
+                  borderRadius: 'var(--radius-full)',
+                  border: '1px solid var(--color-border)',
+                  fontSize: '0.8125rem'
+                }}
+              >
+                <UserIcon size={14} color="var(--color-primary-500)" />
+                <span style={{ fontWeight: 600 }}>{user?.name || user?.username}</span>
+                <span
+                  className={`badge ${user?.role === 'ADMIN' ? 'badge-warning' : 'badge-success'}`}
+                  style={{ fontSize: '0.6875rem', padding: '0.1rem 0.4rem' }}
+                >
+                  {user?.role}
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={logout}
+                className="btn btn-secondary"
+                aria-label="Logout"
+                style={{
+                  minHeight: '40px',
+                  padding: '0.5rem',
+                  color: 'var(--color-danger-primary)'
+                }}
+              >
+                <LogOut size={16} />
+              </button>
+            </div>
+          ) : (
+            <Link
+              to="/login"
+              className="btn btn-primary"
+              style={{
+                minHeight: '40px',
+                padding: '0.5rem 0.875rem',
+                fontSize: '0.875rem'
+              }}
+            >
+              <LogIn size={16} />
+              <span>Login</span>
+            </Link>
+          )}
         </nav>
       </div>
     </header>
