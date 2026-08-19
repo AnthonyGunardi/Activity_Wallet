@@ -4,6 +4,7 @@ import { AuthProvider } from './context/AuthContext';
 import { Header } from './components/common/Header';
 import { ProtectedRoute } from './components/common/ProtectedRoute';
 import { LoginView } from './pages/LoginView';
+import { ParticipantView } from './pages/ParticipantView';
 import { Wallet, QrCode, ShieldCheck, Waves } from 'lucide-react';
 
 const HomeView = () => {
@@ -15,125 +16,129 @@ const HomeView = () => {
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'center',
-        padding: '3rem 1rem'
+        paddingTop: '2.5rem',
+        paddingBottom: '3.5rem'
       }}
     >
-      <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
+      <div className="hero-section">
         <div
+          className="badge badge-blue"
           style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '0.5rem',
-            padding: '0.375rem 1rem',
-            borderRadius: '9999px',
-            background: 'rgba(14, 165, 233, 0.15)',
-            color: 'var(--color-primary-500)',
-            fontWeight: 600,
-            fontSize: '0.875rem',
             marginBottom: '1rem',
-            border: '1px solid rgba(14, 165, 233, 0.3)'
+            padding: '0.375rem 0.875rem'
           }}
         >
-          <Waves size={16} /> Event Sepa Island Water Sports
+          <Waves size={15} /> Event Sepa Island Water Sports
         </div>
-        <h1 style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>
+        <h1 className="hero-title">
           Digital Activity Wallet
         </h1>
-        <p
-          style={{
-            color: 'var(--color-text-muted)',
-            fontSize: '1.125rem',
-            maxWidth: '600px',
-            margin: '0 auto'
-          }}
-        >
+        <p className="hero-subtitle">
           Sistem manajemen saldo prepaid aktivitas air digital untuk kenyamanan dan kecepatan transaksi di pulau.
         </p>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem' }}>
+      <div className="portal-grid">
         <Link
           to="/participant"
-          className="glass-card"
-          style={{ textDecoration: 'none', display: 'flex', flexDirection: 'column', gap: '1rem' }}
+          className="sport-card"
+          style={{
+            textDecoration: 'none',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '1.25rem'
+          }}
         >
           <div
             style={{
-              width: '48px',
-              height: '48px',
-              borderRadius: '0.75rem',
-              background: 'rgba(14, 165, 233, 0.2)',
+              width: '46px',
+              height: '46px',
+              borderRadius: 'var(--radius-md)',
+              background: 'var(--color-primary-50)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              color: 'var(--color-primary-500)'
+              color: 'var(--color-primary-500)',
+              border: '1px solid var(--color-primary-200)'
             }}
           >
             <Wallet size={24} />
           </div>
           <div>
-            <h2 style={{ fontSize: '1.25rem', marginBottom: '0.25rem' }}>Portal Peserta</h2>
-            <p style={{ color: 'var(--color-text-muted)', fontSize: '0.875rem' }}>
+            <h2 style={{ fontSize: '1.25rem', marginBottom: '0.375rem', color: 'var(--color-text-main)' }}>Portal Peserta</h2>
+            <p style={{ color: 'var(--color-text-muted)', fontSize: '0.875rem', lineHeight: 1.6 }}>
               Cek sisa saldo, tampilkan QR gelang, dan lihat katalog wahana air yang tersedia.
             </p>
           </div>
-          <span className="btn btn-primary" style={{ marginTop: 'auto' }}>Buka Dompet</span>
+          <span className="btn btn-primary" style={{ marginTop: 'auto', width: '100%' }}>Buka Dompet</span>
         </Link>
 
         <Link
           to="/booth"
-          className="glass-card"
-          style={{ textDecoration: 'none', display: 'flex', flexDirection: 'column', gap: '1rem' }}
+          className="sport-card"
+          style={{
+            textDecoration: 'none',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '1.25rem'
+          }}
         >
           <div
             style={{
-              width: '48px',
-              height: '48px',
-              borderRadius: '0.75rem',
-              background: 'rgba(16, 185, 129, 0.2)',
+              width: '46px',
+              height: '46px',
+              borderRadius: 'var(--radius-md)',
+              background: 'var(--color-success-bg)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              color: 'var(--color-success-primary)'
+              color: 'var(--color-success-primary)',
+              border: '1px solid #a7f3d0'
             }}
           >
             <QrCode size={24} />
           </div>
           <div>
-            <h2 style={{ fontSize: '1.25rem', marginBottom: '0.25rem' }}>Scanner Booth Staff</h2>
-            <p style={{ color: 'var(--color-text-muted)', fontSize: '0.875rem' }}>
+            <h2 style={{ fontSize: '1.25rem', marginBottom: '0.375rem', color: 'var(--color-text-main)' }}>Scanner Booth Staff</h2>
+            <p style={{ color: 'var(--color-text-muted)', fontSize: '0.875rem', lineHeight: 1.6 }}>
               Scan QR code peserta, verifikasi saldo, dan eksekusi pemotongan biaya aktivitas secara instan.
             </p>
           </div>
-          <span className="btn btn-success" style={{ marginTop: 'auto' }}>Masuk Scanner</span>
+          <span className="btn btn-success" style={{ marginTop: 'auto', width: '100%' }}>Masuk Scanner</span>
         </Link>
 
         <Link
           to="/admin"
-          className="glass-card"
-          style={{ textDecoration: 'none', display: 'flex', flexDirection: 'column', gap: '1rem' }}
+          className="sport-card"
+          style={{
+            textDecoration: 'none',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '1.25rem'
+          }}
         >
           <div
             style={{
-              width: '48px',
-              height: '48px',
-              borderRadius: '0.75rem',
-              background: 'rgba(245, 158, 11, 0.2)',
+              width: '46px',
+              height: '46px',
+              borderRadius: 'var(--radius-md)',
+              background: 'var(--color-sport-orange-bg)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              color: 'var(--color-warning-primary)'
+              color: 'var(--color-sport-orange)',
+              border: '1px solid #fed7aa'
             }}
           >
             <ShieldCheck size={24} />
           </div>
           <div>
-            <h2 style={{ fontSize: '1.25rem', marginBottom: '0.25rem' }}>Dashboard Supervisor</h2>
-            <p style={{ color: 'var(--color-text-muted)', fontSize: '0.875rem' }}>
+            <h2 style={{ fontSize: '1.25rem', marginBottom: '0.375rem', color: 'var(--color-text-main)' }}>Dashboard Supervisor</h2>
+            <p style={{ color: 'var(--color-text-muted)', fontSize: '0.875rem', lineHeight: 1.6 }}>
               Monitoring real-time transaksi, manajemen peserta & wahana, reissue QR, dan audit refund.
             </p>
           </div>
-          <span className="btn btn-secondary" style={{ marginTop: 'auto' }}>Akses Admin</span>
+          <span className="btn btn-secondary" style={{ marginTop: 'auto', width: '100%' }}>Akses Admin</span>
         </Link>
       </div>
     </div>
@@ -156,10 +161,8 @@ export default function App() {
             <Routes>
               <Route path="/" element={<HomeView />} />
               <Route path="/login" element={<LoginView />} />
-              <Route
-                path="/participant/*"
-                element={<PlaceholderView title="Participant View (Task 3.2)" />}
-              />
+              <Route path="/participant" element={<ParticipantView />} />
+              <Route path="/participant/:qrCode" element={<ParticipantView />} />
               <Route
                 path="/booth/*"
                 element={
