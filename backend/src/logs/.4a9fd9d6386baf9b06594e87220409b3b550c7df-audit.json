@@ -1,0 +1,15 @@
+{
+    "keep": {
+        "days": true,
+        "amount": 30
+    },
+    "auditLog": "C:\\Users\\Admin\\Documents\\Repositories\\Activity_Wallet\\backend\\src\\logs\\.4a9fd9d6386baf9b06594e87220409b3b550c7df-audit.json",
+    "files": [
+        {
+            "date": 1787127627485,
+            "name": "C:\\Users\\Admin\\Documents\\Repositories\\Activity_Wallet\\backend\\src\\logs\\error-2026-08-19.log",
+            "hash": "5d4c9b3daea89d272400eb28d0d6b8f33696286bbff69b064c8b04b115dbbd0a"
+        }
+    ],
+    "hashType": "sha256"
+}
