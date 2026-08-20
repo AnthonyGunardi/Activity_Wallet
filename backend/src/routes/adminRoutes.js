@@ -1,5 +1,6 @@
 const express = require('express');
 const adminParticipantController = require('../controllers/adminParticipantController');
+const adminActivityController = require('../controllers/adminActivityController');
 const { requireAuth, requireRole } = require('../middleware/authMiddleware');
 const { validateBody, validateQuery } = require('../middleware/validate');
 const {
@@ -8,6 +9,11 @@ const {
   bulkParticipantsSchema,
   updateStatusSchema
 } = require('../schemas/adminSchemas');
+const {
+  listActivitiesQuerySchema,
+  createActivitySchema,
+  updateActivitySchema
+} = require('../schemas/activitySchemas');
 const { UserRole } = require('../constants/enums');
 
 const router = express.Router();
@@ -59,6 +65,42 @@ router.put(
   '/participants/:id/status',
   validateBody(updateStatusSchema),
   adminParticipantController.updateStatus
+);
+
+/**
+ * @route GET /api/v1/admin/activities
+ * @desc List all activities with optional status filter
+ */
+router.get(
+  '/activities',
+  validateQuery(listActivitiesQuerySchema),
+  adminActivityController.list
+);
+
+/**
+ * @route GET /api/v1/admin/activities/:id
+ * @desc Retrieve single activity details by ID
+ */
+router.get('/activities/:id', adminActivityController.getById);
+
+/**
+ * @route POST /api/v1/admin/activities
+ * @desc Create a new water sport activity
+ */
+router.post(
+  '/activities',
+  validateBody(createActivitySchema),
+  adminActivityController.create
+);
+
+/**
+ * @route PUT /api/v1/admin/activities/:id
+ * @desc Update an existing activity's pricing, details, or active status
+ */
+router.put(
+  '/activities/:id',
+  validateBody(updateActivitySchema),
+  adminActivityController.update
 );
 
 module.exports = router;
