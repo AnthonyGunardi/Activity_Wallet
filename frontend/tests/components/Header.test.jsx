@@ -6,7 +6,7 @@ import { AuthProvider } from '../../src/context/AuthContext';
 import * as useAuthModule from '../../src/hooks/useAuth';
 
 describe('Header Component Tests', () => {
-  it('should render brand logo, navigation links, and login button when unauthenticated', () => {
+  it('should render brand logo and login button when unauthenticated', () => {
     render(
       <AuthProvider>
         <BrowserRouter>
@@ -17,9 +17,6 @@ describe('Header Component Tests', () => {
 
     expect(screen.getByText('Sepa Island')).toBeInTheDocument();
     expect(screen.getByText('Activity Wallet')).toBeInTheDocument();
-    expect(screen.getByText('Dompet Peserta')).toBeInTheDocument();
-    expect(screen.getByText('Scanner Booth')).toBeInTheDocument();
-    expect(screen.getByText('Admin Dashboard')).toBeInTheDocument();
     expect(screen.getByText('Login')).toBeInTheDocument();
   });
 

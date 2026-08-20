@@ -17,23 +17,10 @@ export const ToastItem = ({ toast, onDismiss }) => {
     <div
       role="alert"
       data-testid={`toast-${id}`}
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: '0.75rem',
-        padding: '0.875rem 1.25rem',
-        borderRadius: '0.625rem',
-        background: '#1e293b',
-        color: '#f8fafc',
-        border: '1px solid #334155',
-        boxShadow: '0 10px 15px -3px rgba(0,0,0,0.5)',
-        minWidth: '280px',
-        maxWidth: '420px',
-        animation: 'fadeIn 0.2s ease-out'
-      }}
+      className="toast-item"
     >
       <div style={{ flexShrink: 0 }}>{icons[type] || icons.info}</div>
-      <div style={{ flex: 1, fontSize: '0.9375rem', fontWeight: 500 }}>{message}</div>
+      <div style={{ flex: 1, fontSize: '0.9375rem', fontWeight: 500, wordBreak: 'break-word' }}>{message}</div>
       <button
         type="button"
         onClick={() => onDismiss(id)}
@@ -46,7 +33,8 @@ export const ToastItem = ({ toast, onDismiss }) => {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          padding: '0.25rem'
+          padding: '0.25rem',
+          flexShrink: 0
         }}
       >
         <X size={16} />
@@ -59,17 +47,7 @@ export const ToastContainer = ({ toasts, onDismiss }) => {
   if (!toasts || toasts.length === 0) return null;
 
   return (
-    <div
-      style={{
-        position: 'fixed',
-        top: '1rem',
-        right: '1rem',
-        zIndex: 9999,
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '0.5rem'
-      }}
-    >
+    <div className="toast-container">
       {toasts.map((toast) => (
         <ToastItem key={toast.id} toast={toast} onDismiss={onDismiss} />
       ))}

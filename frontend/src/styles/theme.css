@@ -1,37 +1,47 @@
 :root {
-  /* Brand / Primary Ocean Palette */
-  --color-primary-50: #f0f9ff;
-  --color-primary-100: #e0f2fe;
-  --color-primary-500: #0ea5e9;
-  --color-primary-600: #0284c7;
-  --color-primary-700: #0369a1;
-  --color-primary-900: #0c4a6e;
+  /* Brand / Signature Cobalt & Ocean Palette */
+  --color-primary-50: #eff6ff;
+  --color-primary-100: #dbeafe;
+  --color-primary-200: #bfdbfe;
+  --color-primary-500: #1d4ed8;  /* Vibrant Royal Cobalt Blue */
+  --color-primary-600: #1e40af;
+  --color-primary-700: #1e3a8a;
+  --color-primary-900: #172554;
 
-  /* Functional Status Colors (High Contrast Outdoor) */
+  /* Accent Colors (Energy / Activity Highlights) */
+  --color-accent-cyan: #0284c7;
+  --color-sport-orange: #ea580c;
+  --color-sport-orange-hover: #c2410c;
+  --color-sport-orange-bg: #fff7ed;
+
+  /* High-Contrast Status Colors */
   --color-success-bg: #ecfdf5;
   --color-success-text: #065f46;
-  --color-success-primary: #10b981;
+  --color-success-primary: #059669;
   --color-success-dark: #047857;
 
   --color-warning-bg: #fffbeb;
   --color-warning-text: #92400e;
-  --color-warning-primary: #f59e0b;
+  --color-warning-primary: #d97706;
 
   --color-danger-bg: #fef2f2;
   --color-danger-text: #991b1b;
-  --color-danger-primary: #ef4444;
+  --color-danger-primary: #dc2626;
 
-  /* Neutrals & Dark Mode Accents */
-  --color-bg-main: #0f172a;
-  --color-bg-surface: #1e293b;
-  --color-bg-card: rgba(30, 41, 59, 0.85);
-  --color-bg-card-hover: rgba(51, 65, 85, 0.95);
-  --color-border: #334155;
-  --color-border-light: #475569;
+  /* Clean Modern Light Theme Surfaces */
+  --color-bg-main: #f1f5f9;      /* Modern soft light slate canvas */
+  --color-bg-surface: #ffffff;   /* Pure white cards / header */
+  --color-bg-card: #ffffff;
+  --color-bg-card-hover: #f8fafc;
+  --color-bg-card-blue: linear-gradient(135deg, #1d4ed8 0%, #2563eb 55%, #0284c7 100%); /* Signature Cobalt Wallet Hero Card */
+  
+  --color-border: #e2e8f0;
+  --color-border-light: #cbd5e1;
+  --color-border-accent: #3b82f6;
 
-  --color-text-main: #f8fafc;
-  --color-text-muted: #94a3b8;
-  --color-text-dim: #64748b;
+  --color-text-main: #0f172a;    /* Deep dark slate for maximum readability */
+  --color-text-muted: #64748b;  /* Slate gray */
+  --color-text-dim: #94a3b8;
 
   /* Typography */
   --font-family-base: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -50,19 +60,19 @@
   /* Radii */
   --radius-sm: 0.375rem;
   --radius-md: 0.625rem;
-  --radius-lg: 0.875rem;
+  --radius-lg: 1rem;
   --radius-xl: 1.25rem;
   --radius-full: 9999px;
 
-  /* Elevation / Shadows */
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.25);
-  --shadow-glow-primary: 0 0 20px rgba(14, 165, 233, 0.35);
-  --shadow-glow-success: 0 0 20px rgba(16, 185, 129, 0.35);
+  /* Refined Elevation Shadows */
+  --shadow-sm: 0 1px 2px 0 rgba(15, 23, 42, 0.05);
+  --shadow-md: 0 4px 12px -2px rgba(15, 23, 42, 0.06), 0 2px 4px -2px rgba(15, 23, 42, 0.04);
+  --shadow-lg: 0 12px 24px -4px rgba(15, 23, 42, 0.08), 0 4px 8px -2px rgba(15, 23, 42, 0.04);
+  --shadow-card-blue: 0 14px 28px -4px rgba(29, 78, 216, 0.35);
+  --shadow-glow-primary: 0 4px 14px 0 rgba(29, 78, 216, 0.3);
 
   /* Outdoor Touch Targets */
   --touch-target-min: 48px;
-  --transition-fast: 0.15s ease;
-  --transition-normal: 0.25s ease;
+  --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-normal: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }

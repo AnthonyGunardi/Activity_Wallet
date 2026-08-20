@@ -55,21 +55,14 @@ export const LoginView = () => {
         padding: '2rem 1rem'
       }}
     >
-      <div
-        className="glass-card animate-fade-in"
-        style={{
-          width: '100%',
-          maxWidth: '440px',
-          padding: '2rem'
-        }}
-      >
+      <div className="sport-card login-card animate-fade-in">
         <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
           <div
             style={{
-              width: '56px',
-              height: '56px',
-              borderRadius: '1rem',
-              background: 'linear-gradient(135deg, var(--color-primary-500), var(--color-primary-700))',
+              width: '52px',
+              height: '52px',
+              borderRadius: 'var(--radius-md)',
+              background: 'var(--color-primary-500)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -78,9 +71,9 @@ export const LoginView = () => {
               boxShadow: 'var(--shadow-glow-primary)'
             }}
           >
-            <Compass size={32} />
+            <Compass size={28} />
           </div>
-          <h1 style={{ fontSize: '1.75rem', marginBottom: '0.5rem' }}>Login Petugas</h1>
+          <h1 style={{ fontSize: '1.75rem', marginBottom: '0.5rem', fontWeight: 800 }}>Login Petugas</h1>
           <p style={{ color: 'var(--color-text-muted)', fontSize: '0.875rem' }}>
             Masuk untuk mengakses Booth Scanner atau Dashboard Admin Sepa Island
           </p>
@@ -136,18 +129,7 @@ export const LoginView = () => {
                 onChange={(e) => setUsername(e.target.value)}
                 placeholder="cth: staff_jetski atau admin"
                 disabled={isSubmitting}
-                style={{
-                  width: '100%',
-                  minHeight: 'var(--touch-target-min)',
-                  padding: '0.75rem 1rem 0.75rem 2.75rem',
-                  background: 'var(--color-bg-surface)',
-                  border: '1px solid var(--color-border)',
-                  borderRadius: 'var(--radius-md)',
-                  color: '#ffffff',
-                  fontSize: '1rem',
-                  outline: 'none',
-                  transition: 'border-color var(--transition-fast)'
-                }}
+                className="form-input"
               />
             </div>
           </div>
@@ -183,18 +165,7 @@ export const LoginView = () => {
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
                 disabled={isSubmitting}
-                style={{
-                  width: '100%',
-                  minHeight: 'var(--touch-target-min)',
-                  padding: '0.75rem 1rem 0.75rem 2.75rem',
-                  background: 'var(--color-bg-surface)',
-                  border: '1px solid var(--color-border)',
-                  borderRadius: 'var(--radius-md)',
-                  color: '#ffffff',
-                  fontSize: '1rem',
-                  outline: 'none',
-                  transition: 'border-color var(--transition-fast)'
-                }}
+                className="form-input"
               />
             </div>
           </div>
@@ -227,7 +198,7 @@ export const LoginView = () => {
               type="button"
               onClick={() => fillQuickDemo('admin', 'admin123')}
               className="badge badge-warning"
-              style={{ cursor: 'pointer', padding: '0.375rem 0.75rem' }}
+              style={{ cursor: 'pointer', padding: '0.375rem 0.75rem', minHeight: '36px' }}
             >
               <ShieldCheck size={14} /> Admin Supervisor
             </button>
@@ -235,7 +206,7 @@ export const LoginView = () => {
               type="button"
               onClick={() => fillQuickDemo('staff_jetski', 'staff123')}
               className="badge badge-success"
-              style={{ cursor: 'pointer', padding: '0.375rem 0.75rem' }}
+              style={{ cursor: 'pointer', padding: '0.375rem 0.75rem', minHeight: '36px' }}
             >
               Staff Jet Ski
             </button>
