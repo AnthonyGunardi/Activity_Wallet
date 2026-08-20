@@ -110,5 +110,57 @@ export const adminApi = {
       method: 'PUT',
       body: JSON.stringify(payload)
     });
+  },
+
+  /**
+   * Retrieves aggregated dashboard KPI metrics.
+   * @returns {Promise<{ success: boolean, data: Object }>}
+   */
+  getDashboardSummary: () => {
+    return apiClient('/api/v1/admin/dashboard/summary', { method: 'GET' });
+  },
+
+  /**
+   * Lists transactions from the immutable audit ledger with filters and pagination.
+   * @param {{
+   *   page?: number,
+   *   limit?: number,
+   *   participant_id?: string,
+   *   activity_id?: string,
+   *   staff_id?: string,
+   *   type?: string,
+   *   start_date?: string,
+   *   end_date?: string,
+   *   search?: string
+   * }} [params={}]
+   * @returns {Promise<{ success: boolean, data: { transactions: Array }, meta: Object }>}
+   */
+  getTransactions: (params = {}) => {
+    const query = new URLSearchParams();
+    if (params.page) query.append('page', params.page);
+    if (params.limit) query.append('limit', params.limit);
+    if (params.participant_id) query.append('participant_id', params.participant_id);
+    if (params.activity_id) query.append('activity_id', params.activity_id);
+    if (params.staff_id) query.append('staff_id', params.staff_id);
+    if (params.type) query.append('type', params.type);
+    if (params.start_date) query.append('start_date', params.start_date);
+    if (params.end_date) query.append('end_date', params.end_date);
+    if (params.search) query.append('search', params.search);
+
+    const queryString = query.toString() ? `?${query.toString()}` : '';
+    return apiClient(`/api/v1/admin/transactions${queryString}`, { method: 'GET' });
+  },
+
+  /**
+   * Processes an authorized atomic refund for a previous deduction transaction.
+   * @param {string} transactionId
+   * @param {{ notes?: string }} [payload={}]
+   * @returns {Promise<{ success: boolean, data: Object }>}
+   */
+  refundTransaction: (transactionId, payload = {}) => {
+    return apiClient(`/api/v1/admin/transactions/${transactionId}/refund`, {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    });
   }
 };
