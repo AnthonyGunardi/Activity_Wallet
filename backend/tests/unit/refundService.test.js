@@ -169,5 +169,37 @@ describe('RefundService Unit Tests', () => {
       expect(deductionOnly.transactions.length).toBe(1);
       expect(deductionOnly.transactions[0].type).toBe(TransactionType.DEDUCTION);
     });
+
+    test('should filter transactions by participant_id, activity_id, staff_id, date range and search', async () => {
+      const filtered = await refundService.listTransactions({
+        participant_id: testParticipant.id,
+        activity_id: testActivity.id,
+        staff_id: adminUser.id,
+        start_date: '2020-01-01',
+        end_date: '2030-12-31',
+        search: 'Dimas'
+      });
+      expect(filtered.transactions.length).toBeGreaterThanOrEqual(1);
+
+      const emptySearch = await refundService.listTransactions({ search: 'NonExistent' });
+      expect(emptySearch.transactions.length).toBe(0);
+    });
+
+    test('should throw 404 PARTICIPANT_NOT_FOUND when participant is missing', async () => {
+      const origFindByPk = Participant.findByPk;
+      jest.spyOn(Participant, 'findByPk').mockResolvedValueOnce(null);
+
+      await expect(
+        refundService.processRefund({
+          transaction_id: deductionTx.id,
+          staff_id: adminUser.id
+        })
+      ).rejects.toMatchObject({
+        statusCode: 404,
+        code: 'PARTICIPANT_NOT_FOUND'
+      });
+
+      Participant.findByPk.mockRestore();
+    });
   });
 });

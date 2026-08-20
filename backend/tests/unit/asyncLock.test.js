@@ -52,4 +52,21 @@ describe('asyncLock Utility Tests', () => {
 
     expect(subsequentTask).toBe('recovered');
   });
+
+  test('should handle multiple queued tasks on the same key', async () => {
+    const results = [];
+    const t1 = withKeyLock('multi-queue', async () => {
+      await new Promise((r) => setTimeout(r, 20));
+      results.push(1);
+    });
+    const t2 = withKeyLock('multi-queue', async () => {
+      results.push(2);
+    });
+    const t3 = withKeyLock('multi-queue', async () => {
+      results.push(3);
+    });
+
+    await Promise.all([t1, t2, t3]);
+    expect(results).toEqual([1, 2, 3]);
+  });
 });

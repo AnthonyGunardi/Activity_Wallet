@@ -216,5 +216,31 @@ describe('ExportService Unit Tests', () => {
       expect(filtered.data).toContain('Ahmad Dahlan');
       expect(filtered.data).toContain('Jet Ski');
     });
+
+    it('handles headers with commas and quotes in buildCsv', () => {
+      const csv = buildCsv(['Col, 1', 'Col "2"'], [['Val 1', 'Val 2']]);
+      expect(csv).toContain('"Col, 1"');
+      expect(csv).toContain('"Col ""2"""');
+    });
+
+    it('defaults sheetName to Report when null or empty in buildXmlSpreadsheet', () => {
+      const xml = buildXmlSpreadsheet(null, ['Col 1'], [['Val 1']]);
+      expect(xml).toContain('<Worksheet ss:Name="Report">');
+    });
+
+    it('handles transactions with null or empty relational fields', async () => {
+      const orphanTx = await Transaction.create({
+        participant_id: participant.id,
+        staff_id: staff.id,
+        type: TransactionType.ADJUSTMENT,
+        amount: 10000,
+        balance_before: 100000,
+        balance_after: 110000
+      });
+
+      const exportRes = await generateTransactionsExport({ format: 'csv' });
+      expect(exportRes.data).toContain(orphanTx.id);
+      expect(exportRes.data).toContain('N/A');
+    });
   });
 });

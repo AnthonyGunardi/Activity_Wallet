@@ -104,11 +104,11 @@ async function scanParticipant(qrCode) {
 async function processDeduction({ qr_code, activity_id, staff_id, notes }) {
   return await withKeyLock(qr_code, async () => {
     return await sequelize.transaction(async (t) => {
-      const isPostgres = sequelize.getDialect() === 'postgres';
+      const isLockSupported = sequelize.getDialect() === 'postgres' || sequelize.getDialect() === 'mysql';
       // 1. Fetch participant with pessimistic update lock
       const participant = await Participant.findOne({
         where: { qr_code },
-        ...(isPostgres ? { lock: t.LOCK.UPDATE } : {}),
+        ...(isLockSupported ? { lock: t.LOCK.UPDATE } : {}),
         transaction: t
       });
 

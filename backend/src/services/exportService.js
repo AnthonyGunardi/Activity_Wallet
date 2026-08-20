@@ -224,6 +224,8 @@ async function generateTransactionsExport({
     ];
   }
 
+  const hasSearch = Boolean(search && search.trim());
+
   const transactions = await Transaction.findAll({
     where,
     include: [
@@ -231,7 +233,8 @@ async function generateTransactionsExport({
         model: Participant,
         as: 'participant',
         attributes: ['id', 'name', 'qr_code'],
-        where: Object.keys(participantWhere).length > 0 ? participantWhere : undefined
+        where: hasSearch ? participantWhere : undefined,
+        required: hasSearch
       },
       {
         model: Activity,

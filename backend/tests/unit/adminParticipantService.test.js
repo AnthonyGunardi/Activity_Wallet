@@ -144,5 +144,60 @@ describe('Admin Participant Service Unit Tests', () => {
       );
       expect(updated.status).toBe(ParticipantStatus.ACTIVE);
     });
+
+    test('should throw 404 when participant ID does not exist', async () => {
+      await expect(
+        adminParticipantService.updateParticipantStatus('00000000-0000-0000-0000-000000000000', ParticipantStatus.ACTIVE)
+      ).rejects.toMatchObject({
+        statusCode: 404,
+        code: 'PARTICIPANT_NOT_FOUND'
+      });
+    });
+  });
+
+  describe('createParticipant branches', () => {
+    test('should create participant with custom initial credit and custom QR code', async () => {
+      const created = await adminParticipantService.createParticipant({
+        name: 'Custom User',
+        initial_credit: 500000,
+        qr_code: 'SEPA-CUSTOM-999'
+      });
+
+      expect(created.initial_credit).toBe(500000);
+      expect(created.current_balance).toBe(500000);
+      expect(created.qr_code).toBe('SEPA-CUSTOM-999');
+    });
+
+    test('should handle while loop when token collision occurs in generateQrToken', async () => {
+      const origFindOne = Participant.findOne;
+      let callCount = 0;
+      jest.spyOn(Participant, 'findOne').mockImplementation(async (opts) => {
+        if (opts?.where?.qr_code && callCount === 0) {
+          callCount++;
+          return { id: 'existing-id' };
+        }
+        return origFindOne.call(Participant, opts);
+      });
+
+      const p = await adminParticipantService.createParticipant({ name: 'Collision Participant' });
+      expect(p).toBeDefined();
+      Participant.findOne.mockRestore();
+    });
+
+    test('should handle while loop in reissueQrCode collision', async () => {
+      const origFindOne = Participant.findOne;
+      let callCount = 0;
+      jest.spyOn(Participant, 'findOne').mockImplementation(async (opts) => {
+        if (opts?.where?.qr_code && opts.where.qr_code.startsWith('SEPA-REISSUE') && callCount === 0) {
+          callCount++;
+          return { id: 'existing-id' };
+        }
+        return origFindOne.call(Participant, opts);
+      });
+
+      const res = await adminParticipantService.reissueQrCode(participant2.id);
+      expect(res.new_qr_code).toBeDefined();
+      Participant.findOne.mockRestore();
+    });
   });
 });

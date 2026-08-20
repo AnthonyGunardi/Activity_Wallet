@@ -57,6 +57,8 @@ async function listTransactions({
     ];
   }
 
+  const hasSearch = Boolean(search && search.trim());
+
   const { rows, count } = await Transaction.findAndCountAll({
     where,
     include: [
@@ -64,7 +66,8 @@ async function listTransactions({
         model: Participant,
         as: 'participant',
         attributes: ['id', 'name', 'qr_code'],
-        where: Object.keys(participantWhere).length > 0 ? participantWhere : undefined
+        where: hasSearch ? participantWhere : undefined,
+        required: hasSearch
       },
       {
         model: Activity,

@@ -178,5 +178,21 @@ describe('AdminActivityService Unit Tests', () => {
         expect(err.code).toBe('ACTIVITY_ALREADY_EXISTS');
       }
     });
+
+    test('should allow update with unchanged name and null description', async () => {
+      const act = await Activity.create({
+        name: 'Keep Name',
+        price: 100000,
+        description: 'Existing Desc'
+      });
+
+      const updated = await adminActivityService.updateActivity(act.id, {
+        name: 'Keep Name',
+        description: ''
+      });
+
+      expect(updated.name).toBe('Keep Name');
+      expect(updated.description).toBeNull();
+    });
   });
 });

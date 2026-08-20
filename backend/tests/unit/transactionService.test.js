@@ -169,6 +169,19 @@ describe('Transaction Service Unit Tests', () => {
       });
     });
 
+    test('should reject deduction with 404 if participant is not found during deduction transaction', async () => {
+      await expect(
+        transactionService.processDeduction({
+          qr_code: 'NON_EXISTENT_QR',
+          activity_id: jetSki.id,
+          staff_id: staffUser.id
+        })
+      ).rejects.toMatchObject({
+        statusCode: 404,
+        code: 'PARTICIPANT_NOT_FOUND'
+      });
+    });
+
     test('should reject deduction with 422 if activity is INACTIVE', async () => {
       await expect(
         transactionService.processDeduction({
@@ -189,6 +202,23 @@ describe('Transaction Service Unit Tests', () => {
       expect(Array.isArray(recent)).toBe(true);
       expect(recent.length).toBeGreaterThanOrEqual(1);
       expect(recent[0].activity_name).toBe('Jet Ski Booth');
+    });
+
+    test('should handle transactions where activity or participant relation is missing', async () => {
+      const orphanTx = await Transaction.create({
+        participant_id: activeParticipant.id,
+        staff_id: staffUser.id,
+        type: TransactionType.ADJUSTMENT,
+        amount: 50000,
+        balance_before: 500000,
+        balance_after: 550000,
+        notes: 'Manual Adjustment'
+      });
+
+      const recent = await transactionService.getRecentStaffTransactions(staffUser.id);
+      const foundOrphan = recent.find((r) => r.id === orphanTx.id);
+      expect(foundOrphan).toBeDefined();
+      expect(foundOrphan.activity_name).toBeNull();
     });
   });
 });
