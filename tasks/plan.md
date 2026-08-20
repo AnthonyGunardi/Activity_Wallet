@@ -53,7 +53,7 @@ graph TD
 ### Slice 0: Foundation & Scaffolding
 
 #### Task 0.1: Backend Project Foundation & Scaffolding
-- **Objective:** Establish the Express.js application skeleton with centralized middleware, standard response envelopes, Winston logging, SQLite/Postgres configuration, and Jest test runner.
+- **Objective:** Establish the Express.js application skeleton with centralized middleware, standard response envelopes, Winston logging, MySQL/Postgres configuration, and Jest test runner.
 - **Dependencies:** None
 - **Likely Files:**
   - `backend/package.json`
@@ -71,7 +71,7 @@ graph TD
   2. Configure Winston logger with JSON formatting and daily rotation in `src/logs/`.
   3. Create standard response envelope helper (`formatSuccess`, `formatError`).
   4. Create Express app with Helmet, CORS, body parsers, rate limiting, and centralized error handler.
-  5. Setup database configuration supporting SQLite for dev/test and PostgreSQL via environment variables.
+  5. Setup database configuration supporting MySQL for dev/prod and PostgreSQL via environment variables.
   6. Add health check route `GET /api/v1/health`.
 - **Acceptance Criteria:**
   - `GET /api/v1/health` returns `{ success: true, data: { status: 'healthy', timestamp: ... } }`.
@@ -142,7 +142,7 @@ graph TD
   6. Setup model associations in `models/index.js`.
   7. Write seed script creating default Admin (`admin`/`admin123`), Staff accounts for booths, standard activities (Jet Ski: Rp350.000, Banana Boat: Rp150.000, Donut Boat: Rp175.000, Snorkeling: Rp200.000), and ~10 sample participants with Rp1.000.000.
 - **Acceptance Criteria:**
-  - All models sync successfully with SQLite and PostgreSQL schemas.
+  - All models sync successfully with MySQL and PostgreSQL schemas.
   - Seeder populates initial data idempotently.
   - Foreign key constraints and unique indexes (`qr_code`, `username`) are enforced.
 - **Required Tests:**

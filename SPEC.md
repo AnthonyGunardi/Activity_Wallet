@@ -40,7 +40,7 @@ Sepa Island Activity Wallet is a digital activity credit management system desig
 ### 2.1 Backend Stack
 - **Runtime:** Node.js (v18+ LTS / v20 LTS)
 - **Framework:** Express.js (v4.x)
-- **ORM / Persistence:** Sequelize ORM (v6.x) with SQLite (local/dev/testing) and support for PostgreSQL
+- **ORM / Persistence:** Sequelize ORM (v6.x) with MySQL (local/dev/production) and support for PostgreSQL
 - **Input Validation:** Joi or Zod validation schemas
 - **Logging:** Winston (JSON format, daily rotation to `/src/logs/`)
 - **Authentication & Security:** JWT for Staff/Admin auth; Helmet, CORS, Rate Limiter
