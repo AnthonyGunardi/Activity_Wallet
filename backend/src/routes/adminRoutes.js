@@ -2,6 +2,7 @@ const express = require('express');
 const adminParticipantController = require('../controllers/adminParticipantController');
 const adminActivityController = require('../controllers/adminActivityController');
 const adminTransactionController = require('../controllers/adminTransactionController');
+const exportController = require('../controllers/exportController');
 const { requireAuth, requireRole } = require('../middleware/authMiddleware');
 const { validateBody, validateQuery } = require('../middleware/validate');
 const {
@@ -19,6 +20,10 @@ const {
   listTransactionsQuerySchema,
   processRefundSchema
 } = require('../schemas/refundSchemas');
+const {
+  exportParticipantsQuerySchema,
+  exportTransactionsQuerySchema
+} = require('../schemas/exportSchemas');
 const { UserRole } = require('../constants/enums');
 
 const router = express.Router();
@@ -132,6 +137,26 @@ router.post(
   '/transactions/:id/refund',
   validateBody(processRefundSchema),
   adminTransactionController.refund
+);
+
+/**
+ * @route GET /api/v1/admin/reports/participants/export
+ * @desc Export participant balances report (CSV / Excel)
+ */
+router.get(
+  '/reports/participants/export',
+  validateQuery(exportParticipantsQuerySchema),
+  exportController.exportParticipants
+);
+
+/**
+ * @route GET /api/v1/admin/reports/transactions/export
+ * @desc Export transaction audit ledger report (CSV / Excel)
+ */
+router.get(
+  '/reports/transactions/export',
+  validateQuery(exportTransactionsQuerySchema),
+  exportController.exportTransactions
 );
 
 module.exports = router;

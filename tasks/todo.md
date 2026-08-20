@@ -22,7 +22,7 @@
   - [x] Task 7.2: Frontend Admin Dashboard & Transaction Audit Ledger UI
 
 - [ ] **Checkpoint D: System Ready & Hardened**
-  - [ ] Task 8.1: Backend Report Generation & CSV/Excel Export API
+  - [x] Task 8.1: Backend Report Generation & CSV/Excel Export API
   - [ ] Task 8.2: Frontend PWA Manifest, Service Worker & Island Offline Shell
   - [ ] Task 9.1: Comprehensive Test Suite & Quality Gate Verification
   - [ ] Task 9.2: Documentation, Operational Runbook & Seed Verification
