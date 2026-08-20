@@ -162,5 +162,11 @@ export const adminApi = {
       method: 'POST',
       body: JSON.stringify(payload)
     });
-  }
+  },
+
+  /**
+   * Export endpoints paths
+   */
+  getParticipantsExportUrl: (format = 'csv') => `/api/v1/admin/reports/participants/export?format=${format}`,
+  getTransactionsExportUrl: (format = 'csv') => `/api/v1/admin/reports/transactions/export?format=${format}`
 };

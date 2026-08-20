@@ -4,6 +4,7 @@ import { SummaryMetricCard } from '../../components/admin/SummaryMetricCard';
 import { TransactionAuditTable } from '../../components/admin/TransactionAuditTable';
 import { RefundModal } from '../../components/admin/RefundModal';
 import { AdminNavTabs } from '../../components/admin/AdminNavTabs';
+import { ExportToolbar } from '../../components/admin/ExportToolbar';
 import { useToast } from '../../hooks/useToast';
 import { formatCurrency } from '../../utils/formatters';
 import {
@@ -11,8 +12,6 @@ import {
   TrendingDown,
   Coins,
   Users,
-  Receipt,
-  Waves,
   RefreshCw,
   Search,
   ChevronLeft,
@@ -149,6 +148,9 @@ export function AdminDashboardView() {
           bgColor="rgba(139, 92, 246, 0.1)"
         />
       </div>
+
+      {/* Export Reports Toolbar */}
+      <ExportToolbar />
 
       {/* Audit Ledger Section */}
       <div style={{ marginBottom: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: '0.75rem' }}>

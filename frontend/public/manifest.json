@@ -1,0 +1,31 @@
+{
+  "short_name": "Activity Wallet",
+  "name": "Sepa Island Activity Wallet",
+  "description": "Digital Activity Credit Management & Wallet System for Sepa Island Water Sports",
+  "icons": [
+    {
+      "src": "/icon-192.svg",
+      "type": "image/svg+xml",
+      "sizes": "192x192",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.svg",
+      "type": "image/svg+xml",
+      "sizes": "512x512",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/favicon.svg",
+      "type": "image/svg+xml",
+      "sizes": "48x48 72x72 96x96",
+      "purpose": "any"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#0f172a",
+  "theme_color": "#0284c7",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "scope": "/"
+}

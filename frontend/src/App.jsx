@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
 import { ToastProvider } from './context/ToastContext';
 import { AuthProvider } from './context/AuthContext';
 import { Header } from './components/common/Header';
+import { OfflineBanner } from './components/common/OfflineBanner';
 import { ProtectedRoute } from './components/common/ProtectedRoute';
 import { LoginView } from './pages/LoginView';
 import { ParticipantView } from './pages/ParticipantView';
@@ -159,6 +160,7 @@ export default function App() {
   return (
     <ToastProvider>
       <AuthProvider>
+        <OfflineBanner />
         <BrowserRouter>
           <Header />
           <main style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
