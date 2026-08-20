@@ -74,7 +74,8 @@ describe('Participant Service Unit Tests', () => {
       amount: 150000,
       balance_before: 1000000,
       balance_after: 850000,
-      notes: 'Pembayaran Banana Boat'
+      notes: 'Pembayaran Banana Boat',
+      created_at: new Date(Date.now() - 10000)
     });
 
     await Transaction.create({
@@ -85,7 +86,8 @@ describe('Participant Service Unit Tests', () => {
       amount: 100000,
       balance_before: 850000,
       balance_after: 750000,
-      notes: 'Sewa Handuk & Loker'
+      notes: 'Sewa Handuk & Loker',
+      created_at: new Date()
     });
   });
 
