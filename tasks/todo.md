@@ -17,7 +17,7 @@
   - [x] Task 5.1: Backend Admin Participant Management & QR Reissuance API
   - [x] Task 5.2: Frontend Admin Participant Manager & QR Reissuance UI
   - [x] Task 6.1: Backend Admin Activity CRUD API
-  - [ ] Task 6.2: Frontend Admin Activity Manager UI
+  - [x] Task 6.2: Frontend Admin Activity Manager UI
   - [ ] Task 7.1: Backend Admin Metrics, Audit Ledger & Refund Engine
   - [ ] Task 7.2: Frontend Admin Dashboard & Transaction Audit Ledger UI
 

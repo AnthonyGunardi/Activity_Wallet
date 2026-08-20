@@ -7,6 +7,7 @@ import { LoginView } from './pages/LoginView';
 import { ParticipantView } from './pages/ParticipantView';
 import { BoothView } from './pages/BoothView';
 import { ParticipantManagerView } from './pages/admin/ParticipantManagerView';
+import { ActivityManagerView } from './pages/admin/ActivityManagerView';
 import { Wallet, QrCode, ShieldCheck, Waves } from 'lucide-react';
 
 const HomeView = () => {
@@ -186,6 +187,14 @@ export default function App() {
                 element={
                   <ProtectedRoute allowedRoles={['ADMIN']}>
                     <ParticipantManagerView />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/admin/activities"
+                element={
+                  <ProtectedRoute allowedRoles={['ADMIN']}>
+                    <ActivityManagerView />
                   </ProtectedRoute>
                 }
               />

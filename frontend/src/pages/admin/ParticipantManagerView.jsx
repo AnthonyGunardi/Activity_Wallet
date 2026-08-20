@@ -4,6 +4,7 @@ import { ParticipantTable } from '../../components/admin/ParticipantTable';
 import { ParticipantModal } from '../../components/admin/ParticipantModal';
 import { BulkImportModal } from '../../components/admin/BulkImportModal';
 import { ReissueQRModal } from '../../components/admin/ReissueQRModal';
+import { AdminNavTabs } from '../../components/admin/AdminNavTabs';
 import { useToast } from '../../hooks/useToast';
 import { Users, UserPlus, Upload, Search, ChevronLeft, ChevronRight, RefreshCw } from 'lucide-react';
 
@@ -129,6 +130,9 @@ export function ParticipantManagerView() {
           </button>
         </div>
       </div>
+
+      {/* Admin Module Tabs */}
+      <AdminNavTabs />
 
       {/* Filter and Search Bar */}
       <div

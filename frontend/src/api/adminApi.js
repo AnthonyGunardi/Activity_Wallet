@@ -63,5 +63,52 @@ export const adminApi = {
       method: 'PUT',
       body: JSON.stringify({ status })
     });
+  },
+
+  /**
+   * Lists all activities, optionally filtered by status.
+   * @param {{ status?: string }} [params={}]
+   * @returns {Promise<{ success: boolean, data: { activities: Array } }>}
+   */
+  getActivities: (params = {}) => {
+    const query = new URLSearchParams();
+    if (params.status) query.append('status', params.status);
+
+    const queryString = query.toString() ? `?${query.toString()}` : '';
+    return apiClient(`/api/v1/admin/activities${queryString}`, { method: 'GET' });
+  },
+
+  /**
+   * Retrieves single activity details by ID.
+   * @param {string} activityId
+   * @returns {Promise<Object>}
+   */
+  getActivityById: (activityId) => {
+    return apiClient(`/api/v1/admin/activities/${activityId}`, { method: 'GET' });
+  },
+
+  /**
+   * Creates a new water sport activity.
+   * @param {{ name: string, price: number, description?: string, status?: string }} payload
+   * @returns {Promise<Object>}
+   */
+  createActivity: (payload) => {
+    return apiClient('/api/v1/admin/activities', {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    });
+  },
+
+  /**
+   * Updates an existing activity.
+   * @param {string} activityId
+   * @param {{ name?: string, price?: number, description?: string, status?: string }} payload
+   * @returns {Promise<Object>}
+   */
+  updateActivity: (activityId, payload) => {
+    return apiClient(`/api/v1/admin/activities/${activityId}`, {
+      method: 'PUT',
+      body: JSON.stringify(payload)
+    });
   }
 };
