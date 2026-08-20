@@ -1,6 +1,7 @@
 const express = require('express');
 const adminParticipantController = require('../controllers/adminParticipantController');
 const adminActivityController = require('../controllers/adminActivityController');
+const adminTransactionController = require('../controllers/adminTransactionController');
 const { requireAuth, requireRole } = require('../middleware/authMiddleware');
 const { validateBody, validateQuery } = require('../middleware/validate');
 const {
@@ -14,12 +15,22 @@ const {
   createActivitySchema,
   updateActivitySchema
 } = require('../schemas/activitySchemas');
+const {
+  listTransactionsQuerySchema,
+  processRefundSchema
+} = require('../schemas/refundSchemas');
 const { UserRole } = require('../constants/enums');
 
 const router = express.Router();
 
 // Enforce Admin role for all routes under /api/v1/admin
 router.use(requireAuth, requireRole(UserRole.ADMIN));
+
+/**
+ * @route GET /api/v1/admin/dashboard/summary
+ * @desc Retrieve executive KPI summary metrics
+ */
+router.get('/dashboard/summary', adminTransactionController.getSummary);
 
 /**
  * @route GET /api/v1/admin/participants
@@ -101,6 +112,26 @@ router.put(
   '/activities/:id',
   validateBody(updateActivitySchema),
   adminActivityController.update
+);
+
+/**
+ * @route GET /api/v1/admin/transactions
+ * @desc List immutable transaction audit ledger with filters and pagination
+ */
+router.get(
+  '/transactions',
+  validateQuery(listTransactionsQuerySchema),
+  adminTransactionController.list
+);
+
+/**
+ * @route POST /api/v1/admin/transactions/:id/refund
+ * @desc Process an authorized atomic refund for a previous deduction
+ */
+router.post(
+  '/transactions/:id/refund',
+  validateBody(processRefundSchema),
+  adminTransactionController.refund
 );
 
 module.exports = router;
