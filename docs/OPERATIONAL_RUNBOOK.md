@@ -87,10 +87,10 @@ This runbook serves as the definitive day-of-event operational manual for **Even
 *Staff accidentally tapped Jet Ski (Rp 350.000) instead of Banana Boat (Rp 150.000).*
 
 1. Staff notifies Supervisor via radio / intercom with Participant Name and approximate time.
-2. Supervisor opens **Transaction Audit Ledger** (`/admin/transactions`).
+2. Supervisor opens **Transaction Audit Ledger** on the Admin Dashboard (`/admin`).
 3. Filter by Participant Name or Booth.
 4. Locate the accidental `DEDUCTION` entry and click **Refund (Proses Refund)**.
-5. Enter reason (e.g., "Salah pilih wahana oleh booth staff") and confirm.
+5. Enter reason (e.g., "Salah pilih aktivitas oleh booth staff") and confirm.
 6. System atomically restores Rp 350.000 to participant balance and writes an immutable `REFUND` record referencing the original transaction ID.
 7. Staff at booth refreshes and processes the correct deduction (Banana Boat: Rp 150.000).
 

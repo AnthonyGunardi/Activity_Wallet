@@ -50,7 +50,7 @@ Sepa Island Activity Wallet is a digital activity credit management system desig
 - **Framework:** React 18+ (Vite)
 - **Architecture:** Single-Page App / Progressive Web App (PWA with manifest and offline caching shell)
 - **Styling:** Vanilla CSS / Modern CSS Variables (High-contrast outdoor theme, glassmorphic accents)
-- **QR Utilities:** `html5-qrcode` (or `@zxing/library`) for scanning; `qrcode.react` for rendering
+- **QR Utilities & Excel:** `html5-qrcode` (or `@zxing/library`) for scanning; `qrcode.react` for rendering; `xlsx` (SheetJS) for client-side spreadsheet import & template generation
 - **State Management & Data Fetching:** Custom Hooks + React Context for global auth/session state
 - **Testing:** Vitest + React Testing Library
 
@@ -242,14 +242,21 @@ All REST API endpoints adhere to the project envelope format:
 - `GET /api/v1/admin/dashboard/summary`
   - Overview metrics: Total participants, total credit allocated, total credit used, total transactions, active booths.
 - `GET /api/v1/admin/participants` (with pagination, search, status filter)
-- `GET /api/v1/admin/participants/:id` (Retrieve participant profile, wallet status, and history)
-- `POST /api/v1/admin/participants` (Single create)
-- `POST /api/v1/admin/participants/bulk` (Bulk batch import via Excel .xlsx upload / JSON array)
-- `PUT /api/v1/admin/participants/:id` (Update participant name/details)
-- `DELETE /api/v1/admin/participants/:id` (Delete participant without transactions; reject with 422 if transactions exist)
+- `GET /api/v1/admin/participants/:id`
+  - Retrieve participant profile, wallet status, and full transaction history.
+- `POST /api/v1/admin/participants`
+  - Body: `{ name, initial_credit?, qr_code? }`
+- `POST /api/v1/admin/participants/bulk`
+  - Body: `{ participants: [ { name, initial_credit?, qr_code? } ] }` (parsed from Excel .xlsx or direct JSON)
+- `PUT /api/v1/admin/participants/:id`
+  - Body: `{ name?: string, status?: 'ACTIVE' | 'BLOCKED' }` (minimum 1 field required)
+- `DELETE /api/v1/admin/participants/:id`
+  - Deletes participant if no transactions exist in the ledger. Rejects with HTTP 422 `CANNOT_DELETE_PARTICIPANT_WITH_TRANSACTIONS` if transaction history exists.
+  - Response: `{ success: true, data: { deleted: true, id } }`
 - `PUT /api/v1/admin/participants/:id/reissue-qr`
   - Generates new QR token, invalidates old token, retains balance & history.
 - `PUT /api/v1/admin/participants/:id/status`
+  - Body: `{ status: 'ACTIVE' | 'BLOCKED' }`
   - Block or unblock participant.
 - `GET /api/v1/admin/activities`
 - `POST /api/v1/admin/activities`
