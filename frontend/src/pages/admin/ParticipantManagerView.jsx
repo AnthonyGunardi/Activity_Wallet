@@ -2,11 +2,13 @@ import { useState } from 'react';
 import { useAdminParticipants } from '../../hooks/useAdminParticipants';
 import { ParticipantTable } from '../../components/admin/ParticipantTable';
 import { ParticipantModal } from '../../components/admin/ParticipantModal';
+import { ParticipantDetailModal } from '../../components/admin/ParticipantDetailModal';
+import { DeleteConfirmModal } from '../../components/admin/DeleteConfirmModal';
 import { BulkImportModal } from '../../components/admin/BulkImportModal';
 import { ReissueQRModal } from '../../components/admin/ReissueQRModal';
 import { AdminNavTabs } from '../../components/admin/AdminNavTabs';
 import { useToast } from '../../hooks/useToast';
-import { Users, UserPlus, Upload, Search, ChevronLeft, ChevronRight, RefreshCw } from 'lucide-react';
+import { Users, UserPlus, FileSpreadsheet, Search, ChevronLeft, ChevronRight, RefreshCw } from 'lucide-react';
 
 export function ParticipantManagerView() {
   const {
@@ -20,6 +22,9 @@ export function ParticipantManagerView() {
     fetchParticipants,
     handleCreate,
     handleBulkCreate,
+    handleUpdate,
+    handleDelete,
+    handleGetDetail,
     handleReissueQr,
     handleToggleStatus
   } = useAdminParticipants();
@@ -29,6 +34,9 @@ export function ParticipantManagerView() {
   // Modals state
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isBulkModalOpen, setIsBulkModalOpen] = useState(false);
+  const [selectedParticipantForEdit, setSelectedParticipantForEdit] = useState(null);
+  const [selectedParticipantForDetail, setSelectedParticipantForDetail] = useState(null);
+  const [selectedParticipantForDelete, setSelectedParticipantForDelete] = useState(null);
   const [selectedParticipantForReissue, setSelectedParticipantForReissue] = useState(null);
   const [reissueResult, setReissueResult] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -41,6 +49,33 @@ export function ParticipantManagerView() {
       setIsAddModalOpen(false);
     } catch (err) {
       toast.showError(err.message || 'Gagal menambahkan peserta.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const onEditSubmit = async (payload) => {
+    if (!selectedParticipantForEdit) return;
+    setIsSubmitting(true);
+    try {
+      await handleUpdate(selectedParticipantForEdit.id, payload);
+      toast.showSuccess(`Data peserta ${payload.name || selectedParticipantForEdit.name} berhasil diperbarui.`);
+      setSelectedParticipantForEdit(null);
+    } catch (err) {
+      toast.showError(err.message || 'Gagal memperbarui data peserta.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const onDeleteConfirm = async (participantId) => {
+    setIsSubmitting(true);
+    try {
+      await handleDelete(participantId);
+      toast.showSuccess('Data peserta berhasil dihapus.');
+      setSelectedParticipantForDelete(null);
+    } catch (err) {
+      toast.showError(err.message || 'Gagal menghapus peserta.');
     } finally {
       setIsSubmitting(false);
     }
@@ -64,7 +99,7 @@ export function ParticipantManagerView() {
     try {
       const result = await handleReissueQr(participantId);
       setReissueResult(result);
-      toast.showSuccess(`QR Token berhasil diperbarui menjadi ${result.new_qr_code}.`);
+      toast.showSuccess(`Kode QR berhasil diperbarui menjadi ${result.new_qr_code}.`);
     } catch (err) {
       toast.showError(err.message || 'Gagal mereissue QR peserta.');
     } finally {
@@ -100,14 +135,14 @@ export function ParticipantManagerView() {
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', color: 'var(--color-primary-600)' }}>
             <Users size={24} />
             <span style={{ fontSize: '0.8125rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-              Admin Supervisor
+              Activity Admin
             </span>
           </div>
           <h1 style={{ margin: '0.25rem 0 0 0', fontSize: '1.75rem', fontWeight: 800, color: 'var(--color-text-main)' }}>
-            Manajemen Peserta & Gelang
+            Manajemen Peserta & QR
           </h1>
           <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.875rem', color: 'var(--color-text-muted)' }}>
-            Kelola saldo peserta, registrasi single/batch, dan reissue wristband QR yang hilang.
+            Kelola data peserta, kredit aktivitas, status QR, dan riwayat transaksi.
           </p>
         </div>
 
@@ -118,7 +153,7 @@ export function ParticipantManagerView() {
             onClick={() => setIsBulkModalOpen(true)}
             style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.875rem' }}
           >
-            <Upload size={16} /> Import Bulk (CSV)
+            <FileSpreadsheet size={16} /> Impor Data Peserta (Excel)
           </button>
           <button
             type="button"
@@ -164,7 +199,7 @@ export function ParticipantManagerView() {
           <input
             type="text"
             className="form-input"
-            placeholder="Cari berdasarkan nama atau kode QR..."
+            placeholder="Cari berdasarkan nama atau kode peserta"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             style={{ paddingLeft: '2.5rem', fontSize: '0.875rem' }}
@@ -205,6 +240,9 @@ export function ParticipantManagerView() {
       ) : (
         <ParticipantTable
           participants={participants}
+          onViewDetail={(p) => setSelectedParticipantForDetail(p)}
+          onEdit={(p) => setSelectedParticipantForEdit(p)}
+          onDelete={(p) => setSelectedParticipantForDelete(p)}
           onReissue={(p) => {
             setSelectedParticipantForReissue(p);
             setReissueResult(null);
@@ -252,7 +290,7 @@ export function ParticipantManagerView() {
         </div>
       )}
 
-      {/* Modal Dialogs */}
+      {/* Modal: Tambah Peserta Baru */}
       <ParticipantModal
         isOpen={isAddModalOpen}
         isSubmitting={isSubmitting}
@@ -260,6 +298,33 @@ export function ParticipantManagerView() {
         onClose={() => setIsAddModalOpen(false)}
       />
 
+      {/* Modal: Edit Data Peserta */}
+      <ParticipantModal
+        isOpen={Boolean(selectedParticipantForEdit)}
+        isSubmitting={isSubmitting}
+        participant={selectedParticipantForEdit}
+        onSubmit={onEditSubmit}
+        onClose={() => setSelectedParticipantForEdit(null)}
+      />
+
+      {/* Modal: Detail Peserta & Riwayat Transaksi */}
+      <ParticipantDetailModal
+        isOpen={Boolean(selectedParticipantForDetail)}
+        participantId={selectedParticipantForDetail?.id}
+        fetchDetail={handleGetDetail}
+        onClose={() => setSelectedParticipantForDetail(null)}
+      />
+
+      {/* Modal: Konfirmasi Hapus */}
+      <DeleteConfirmModal
+        isOpen={Boolean(selectedParticipantForDelete)}
+        participant={selectedParticipantForDelete}
+        isSubmitting={isSubmitting}
+        onConfirm={onDeleteConfirm}
+        onClose={() => setSelectedParticipantForDelete(null)}
+      />
+
+      {/* Modal: Bulk Import */}
       <BulkImportModal
         isOpen={isBulkModalOpen}
         isSubmitting={isSubmitting}
@@ -267,6 +332,7 @@ export function ParticipantManagerView() {
         onClose={() => setIsBulkModalOpen(false)}
       />
 
+      {/* Modal: Reissue QR */}
       <ReissueQRModal
         isOpen={Boolean(selectedParticipantForReissue)}
         participant={selectedParticipantForReissue}

@@ -26,3 +26,9 @@
   - [x] Task 8.2: Frontend PWA Manifest, Service Worker & Island Offline Shell
   - [x] Task 9.1: Comprehensive Test Suite & Quality Gate Verification
   - [x] Task 9.2: Documentation, Operational Runbook & Seed Verification
+
+- [x] **Checkpoint E: Excel Participant Import**
+  - [x] Task 10.1: Install xlsx & Build Excel Helper Utility
+  - [x] Task 10.2: Upgrade BulkImportModal to Excel Upload, Preview Table & Template Download
+  - [x] Task 10.3: Update ParticipantManagerView Header & End-to-End Tests
+

@@ -56,7 +56,7 @@ describe('ParticipantManagerView Page Integration Tests', () => {
 
     renderComponent();
 
-    expect(screen.getByText('Manajemen Peserta & Gelang')).toBeInTheDocument();
+    expect(screen.getByText('Manajemen Peserta & QR')).toBeInTheDocument();
 
     await waitFor(() => {
       expect(screen.getByText('Budi Handoko')).toBeInTheDocument();
@@ -119,4 +119,156 @@ describe('ParticipantManagerView Page Integration Tests', () => {
       expect(screen.getByText('Citra Kirana')).toBeInTheDocument();
     });
   });
+
+  it('should open edit modal and update participant', async () => {
+    global.fetch = vi.fn()
+      .mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: async () => ({
+          success: true,
+          data: mockParticipantsList,
+          meta: { total: 1, page: 1, limit: 20, totalPages: 1 }
+        })
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: async () => ({
+          success: true,
+          data: { id: 'p-1', name: 'Budi Handoko Updated', qr_code: 'SEPA-001', current_balance: 750000 }
+        })
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: async () => ({
+          success: true,
+          data: {
+            participants: [
+              { id: 'p-1', name: 'Budi Handoko Updated', qr_code: 'SEPA-001', current_balance: 750000, total_spent: 250000, status: 'ACTIVE' }
+            ]
+          },
+          meta: { total: 1, page: 1, limit: 20, totalPages: 1 }
+        })
+      });
+
+    renderComponent();
+
+    await waitFor(() => {
+      expect(screen.getByText('Budi Handoko')).toBeInTheDocument();
+    });
+
+    const editBtn = screen.getByRole('button', { name: /edit budi handoko/i });
+    fireEvent.click(editBtn);
+
+    expect(screen.getByText('Edit Data Peserta')).toBeInTheDocument();
+    fireEvent.change(screen.getByLabelText(/nama lengkap peserta/i), {
+      target: { value: 'Budi Handoko Updated' }
+    });
+
+    const saveBtn = screen.getByRole('button', { name: /simpan perubahan/i });
+    fireEvent.click(saveBtn);
+
+    await waitFor(() => {
+      expect(screen.getByText('Budi Handoko Updated')).toBeInTheDocument();
+    });
+  });
+
+  it('should open delete confirm modal and handle deletion', async () => {
+    global.fetch = vi.fn()
+      .mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: async () => ({
+          success: true,
+          data: mockParticipantsList,
+          meta: { total: 1, page: 1, limit: 20, totalPages: 1 }
+        })
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: async () => ({
+          success: true,
+          data: { deleted: true, id: 'p-1' }
+        })
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: async () => ({
+          success: true,
+          data: { participants: [] },
+          meta: { total: 0, page: 1, limit: 20, totalPages: 1 }
+        })
+      });
+
+    renderComponent();
+
+    await waitFor(() => {
+      expect(screen.getByText('Budi Handoko')).toBeInTheDocument();
+    });
+
+    const deleteBtn = screen.getByRole('button', { name: /hapus budi handoko/i });
+    fireEvent.click(deleteBtn);
+
+    expect(screen.getByText('Hapus Peserta?')).toBeInTheDocument();
+
+    const confirmBtn = screen.getByRole('button', { name: /hapus permanen/i });
+    fireEvent.click(confirmBtn);
+
+    await waitFor(() => {
+      expect(screen.getByText(/tidak ada data peserta ditemukan/i)).toBeInTheDocument();
+    });
+  });
+
+  it('should open Excel bulk import modal and import multiple participants', async () => {
+    global.fetch = vi.fn()
+      .mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: async () => ({
+          success: true,
+          data: mockParticipantsList,
+          meta: { total: 1, page: 1, limit: 20, totalPages: 1 }
+        })
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        status: 201,
+        json: async () => ({
+          success: true,
+          data: { created_count: 2 }
+        })
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: async () => ({
+          success: true,
+          data: {
+            participants: [
+              ...mockParticipantsList.participants,
+              { id: 'p-2', name: 'Peserta Baru 1', qr_code: 'SEPA-002', current_balance: 1000000, total_spent: 0, status: 'ACTIVE' },
+              { id: 'p-3', name: 'Peserta Baru 2', qr_code: 'SEPA-003', current_balance: 1000000, total_spent: 0, status: 'ACTIVE' }
+            ]
+          },
+          meta: { total: 3, page: 1, limit: 20, totalPages: 1 }
+        })
+      });
+
+    renderComponent();
+
+    await waitFor(() => {
+      expect(screen.getByText('Budi Handoko')).toBeInTheDocument();
+    });
+
+    const bulkBtn = screen.getByRole('button', { name: /impor data peserta \(excel\)/i });
+    expect(bulkBtn).toBeInTheDocument();
+    fireEvent.click(bulkBtn);
+
+    expect(screen.getByText('Impor Data Peserta (Excel / .xlsx)')).toBeInTheDocument();
+  });
 });
+

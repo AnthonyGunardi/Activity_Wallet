@@ -242,7 +242,11 @@ All REST API endpoints adhere to the project envelope format:
 - `GET /api/v1/admin/dashboard/summary`
   - Overview metrics: Total participants, total credit allocated, total credit used, total transactions, active booths.
 - `GET /api/v1/admin/participants` (with pagination, search, status filter)
-- `POST /api/v1/admin/participants` (Single create or bulk import)
+- `GET /api/v1/admin/participants/:id` (Retrieve participant profile, wallet status, and history)
+- `POST /api/v1/admin/participants` (Single create)
+- `POST /api/v1/admin/participants/bulk` (Bulk batch import via Excel .xlsx upload / JSON array)
+- `PUT /api/v1/admin/participants/:id` (Update participant name/details)
+- `DELETE /api/v1/admin/participants/:id` (Delete participant without transactions; reject with 422 if transactions exist)
 - `PUT /api/v1/admin/participants/:id/reissue-qr`
   - Generates new QR token, invalidates old token, retains balance & history.
 - `PUT /api/v1/admin/participants/:id/status`
@@ -341,6 +345,7 @@ All REST API endpoints adhere to the project envelope format:
 | **Booth** | Deduction | Deducts exact activity price, updates balance atomically, creates immutable tx record. | Concurrency & Integration test |
 | **Booth** | Insufficient Balance | Rejects deduction if price > balance with clear visual alert. | Integration test (HTTP 422) |
 | **Admin** | Dashboard | Real-time totals of allocated credit, spent credit, activity counts, and full transaction feed. | Integration & Dashboard test |
+| **Admin** | Participant CRUD | Full lifecycle management (Create, Read/Search, Update details, Safe Delete without tx, Reissue QR, Block/Unblock). | Unit, Integration & UI test |
 | **Admin** | QR Reissue | Generates new QR token; old QR immediately returns invalid; balance preserved. | Integration test |
 | **Admin** | Refund | Admin can refund a specific transaction; creates linked `REFUND` tx; balance restored. | Integration test & ledger check |
 | **Admin** | Export | Exports full participant balances and transactions to CSV/Excel matching DB ledger. | Unit & Integration test |
