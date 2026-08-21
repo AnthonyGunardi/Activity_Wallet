@@ -7,15 +7,16 @@ import { ActivityCatalog } from '../components/participant/ActivityCatalog';
 import { TransactionList } from '../components/participant/TransactionList';
 import { Wallet, RefreshCw, ArrowLeft, Search, AlertCircle } from 'lucide-react';
 import { useToast } from '../hooks/useToast';
+import { useAuth } from '../hooks/useAuth';
 
 export function ParticipantView() {
   const { qrCode: routeQrCode } = useParams();
   const navigate = useNavigate();
   const toast = useToast();
+  const { isAdmin } = useAuth();
 
   const [inputToken, setInputToken] = useState('');
-  const savedToken = localStorage.getItem('sepa_participant_token') || '';
-  const effectiveInitialToken = routeQrCode || savedToken;
+  const effectiveInitialToken = routeQrCode || '';
 
   const {
     wallet,
@@ -27,8 +28,12 @@ export function ParticipantView() {
   } = useParticipantWallet(effectiveInitialToken);
 
   useEffect(() => {
-    if (routeQrCode && routeQrCode !== qrCode) {
-      setQrCode(routeQrCode);
+    if (routeQrCode) {
+      if (routeQrCode !== qrCode) {
+        setQrCode(routeQrCode);
+      }
+    } else if (qrCode) {
+      setQrCode('');
     }
   }, [routeQrCode, qrCode, setQrCode]);
 
@@ -49,7 +54,6 @@ export function ParticipantView() {
   };
 
   const handleClearParticipant = () => {
-    localStorage.removeItem('sepa_participant_token');
     setQrCode('');
     navigate('/participant');
   };
@@ -88,7 +92,7 @@ export function ParticipantView() {
             Buka Dompet Peserta
           </h1>
           <p style={{ color: 'var(--color-text-muted)', fontSize: '0.9375rem', marginTop: '0.5rem' }}>
-            Masukkan kode token yang tertera pada gelang QR atau gunakan demo token di bawah.
+            Masukkan kode token dari QR peserta atau gunakan demo token di bawah.
           </p>
         </div>
 
@@ -96,7 +100,7 @@ export function ParticipantView() {
           <form onSubmit={handleLookupSubmit}>
             <div className="form-group" style={{ marginBottom: '1.25rem' }}>
               <label htmlFor="tokenInput" className="form-label" style={{ fontWeight: 600 }}>
-                Kode QR Token Gelang
+                Kode Peserta
               </label>
               <div style={{ position: 'relative' }}>
                 <input
@@ -128,13 +132,13 @@ export function ParticipantView() {
             </div>
 
             <button type="submit" className="btn btn-primary" style={{ width: '100%', padding: '0.75rem' }}>
-              Periksa Saldo & Aktivitas
+              Lihat Saldo & Aktivitas →
             </button>
           </form>
 
           <div style={{ marginTop: '1.5rem', paddingTop: '1.25rem', borderTop: '1px solid var(--color-border)' }}>
             <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', fontWeight: 600, textTransform: 'uppercase', marginBottom: '0.75rem' }}>
-              ⚡ Coba Demo Token Peserta:
+              Coba Demo Token Peserta:
             </div>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
               {['SEPA-001', 'SEPA-002', 'SEPA-003', 'SEPA-004'].map((token) => (
@@ -161,20 +165,22 @@ export function ParticipantView() {
       <div
         style={{
           display: 'flex',
-          justifyContent: 'space-between',
+          justifyContent: isAdmin ? 'space-between' : 'flex-end',
           alignItems: 'center',
           marginBottom: '1.25rem',
           gap: '0.5rem'
         }}
       >
-        <button
-          type="button"
-          className="btn btn-ghost"
-          onClick={handleClearParticipant}
-          style={{ display: 'inline-flex', alignItems: 'center', gap: '0.375rem', padding: '0.375rem 0.625rem', fontSize: '0.875rem' }}
-        >
-          <ArrowLeft size={16} /> Ganti Peserta
-        </button>
+        {isAdmin && (
+          <button
+            type="button"
+            className="btn btn-ghost"
+            onClick={handleClearParticipant}
+            style={{ display: 'inline-flex', alignItems: 'center', gap: '0.375rem', padding: '0.375rem 0.625rem', fontSize: '0.875rem' }}
+          >
+            <ArrowLeft size={16} /> Ganti Peserta
+          </button>
+        )}
 
         <button
           type="button"

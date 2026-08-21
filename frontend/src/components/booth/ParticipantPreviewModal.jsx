@@ -140,7 +140,7 @@ export function ParticipantPreviewModal({
         {/* Activity Selection List */}
         <div style={{ padding: '1.25rem 1.5rem', overflowY: 'auto', flex: 1 }}>
           <div style={{ fontSize: '0.875rem', fontWeight: 700, marginBottom: '0.75rem', color: 'var(--color-text-main)' }}>
-            Pilih Wahana / Aktivitas untuk Dipotong:
+            Pilih Aktivitas untuk Dipotong:
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.625rem' }}>

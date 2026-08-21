@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Users, Waves, ReceiptText } from 'lucide-react';
+import { LayoutDashboard, Users, Waves } from 'lucide-react';
 
 /**
  * AdminNavTabs Component
@@ -15,7 +15,6 @@ export function AdminNavTabs() {
 
   const isParticipantsActive = location.pathname.startsWith('/admin/participants');
   const isActivitiesActive = location.pathname.startsWith('/admin/activities');
-  const isTransactionsActive = location.pathname.startsWith('/admin/transactions');
 
   return (
     <div
@@ -44,7 +43,7 @@ export function AdminNavTabs() {
           transition: 'all 0.15s ease'
         }}
       >
-        <LayoutDashboard size={16} /> Ringkasan & Metrik
+        <LayoutDashboard size={16} /> Ringkasan
       </Link>
 
       <Link
@@ -64,7 +63,7 @@ export function AdminNavTabs() {
           transition: 'all 0.15s ease'
         }}
       >
-        <Users size={16} /> Peserta & Gelang
+        <Users size={16} /> Peserta & QR
       </Link>
 
       <Link
@@ -84,27 +83,7 @@ export function AdminNavTabs() {
           transition: 'all 0.15s ease'
         }}
       >
-        <Waves size={16} /> Katalog Wahana
-      </Link>
-
-      <Link
-        to="/admin/transactions"
-        style={{
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: '0.5rem',
-          padding: '0.75rem 1.125rem',
-          textDecoration: 'none',
-          fontWeight: 700,
-          fontSize: '0.875rem',
-          color: isTransactionsActive ? 'var(--color-primary-600)' : 'var(--color-text-muted)',
-          borderBottom: isTransactionsActive ? '2px solid var(--color-primary-600)' : '2px solid transparent',
-          marginBottom: '-1px',
-          whiteSpace: 'nowrap',
-          transition: 'all 0.15s ease'
-        }}
-      >
-        <ReceiptText size={16} /> Audit Ledger & Refund
+        <Waves size={16} /> Daftar Aktivitas
       </Link>
     </div>
   );

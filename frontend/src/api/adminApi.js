@@ -42,6 +42,41 @@ export const adminApi = {
   },
 
   /**
+   * Retrieves single participant profile and transaction history.
+   * @param {string} participantId
+   * @returns {Promise<Object>}
+   */
+  getParticipantById: (participantId) => {
+    return apiClient(`/api/v1/admin/participants/${participantId}`, {
+      method: 'GET'
+    });
+  },
+
+  /**
+   * Updates participant details (e.g. name, status).
+   * @param {string} participantId
+   * @param {{ name?: string, status?: string }} payload
+   * @returns {Promise<Object>}
+   */
+  updateParticipant: (participantId, payload) => {
+    return apiClient(`/api/v1/admin/participants/${participantId}`, {
+      method: 'PUT',
+      body: JSON.stringify(payload)
+    });
+  },
+
+  /**
+   * Deletes a participant (allowed only if no transaction records exist).
+   * @param {string} participantId
+   * @returns {Promise<{ deleted: boolean, id: string }>}
+   */
+  deleteParticipant: (participantId) => {
+    return apiClient(`/api/v1/admin/participants/${participantId}`, {
+      method: 'DELETE'
+    });
+  },
+
+  /**
    * Reissues a new unique QR code token for a participant while preserving balance.
    * @param {string} participantId
    * @returns {Promise<{ participant: Object, previous_qr_code: string, new_qr_code: string }>}

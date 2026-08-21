@@ -89,7 +89,7 @@ export function ActivityModal({ isOpen, activity = null, isSubmitting, onSubmit,
               <Waves size={20} />
             </div>
             <h3 style={{ margin: 0, fontSize: '1.125rem', fontWeight: 800, color: 'var(--color-text-main)' }}>
-              {isEditing ? 'Edit Aktivitas Wahana' : 'Tambah Aktivitas Baru'}
+              {isEditing ? 'Edit Aktivitas' : 'Tambah Aktivitas Baru'}
             </h3>
           </div>
 
@@ -107,7 +107,7 @@ export function ActivityModal({ isOpen, activity = null, isSubmitting, onSubmit,
         <form onSubmit={handleSubmit}>
           <div className="form-group" style={{ marginBottom: '1rem' }}>
             <label htmlFor="activityName" className="form-label" style={{ fontWeight: 600 }}>
-              Nama Aktivitas / Wahana *
+              Nama Aktivitas *
             </label>
             <input
               id="activityName"

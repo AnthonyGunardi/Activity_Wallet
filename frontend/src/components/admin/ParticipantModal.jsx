@@ -1,21 +1,36 @@
-import { useState } from 'react';
-import { X, UserPlus, RefreshCw } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { X, UserPlus, UserCheck, RefreshCw } from 'lucide-react';
+import { formatCurrency } from '../../utils/formatters';
 
 /**
  * ParticipantModal Component
- * Dialog for creating a single participant.
+ * Dialog for creating a new participant or editing an existing participant's data.
  *
  * @param {{
  *   isOpen: boolean,
  *   isSubmitting: boolean,
- *   onSubmit: (payload: { name: string, initial_credit: number, qr_code?: string }) => void,
+ *   participant?: Object | null,
+ *   onSubmit: (payload: { name: string, initial_credit?: number, qr_code?: string }) => void,
  *   onClose: () => void
  * }} props
  */
-export function ParticipantModal({ isOpen, isSubmitting, onSubmit, onClose }) {
+export function ParticipantModal({ isOpen, isSubmitting, participant, onSubmit, onClose }) {
+  const isEditMode = Boolean(participant);
   const [name, setName] = useState('');
   const [initialCredit, setInitialCredit] = useState(1000000);
   const [customQr, setCustomQr] = useState('');
+
+  useEffect(() => {
+    if (participant) {
+      setName(participant.name || '');
+      setInitialCredit(participant.initial_credit || 1000000);
+      setCustomQr(participant.qr_code || '');
+    } else {
+      setName('');
+      setInitialCredit(1000000);
+      setCustomQr('');
+    }
+  }, [participant, isOpen]);
 
   if (!isOpen) return null;
 
@@ -23,11 +38,17 @@ export function ParticipantModal({ isOpen, isSubmitting, onSubmit, onClose }) {
     e.preventDefault();
     if (!name.trim()) return;
 
-    onSubmit({
-      name: name.trim(),
-      initial_credit: Number(initialCredit) || 1000000,
-      qr_code: customQr.trim() ? customQr.trim().toUpperCase() : ''
-    });
+    if (isEditMode) {
+      onSubmit({
+        name: name.trim()
+      });
+    } else {
+      onSubmit({
+        name: name.trim(),
+        initial_credit: Number(initialCredit) || 1000000,
+        qr_code: customQr.trim() ? customQr.trim().toUpperCase() : ''
+      });
+    }
   };
 
   return (
@@ -64,17 +85,17 @@ export function ParticipantModal({ isOpen, isSubmitting, onSubmit, onClose }) {
                 width: '36px',
                 height: '36px',
                 borderRadius: 'var(--radius-md)',
-                background: 'var(--color-primary-50)',
-                color: 'var(--color-primary-600)',
+                background: isEditMode ? 'var(--color-blue-50, #eff6ff)' : 'var(--color-primary-50)',
+                color: isEditMode ? 'var(--color-blue-600, #2563eb)' : 'var(--color-primary-600)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center'
               }}
             >
-              <UserPlus size={20} />
+              {isEditMode ? <UserCheck size={20} /> : <UserPlus size={20} />}
             </div>
             <h3 style={{ margin: 0, fontSize: '1.125rem', fontWeight: 800, color: 'var(--color-text-main)' }}>
-              Tambah Peserta Baru
+              {isEditMode ? 'Edit Data Peserta' : 'Tambah Peserta Baru'}
             </h3>
           </div>
 
@@ -98,7 +119,7 @@ export function ParticipantModal({ isOpen, isSubmitting, onSubmit, onClose }) {
               id="participantName"
               type="text"
               className="form-input"
-              placeholder="Contoh: Anthony Gunardi"
+              placeholder="Masukkan Nama Peserta"
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
@@ -107,38 +128,72 @@ export function ParticipantModal({ isOpen, isSubmitting, onSubmit, onClose }) {
             />
           </div>
 
-          <div className="form-group" style={{ marginBottom: '1rem' }}>
-            <label htmlFor="initialCredit" className="form-label" style={{ fontWeight: 600 }}>
-              Saldo Awal (IDR)
-            </label>
-            <input
-              id="initialCredit"
-              type="number"
-              className="form-input"
-              value={initialCredit}
-              onChange={(e) => setInitialCredit(e.target.value)}
-              min="0"
-              step="50000"
-              disabled={isSubmitting}
-              style={{ fontSize: '0.9375rem' }}
-            />
-          </div>
+          {isEditMode ? (
+            <div
+              style={{
+                background: 'var(--color-bg-main)',
+                padding: '1rem',
+                borderRadius: 'var(--radius-md)',
+                border: '1px solid var(--color-border)',
+                marginBottom: '1.5rem',
+                fontSize: '0.875rem'
+              }}
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+                <span style={{ color: 'var(--color-text-muted)' }}>Kode Peserta:</span>
+                <span style={{ fontFamily: 'monospace', fontWeight: 700, color: 'var(--color-text-main)' }}>
+                  {participant.qr_code}
+                </span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+                <span style={{ color: 'var(--color-text-muted)' }}>Sisa Saldo:</span>
+                <span style={{ fontWeight: 700, color: 'var(--color-primary-600)' }}>
+                  {formatCurrency(participant.current_balance)}
+                </span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <span style={{ color: 'var(--color-text-muted)' }}>Total Penggunaan:</span>
+                <span style={{ fontWeight: 600, color: 'var(--color-text-muted)' }}>
+                  {formatCurrency(participant.total_spent)}
+                </span>
+              </div>
+            </div>
+          ) : (
+            <>
+              <div className="form-group" style={{ marginBottom: '1rem' }}>
+                <label htmlFor="initialCredit" className="form-label" style={{ fontWeight: 600 }}>
+                  Saldo Awal (IDR)
+                </label>
+                <input
+                  id="initialCredit"
+                  type="number"
+                  className="form-input"
+                  value={initialCredit}
+                  onChange={(e) => setInitialCredit(e.target.value)}
+                  min="0"
+                  step="50000"
+                  disabled={isSubmitting}
+                  style={{ fontSize: '0.9375rem' }}
+                />
+              </div>
 
-          <div className="form-group" style={{ marginBottom: '1.5rem' }}>
-            <label htmlFor="customQrCode" className="form-label" style={{ fontWeight: 600 }}>
-              Kode Gelang Khusus (Opsional - Kosongkan untuk auto-generate)
-            </label>
-            <input
-              id="customQrCode"
-              type="text"
-              className="form-input"
-              placeholder="Contoh: SEPA-VIP-001"
-              value={customQr}
-              onChange={(e) => setCustomQr(e.target.value)}
-              disabled={isSubmitting}
-              style={{ fontSize: '0.9375rem', textTransform: 'uppercase' }}
-            />
-          </div>
+              <div className="form-group" style={{ marginBottom: '1.5rem' }}>
+                <label htmlFor="customQrCode" className="form-label" style={{ fontWeight: 600 }}>
+                  Kode Gelang Khusus (Opsional - Kosongkan untuk auto-generate)
+                </label>
+                <input
+                  id="customQrCode"
+                  type="text"
+                  className="form-input"
+                  placeholder="Contoh: SEPA-VIP-001"
+                  value={customQr}
+                  onChange={(e) => setCustomQr(e.target.value)}
+                  disabled={isSubmitting}
+                  style={{ fontSize: '0.9375rem', textTransform: 'uppercase' }}
+                />
+              </div>
+            </>
+          )}
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.5fr', gap: '0.75rem' }}>
             <button
@@ -159,6 +214,8 @@ export function ParticipantModal({ isOpen, isSubmitting, onSubmit, onClose }) {
                 <>
                   <RefreshCw size={16} className="loading-spin" /> Menyimpan...
                 </>
+              ) : isEditMode ? (
+                'Simpan Perubahan'
               ) : (
                 'Simpan Peserta'
               )}

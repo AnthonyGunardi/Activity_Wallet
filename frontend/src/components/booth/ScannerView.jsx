@@ -39,7 +39,7 @@ export function ScannerView({ onScan, isScanning }) {
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', marginBottom: '1.25rem', color: 'var(--color-primary-600)' }}>
         <QrCode size={24} />
         <h2 style={{ fontSize: '1.25rem', fontWeight: 800, margin: 0, color: 'var(--color-text-main)' }}>
-          Scanner Booth Aktivitas
+          Scanner Aktivitas
         </h2>
       </div>
 
@@ -79,7 +79,7 @@ export function ScannerView({ onScan, isScanning }) {
         </div>
 
         <span style={{ fontSize: '0.75rem', marginTop: '0.75rem', opacity: 0.8, fontWeight: 500 }}>
-          Arahkan kamera ke QR gelang peserta atau masukkan token di bawah
+          Scan QR peserta atau masukkan kode peserta secara manual.
         </span>
       </div>
 
@@ -87,7 +87,7 @@ export function ScannerView({ onScan, isScanning }) {
       <form onSubmit={handleManualSubmit}>
         <div className="form-group" style={{ marginBottom: '1rem' }}>
           <label htmlFor="boothManualInput" className="form-label" style={{ fontWeight: 600 }}>
-            Input Manual Kode QR Token
+            Masukkan Kode Peserta
           </label>
           <div style={{ position: 'relative' }}>
             <input
@@ -136,7 +136,7 @@ export function ScannerView({ onScan, isScanning }) {
               <RefreshCw size={18} className="loading-spin" /> Memindai Peserta...
             </>
           ) : (
-            'Cari Peserta'
+            'Verifikasi Peserta →'
           )}
         </button>
       </form>
@@ -144,7 +144,7 @@ export function ScannerView({ onScan, isScanning }) {
       {/* Preset Quick Scan Buttons */}
       <div style={{ marginTop: '1.25rem', paddingTop: '1rem', borderTop: '1px solid var(--color-border)' }}>
         <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', fontWeight: 600, textTransform: 'uppercase', marginBottom: '0.5rem' }}>
-          ⚡ Preset Token Peserta Uji Coba:
+          DATA PESERTA DEMO
         </div>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
           {['SEPA-001', 'SEPA-002', 'SEPA-003', 'SEPA-004'].map((code) => (

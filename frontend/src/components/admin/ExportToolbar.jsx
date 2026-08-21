@@ -45,11 +45,11 @@ export function ExportToolbar() {
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--color-primary-600)' }}>
           <Download size={18} />
           <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 700, color: 'var(--color-text-main)' }}>
-            Ekspor Laporan & Rekonsiliasi Finansial
+            Ekspor Data & Laporan
           </h3>
         </div>
         <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.8125rem', color: 'var(--color-text-muted)' }}>
-          Unduh data saldo peserta dan rekaman immutable transaction ledger dalam format CSV atau Excel.
+          Unduh data peserta dan riwayat transaksi dalam format CSV atau Excel.
         </p>
       </div>
 
@@ -120,7 +120,7 @@ export function ExportToolbar() {
           ) : (
             <FileText size={14} style={{ color: 'var(--color-sport-orange)' }} />
           )}
-          Ledger (CSV)
+          Transaksi (CSV)
         </button>
 
         {/* Transactions Excel */}
@@ -143,7 +143,7 @@ export function ExportToolbar() {
           ) : (
             <FileSpreadsheet size={14} style={{ color: 'var(--color-success-primary)' }} />
           )}
-          Ledger (Excel)
+          Transaksi (Excel)
         </button>
       </div>
     </div>

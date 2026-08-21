@@ -110,7 +110,7 @@ export function RefundModal({ isOpen, transaction = null, isSubmitting, onConfir
           </div>
 
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.875rem' }}>
-            <span style={{ color: 'var(--color-text-muted)' }}>Aktivitas / Wahana:</span>
+            <span style={{ color: 'var(--color-text-muted)' }}>Aktivitas:</span>
             <span style={{ fontWeight: 600, color: 'var(--color-text-main)' }}>
               {transaction.activity?.name || 'Aktivitas'}
             </span>
@@ -173,7 +173,7 @@ export function RefundModal({ isOpen, transaction = null, isSubmitting, onConfir
               id="refundNotes"
               type="text"
               className="form-input"
-              placeholder="Contoh: Pembatalan wahana / salah scan tiket"
+              placeholder="Contoh: Pembatalan transaksi / salah scan tiket"
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               disabled={isSubmitting}

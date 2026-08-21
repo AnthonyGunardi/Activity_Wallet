@@ -28,7 +28,7 @@ export function ActivityTable({ activities = [], onEdit, onToggleStatus }) {
         <Waves size={36} style={{ opacity: 0.4, marginBottom: '0.75rem' }} />
         <h4 style={{ margin: 0, fontSize: '1rem', fontWeight: 600 }}>Tidak ada data aktivitas ditemukan.</h4>
         <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.875rem' }}>
-          Silakan tambahkan aktivitas wahana air baru ke dalam katalog.
+          Silakan tambahkan aktivitas air baru ke dalam katalog.
         </p>
       </div>
     );
@@ -58,7 +58,7 @@ export function ActivityTable({ activities = [], onEdit, onToggleStatus }) {
                 letterSpacing: '0.05em'
               }}
             >
-              <th style={{ padding: '0.875rem 1rem', fontWeight: 700 }}>Nama Wahana / Aktivitas</th>
+              <th style={{ padding: '0.875rem 1rem', fontWeight: 700 }}>Nama Aktivitas</th>
               <th style={{ padding: '0.875rem 1rem', fontWeight: 700 }}>Harga (IDR)</th>
               <th style={{ padding: '0.875rem 1rem', fontWeight: 700 }}>Deskripsi</th>
               <th style={{ padding: '0.875rem 1rem', fontWeight: 700 }}>Status</th>

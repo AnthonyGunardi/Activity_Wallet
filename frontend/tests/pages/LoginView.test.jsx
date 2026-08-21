@@ -32,7 +32,7 @@ describe('LoginView Component Tests', () => {
   it('should render login form with title and quick demo buttons', () => {
     renderLoginView();
 
-    expect(screen.getByText('Login Petugas')).toBeInTheDocument();
+    expect(screen.getByText('Login Staff')).toBeInTheDocument();
     expect(screen.getByLabelText('Username')).toBeInTheDocument();
     expect(screen.getByLabelText('Kata Sandi')).toBeInTheDocument();
     expect(screen.getByText('Admin Supervisor')).toBeInTheDocument();
@@ -58,7 +58,7 @@ describe('LoginView Component Tests', () => {
   it('should display error message on empty submit', async () => {
     renderLoginView();
 
-    const submitBtn = screen.getByText('Masuk ke Sistem');
+    const submitBtn = screen.getByRole('button', { name: /masuk/i });
     fireEvent.click(submitBtn);
 
     expect(screen.getByText('Silakan masukkan username dan kata sandi.')).toBeInTheDocument();
@@ -77,7 +77,7 @@ describe('LoginView Component Tests', () => {
     fireEvent.click(screen.getByText('Admin Supervisor'));
 
     await act(async () => {
-      fireEvent.click(screen.getByText('Masuk ke Sistem'));
+      fireEvent.click(screen.getByRole('button', { name: /masuk/i }));
     });
 
     expect(mockLogin).toHaveBeenCalledWith('admin', 'admin123');
@@ -92,7 +92,7 @@ describe('LoginView Component Tests', () => {
     fireEvent.click(screen.getByText('Admin Supervisor'));
 
     await act(async () => {
-      fireEvent.click(screen.getByText('Masuk ke Sistem'));
+      fireEvent.click(screen.getByRole('button', { name: /masuk/i }));
     });
 
     expect(screen.getByText('Username atau kata sandi tidak valid.')).toBeInTheDocument();

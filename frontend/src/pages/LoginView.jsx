@@ -73,9 +73,9 @@ export const LoginView = () => {
           >
             <Compass size={28} />
           </div>
-          <h1 style={{ fontSize: '1.75rem', marginBottom: '0.5rem', fontWeight: 800 }}>Login Petugas</h1>
+          <h1 style={{ fontSize: '1.75rem', marginBottom: '0.5rem', fontWeight: 800 }}>Login Staff</h1>
           <p style={{ color: 'var(--color-text-muted)', fontSize: '0.875rem' }}>
-            Masuk untuk mengakses Booth Scanner atau Dashboard Admin Sepa Island
+            Masuk untuk mengakses Scanner Aktivitas atau Dashboard Supervisor.
           </p>
         </div>
 
@@ -127,7 +127,7 @@ export const LoginView = () => {
                 type="text"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                placeholder="cth: staff_jetski atau admin"
+                placeholder="Masukkan username"
                 disabled={isSubmitting}
                 className="form-input"
               />
@@ -176,7 +176,7 @@ export const LoginView = () => {
             className="btn btn-primary"
             style={{ width: '100%', marginBottom: '1.5rem' }}
           >
-            {isSubmitting ? 'Memproses...' : 'Masuk ke Sistem'}
+            {isSubmitting ? 'Memproses...' : 'Masuk →'}
             {!isSubmitting && <ArrowRight size={18} />}
           </button>
         </form>
@@ -191,7 +191,7 @@ export const LoginView = () => {
               marginBottom: '0.75rem'
             }}
           >
-            AKUN DEMO CEPAT (KLIK UNTUK MENGISI):
+            GUNAKAN AKUN DEMO:
           </div>
           <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'center', flexWrap: 'wrap' }}>
             <button

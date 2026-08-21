@@ -25,9 +25,9 @@ export function TransactionAuditTable({ transactions = [], onRefundClick }) {
         }}
       >
         <FileText size={36} style={{ opacity: 0.4, marginBottom: '0.75rem' }} />
-        <h4 style={{ margin: 0, fontSize: '1rem', fontWeight: 600 }}>Belum ada catatan transaksi pada ledger.</h4>
+        <h4 style={{ margin: 0, fontSize: '1rem', fontWeight: 600 }}>Belum ada catatan transaksi.</h4>
         <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.875rem' }}>
-          Transaksi pemotongan saldo booth dan refund akan tercatat otomatis di sini.
+          Transaksi akan tercatat otomatis di sini.
         </p>
       </div>
     );

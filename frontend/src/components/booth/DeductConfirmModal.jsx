@@ -89,7 +89,7 @@ export function DeductConfirmModal({
             Konfirmasi Potong Saldo
           </h3>
           <p style={{ fontSize: '0.875rem', color: 'var(--color-text-muted)', marginTop: '0.25rem' }}>
-            Pastikan detail peserta dan wahana air sudah sesuai.
+            Pastikan detail peserta dan water activity sudah sesuai.
           </p>
         </div>
 
@@ -110,7 +110,7 @@ export function DeductConfirmModal({
           </div>
 
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.625rem' }}>
-            <span style={{ fontSize: '0.8125rem', color: 'var(--color-text-muted)' }}>Wahana</span>
+            <span style={{ fontSize: '0.8125rem', color: 'var(--color-text-muted)' }}>Aktivitas</span>
             <span style={{ fontSize: '0.875rem', fontWeight: 700, color: 'var(--color-text-main)' }}>
               {activity.name}
             </span>

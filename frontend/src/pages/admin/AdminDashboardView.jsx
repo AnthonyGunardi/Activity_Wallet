@@ -75,14 +75,14 @@ export function AdminDashboardView() {
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', color: 'var(--color-primary-600)' }}>
             <ShieldAlert size={24} />
             <span style={{ fontSize: '0.8125rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-              Supervisor Dashboard
+              Dashboard Admin
             </span>
           </div>
           <h1 style={{ margin: '0.25rem 0 0 0', fontSize: '1.75rem', fontWeight: 800, color: 'var(--color-text-main)' }}>
-            Ringkasan Kredit & Audit Ledger
+            Ringkasan Kredit & Transaksi
           </h1>
           <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.875rem', color: 'var(--color-text-muted)' }}>
-            Monitoring real-time saldo kredit event, total penggunaan per wahana, dan eksekusi refund terotorisasi.
+            Pantau saldo peserta, penggunaan aktivitas, dan transaksi secara real-time.
           </p>
         </div>
 
@@ -96,7 +96,7 @@ export function AdminDashboardView() {
           disabled={isLoadingSummary || isLoadingTransactions}
           style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.875rem' }}
         >
-          <RefreshCw size={16} className={isLoadingSummary || isLoadingTransactions ? 'loading-spin' : ''} /> Segarkan Data
+          <RefreshCw size={16} className={isLoadingSummary || isLoadingTransactions ? 'loading-spin' : ''} /> Refresh Data
         </button>
       </div>
 
@@ -113,7 +113,7 @@ export function AdminDashboardView() {
         }}
       >
         <SummaryMetricCard
-          title="Total Kredit Teralokasi"
+          title="Total Kredit Peserta"
           value={isLoadingSummary ? '...' : formatCurrency(summary?.total_allocated_credit || 0)}
           subtitle={`${summary?.total_participants || 0} Peserta terdaftar`}
           icon={<Wallet size={20} />}
@@ -131,7 +131,7 @@ export function AdminDashboardView() {
         />
 
         <SummaryMetricCard
-          title="Sisa Saldo di Sistem"
+          title="Total Saldo Tersisa"
           value={isLoadingSummary ? '...' : formatCurrency(summary?.remaining_balance || 0)}
           subtitle="Saldo aktif siap pakai"
           icon={<Coins size={20} />}
@@ -140,9 +140,9 @@ export function AdminDashboardView() {
         />
 
         <SummaryMetricCard
-          title="Peserta & Wahana"
+          title="Peserta & Aktivitas"
           value={isLoadingSummary ? '...' : `${summary?.active_participants || 0} / ${summary?.total_participants || 0}`}
-          subtitle={`${summary?.active_activities || 0} Wahana aktif beroperasi`}
+          subtitle={`${summary?.active_activities || 0} Aktivitas aktif`}
           icon={<Users size={20} />}
           color="#8b5cf6"
           bgColor="rgba(139, 92, 246, 0.1)"
@@ -156,10 +156,10 @@ export function AdminDashboardView() {
       <div style={{ marginBottom: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: '0.75rem' }}>
         <div>
           <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--color-text-main)', margin: 0 }}>
-            Audit Ledger Transaksi
+            Riwayat Transaksi
           </h2>
           <p style={{ fontSize: '0.875rem', color: 'var(--color-text-muted)', margin: '0.15rem 0 0 0' }}>
-            Catatan mutasi saldo write-once (append-only) untuk kepatuhan finansial event.
+            Seluruh transaksi penggunaan saldo tercatat otomatis untuk kebutuhan monitoring.
           </p>
         </div>
       </div>
@@ -194,7 +194,7 @@ export function AdminDashboardView() {
           <input
             type="text"
             className="form-input"
-            placeholder="Cari nama peserta atau kode QR..."
+            placeholder="Cari nama atau kode peserta"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             style={{ paddingLeft: '2.5rem', fontSize: '0.875rem' }}
@@ -208,7 +208,7 @@ export function AdminDashboardView() {
             onChange={(e) => setTypeFilter(e.target.value)}
             style={{ fontSize: '0.875rem', width: '180px', padding: '0.5rem 0.75rem' }}
           >
-            <option value="">Semua Tipe Mutasi</option>
+            <option value="">Semua Jenis Transaksi</option>
             <option value="DEDUCTION">DEDUCTION (Pemotongan)</option>
             <option value="REFUND">REFUND (Pengembalian)</option>
           </select>
@@ -219,7 +219,7 @@ export function AdminDashboardView() {
       {isLoadingTransactions && transactions.length === 0 ? (
         <div style={{ textAlign: 'center', padding: '3rem 1rem' }}>
           <RefreshCw size={32} className="loading-spin" style={{ color: 'var(--color-primary-600)', marginBottom: '0.5rem' }} />
-          <p style={{ margin: 0, color: 'var(--color-text-muted)', fontSize: '0.875rem' }}>Memuat riwayat ledger...</p>
+          <p style={{ margin: 0, color: 'var(--color-text-muted)', fontSize: '0.875rem' }}>Memuat riwayat transaksi...</p>
         </div>
       ) : (
         <TransactionAuditTable

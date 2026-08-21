@@ -8,8 +8,8 @@ describe('App Root Integration Tests', () => {
 
     expect(screen.getByText('Digital Activity Wallet')).toBeInTheDocument();
     expect(screen.getByText('Portal Peserta')).toBeInTheDocument();
-    expect(screen.getByText('Scanner Booth Staff')).toBeInTheDocument();
-    expect(screen.getByText('Dashboard Supervisor')).toBeInTheDocument();
+    expect(screen.getByText('Scanner Aktivitas')).toBeInTheDocument();
+    expect(screen.getByText('Dashboard Admin')).toBeInTheDocument();
   });
 
   it('should render PlaceholderView component with title', () => {

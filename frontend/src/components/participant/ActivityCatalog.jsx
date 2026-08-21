@@ -40,10 +40,10 @@ export function ActivityCatalog({ activities = [], currentBalance = 0 }) {
     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.875rem' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.25rem' }}>
         <h3 style={{ fontSize: '1.125rem', fontWeight: 700, margin: 0, color: 'var(--color-text-main)' }}>
-          Katalog Wahana Air
+          Pilihan Water Activity
         </h3>
         <span style={{ fontSize: '0.8125rem', color: 'var(--color-text-muted)' }}>
-          {activities.length} Wahana
+          {activities.length} Aktivitas
         </span>
       </div>
 

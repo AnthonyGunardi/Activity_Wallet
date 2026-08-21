@@ -27,3 +27,6 @@ export function formatTransactionDate(dateString) {
     return dateString;
   }
 }
+
+export const formatDateTime = formatTransactionDate;
+

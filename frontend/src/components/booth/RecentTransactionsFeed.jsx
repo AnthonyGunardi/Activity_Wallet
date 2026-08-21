@@ -83,7 +83,7 @@ export function RecentTransactionsFeed({ transactions = [] }) {
                 <div style={{ fontWeight: 600, fontSize: '0.875rem', color: 'var(--color-text-main)' }}>
                   {tx.participant_name || tx.participant_qr || 'Peserta'}
                   <span style={{ fontWeight: 400, color: 'var(--color-text-muted)', marginLeft: '0.375rem' }}>
-                    • {tx.activity_name || 'Wahana'}
+                    • {tx.activity_name || 'Aktivitas'}
                   </span>
                 </div>
                 <div style={{ fontSize: '0.6875rem', color: 'var(--color-text-muted)' }}>

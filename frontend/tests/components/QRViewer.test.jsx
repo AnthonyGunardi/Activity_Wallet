@@ -7,7 +7,7 @@ describe('QRViewer Component Tests', () => {
     render(<QRViewer qrCode="SEPA-001" participantName="Budi Santoso" />);
 
     expect(screen.getByText('SEPA-001')).toBeInTheDocument();
-    expect(screen.getByText('Tunjukkan QR ini ke petugas booth aktivitas')).toBeInTheDocument();
+    expect(screen.getByText('Tunjukkan QR ini ke staff booth aktivitas')).toBeInTheDocument();
   });
 
   it('should toggle full-screen zoom modal on click', () => {

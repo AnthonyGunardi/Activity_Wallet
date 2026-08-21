@@ -26,6 +26,6 @@ describe('BalanceCard Component Tests', () => {
     const blockedParticipant = { ...mockParticipant, status: 'BLOCKED' };
     render(<BalanceCard participant={blockedParticipant} />);
 
-    expect(screen.getByText('Diblokir')).toBeInTheDocument();
+    expect(screen.getByText(/blocked/i)).toBeInTheDocument();
   });
 });

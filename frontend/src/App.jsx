@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Link, Navigate } from 'react-router-dom';
 import { ToastProvider } from './context/ToastContext';
 import { AuthProvider } from './context/AuthContext';
 import { Header } from './components/common/Header';
@@ -10,7 +10,20 @@ import { BoothView } from './pages/BoothView';
 import { ParticipantManagerView } from './pages/admin/ParticipantManagerView';
 import { ActivityManagerView } from './pages/admin/ActivityManagerView';
 import { AdminDashboardView } from './pages/admin/AdminDashboardView';
-import { Wallet, QrCode, ShieldCheck, Waves } from 'lucide-react';
+import {
+  Wallet,
+  QrCode,
+  ShieldCheck,
+  Waves,
+  Zap,
+  FileSpreadsheet,
+  ArrowRight,
+  Watch,
+  ScanLine,
+  BarChart3,
+  Sparkles,
+  ChevronRight
+} from 'lucide-react';
 
 const HomeView = () => {
   return (
@@ -20,132 +33,233 @@ const HomeView = () => {
         flex: 1,
         display: 'flex',
         flexDirection: 'column',
-        justifyContent: 'center',
         paddingTop: '2.5rem',
-        paddingBottom: '3.5rem'
+        paddingBottom: '3.5rem',
+        gap: '2.5rem'
       }}
     >
-      <div className="hero-section">
-        <div
-          className="badge badge-blue"
-          style={{
-            marginBottom: '1rem',
-            padding: '0.375rem 0.875rem'
-          }}
-        >
-          <Waves size={15} /> Event Sepa Island Water Sports
+      {/* Hero Section */}
+      <section className="hero-layout">
+        <div className="hero-content">
+          <div className="hero-pill">
+            <Waves size={15} /> EVENT SEPA ISLAND WATER SPORTS
+          </div>
+          <h1 className="hero-headline">
+            Digital Activity Wallet
+          </h1>
+          <p className="hero-description">
+            Kelola kredit aktivitas air dengan mudah, cepat, dan tercatat secara real-time.
+          </p>
+
+          <div className="hero-features">
+            <div className="hero-feature-item">
+              <div className="hero-feature-icon">
+                <Zap size={20} />
+              </div>
+              <div>
+                <div className="hero-feature-title">Transaksi Cepat</div>
+                <div className="hero-feature-desc">Scan QR & proses instan</div>
+              </div>
+            </div>
+
+            <div className="hero-feature-item">
+              <div className="hero-feature-icon">
+                <ShieldCheck size={20} />
+              </div>
+              <div>
+                <div className="hero-feature-title">Saldo Terpantau</div>
+                <div className="hero-feature-desc">Cek saldo dan penggunaan secara real-time</div>
+              </div>
+            </div>
+
+            <div className="hero-feature-item">
+              <div className="hero-feature-icon">
+                <FileSpreadsheet size={20} />
+              </div>
+              <div>
+                <div className="hero-feature-title">Rekap Otomatis</div>
+                <div className="hero-feature-desc">Semua transaksi tercatat dan siap diekspor</div>
+              </div>
+            </div>
+          </div>
         </div>
-        <h1 className="hero-title">
-          Digital Activity Wallet
-        </h1>
-        <p className="hero-subtitle">
-          Sistem manajemen saldo prepaid aktivitas air digital untuk kenyamanan dan kecepatan transaksi di pulau.
-        </p>
-      </div>
 
-      <div className="portal-grid">
-        <Link
-          to="/participant"
-          className="sport-card"
-          style={{
-            textDecoration: 'none',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '1.25rem'
-          }}
-        >
-          <div
-            style={{
-              width: '46px',
-              height: '46px',
-              borderRadius: 'var(--radius-md)',
-              background: 'var(--color-primary-50)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: 'var(--color-primary-500)',
-              border: '1px solid var(--color-primary-200)'
+        <div className="hero-visual-wrapper">
+          <img
+            src="/assets/hero-mockup.png"
+            alt="Sepa Island Activity Wallet Mobile & Water Sports"
+            className="hero-visual-img"
+            width="440"
+            height="420"
+            loading="eager"
+            onError={(e) => {
+              // Fallback to jpg if png is not found
+              e.target.src = '/assets/hero-mockup.jpg';
             }}
-          >
-            <Wallet size={24} />
+          />
+        </div>
+      </section>
+
+      {/* 3 Portal Action Cards */}
+      <section className="portal-grid">
+        <Link to="/participant" className="portal-card portal-card-participant">
+          <div className="portal-card-header">
+            <div className="portal-icon-box portal-icon-blue">
+              <Wallet size={24} />
+            </div>
+            <span className="badge badge-blue">
+              <span className="badge-dot badge-dot-blue"></span> Peserta
+            </span>
           </div>
           <div>
-            <h2 style={{ fontSize: '1.25rem', marginBottom: '0.375rem', color: 'var(--color-text-main)' }}>Portal Peserta</h2>
-            <p style={{ color: 'var(--color-text-muted)', fontSize: '0.875rem', lineHeight: 1.6 }}>
-              Cek sisa saldo, tampilkan QR gelang, dan lihat katalog wahana air yang tersedia.
+            <h2 className="portal-card-title">
+              Portal Peserta
+            </h2>
+            <p className="portal-card-desc">
+              Cek saldo aktivitas, tampilkan QR peserta, dan lihat pilihan aktivitas air yang tersedia.
             </p>
+            <div className="portal-tag-list">
+              <span className="portal-tag">Saldo Aktivitas</span>
+              <span className="portal-tag">QR Peserta</span>
+              <span className="portal-tag">Daftar Aktivitas</span>
+            </div>
           </div>
-          <span className="btn btn-primary" style={{ marginTop: 'auto', width: '100%' }}>Buka Dompet</span>
+          <span className="portal-btn portal-btn-primary">
+            Buka Dompet <ArrowRight size={18} className="portal-btn-arrow" />
+          </span>
         </Link>
 
-        <Link
-          to="/booth"
-          className="sport-card"
-          style={{
-            textDecoration: 'none',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '1.25rem'
-          }}
-        >
-          <div
-            style={{
-              width: '46px',
-              height: '46px',
-              borderRadius: 'var(--radius-md)',
-              background: 'var(--color-success-bg)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: 'var(--color-success-primary)',
-              border: '1px solid #a7f3d0'
-            }}
-          >
-            <QrCode size={24} />
+        <Link to="/booth" className="portal-card portal-card-staff">
+          <div className="portal-card-header">
+            <div className="portal-icon-box portal-icon-green">
+              <QrCode size={24} />
+            </div>
+            <span className="badge badge-success">
+              <span className="badge-dot badge-dot-green"></span> Activity Staff
+            </span>
           </div>
           <div>
-            <h2 style={{ fontSize: '1.25rem', marginBottom: '0.375rem', color: 'var(--color-text-main)' }}>Scanner Booth Staff</h2>
-            <p style={{ color: 'var(--color-text-muted)', fontSize: '0.875rem', lineHeight: 1.6 }}>
-              Scan QR code peserta, verifikasi saldo, dan eksekusi pemotongan biaya aktivitas secara instan.
+            <h2 className="portal-card-title">
+              Scanner Aktivitas
+            </h2>
+            <p className="portal-card-desc">
+              Scan QR peserta, cek saldo, lalu proses transaksi aktivitas dengan cepat.
             </p>
+            <div className="portal-tag-list">
+              <span className="portal-tag">Scan QR</span>
+              <span className="portal-tag">Proses Transaksi</span>
+              <span className="portal-tag">Riwayat Booth</span>
+            </div>
           </div>
-          <span className="btn btn-success" style={{ marginTop: 'auto', width: '100%' }}>Masuk Scanner</span>
+          <span className="portal-btn portal-btn-success">
+            Buka Scanner <ArrowRight size={18} className="portal-btn-arrow" />
+          </span>
         </Link>
 
-        <Link
-          to="/admin"
-          className="sport-card"
-          style={{
-            textDecoration: 'none',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '1.25rem'
-          }}
-        >
-          <div
-            style={{
-              width: '46px',
-              height: '46px',
-              borderRadius: 'var(--radius-md)',
-              background: 'var(--color-sport-orange-bg)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: 'var(--color-sport-orange)',
-              border: '1px solid #fed7aa'
-            }}
-          >
-            <ShieldCheck size={24} />
+        <Link to="/admin" className="portal-card portal-card-admin">
+          <div className="portal-card-header">
+            <div className="portal-icon-box portal-icon-amber">
+              <ShieldCheck size={24} />
+            </div>
+            <span className="badge badge-warning">
+              <span className="badge-dot badge-dot-amber"></span> Admin
+            </span>
           </div>
           <div>
-            <h2 style={{ fontSize: '1.25rem', marginBottom: '0.375rem', color: 'var(--color-text-main)' }}>Dashboard Supervisor</h2>
-            <p style={{ color: 'var(--color-text-muted)', fontSize: '0.875rem', lineHeight: 1.6 }}>
-              Monitoring real-time transaksi, manajemen peserta & wahana, reissue QR, dan audit refund.
+            <h2 className="portal-card-title">
+              Dashboard Admin
+            </h2>
+            <p className="portal-card-desc">
+              Pantau transaksi secara real-time, kelola peserta dan aktivitas, serta ekspor laporan.
             </p>
+            <div className="portal-tag-list">
+              <span className="portal-tag">Monitor Real-time</span>
+              <span className="portal-tag">Riwayat Transaksi</span>
+              <span className="portal-tag">Export Data</span>
+            </div>
           </div>
-          <span className="btn btn-secondary" style={{ marginTop: 'auto', width: '100%' }}>Akses Admin</span>
+          <span className="portal-btn portal-btn-neutral">
+            Buka Dashboard <ArrowRight size={18} className="portal-btn-arrow" />
+          </span>
         </Link>
-      </div>
+      </section>
+
+      {/* How It Works Section */}
+      <section className="how-it-works-card">
+        <div className="how-it-works-header">
+          <div className="how-it-works-pill">
+            <Sparkles size={14} /> ALUR TRANSAKSI
+          </div>
+          <h2 className="how-it-works-title">
+            Bagaimana Sistem Ini Bekerja?
+          </h2>
+          <p className="how-it-works-subtitle">
+            Alur transaksi aktivitas air yang praktis, cashless, dan tercatat secara real-time.
+          </p>
+        </div>
+
+        <div className="how-it-works-steps">
+          <div className="step-card">
+            <div className="step-card-top">
+              <div className="step-icon-container step-icon-1">
+                <Watch size={28} />
+              </div>
+            </div>
+            <div className="step-title">1. Check-in Peserta</div>
+            <div className="step-desc">
+              Peserta menerima nametag dengan QR peserta dan kredit aktivitas awal Rp1.000.000.
+            </div>
+          </div>
+
+          <div className="step-connector" aria-hidden="true">
+            <ChevronRight size={22} className="step-connector-arrow" />
+          </div>
+
+          <div className="step-card">
+            <div className="step-card-top">
+              <div className="step-icon-container step-icon-2">
+                <ScanLine size={28} />
+              </div>
+            </div>
+            <div className="step-title">2. Scan di Pos Aktivitas</div>
+            <div className="step-desc">
+              Staff memindai QR peserta, lalu biaya aktivitas otomatis dipotong dari saldo.
+            </div>
+          </div>
+
+          <div className="step-connector" aria-hidden="true">
+            <ChevronRight size={22} className="step-connector-arrow" />
+          </div>
+
+          <div className="step-card">
+            <div className="step-card-top">
+              <div className="step-icon-container step-icon-3">
+                <Waves size={28} />
+              </div>
+            </div>
+            <div className="step-title">3. Nikmati Aktivitas</div>
+            <div className="step-desc">
+              Transaksi selesai, peserta dapat langsung menikmati aktivitas air.
+            </div>
+          </div>
+
+          <div className="step-connector" aria-hidden="true">
+            <ChevronRight size={22} className="step-connector-arrow" />
+          </div>
+
+          <div className="step-card">
+            <div className="step-card-top">
+              <div className="step-icon-container step-icon-4">
+                <BarChart3 size={28} />
+              </div>
+            </div>
+            <div className="step-title">4. Transaksi Tercatat</div>
+            <div className="step-desc">
+              Seluruh transaksi tercatat secara real-time dan dapat dipantau melalui dashboard.
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
   );
 };
@@ -211,11 +325,7 @@ export default function App() {
               />
               <Route
                 path="/admin/transactions"
-                element={
-                  <ProtectedRoute allowedRoles={['ADMIN']}>
-                    <AdminDashboardView />
-                  </ProtectedRoute>
-                }
+                element={<Navigate to="/admin" replace />}
               />
               <Route
                 path="/admin/*"

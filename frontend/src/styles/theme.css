@@ -1,51 +1,63 @@
 :root {
-  /* Brand / Signature Cobalt & Ocean Palette */
+  /* Brand / Primary Palette (from Mockup: #2563EB) */
   --color-primary-50: #eff6ff;
   --color-primary-100: #dbeafe;
   --color-primary-200: #bfdbfe;
-  --color-primary-500: #1d4ed8;  /* Vibrant Royal Cobalt Blue */
-  --color-primary-600: #1e40af;
-  --color-primary-700: #1e3a8a;
-  --color-primary-900: #172554;
+  --color-primary-500: #2563eb;  /* Primary Royal Blue #2563EB */
+  --color-primary-600: #1d4ed8;
+  --color-primary-700: #1e40af;
+  --color-primary-900: #1e3a8a;
 
-  /* Accent Colors (Energy / Activity Highlights) */
-  --color-accent-cyan: #0284c7;
-  --color-sport-orange: #ea580c;
-  --color-sport-orange-hover: #c2410c;
-  --color-sport-orange-bg: #fff7ed;
+  /* Secondary Palette (from Mockup: #10B981) */
+  --color-secondary-50: #ecfdf5;
+  --color-secondary-100: #d1fae5;
+  --color-secondary-200: #a7f3d0;
+  --color-secondary-500: #10b981; /* Secondary Emerald Green #10B981 */
+  --color-secondary-600: #059669;
+  --color-secondary-700: #047857;
+
+  /* Accent Palette (from Mockup: #F59E0B) */
+  --color-accent-50: #fffbeb;
+  --color-accent-100: #fef3c7;
+  --color-accent-200: #fde68a;
+  --color-accent-500: #f59e0b;  /* Accent Amber / Gold #F59E0B */
+  --color-accent-600: #d97706;
+  --color-sport-orange: #f59e0b;
+  --color-sport-orange-hover: #d97706;
+  --color-sport-orange-bg: #fffbeb;
 
   /* High-Contrast Status Colors */
   --color-success-bg: #ecfdf5;
   --color-success-text: #065f46;
-  --color-success-primary: #059669;
-  --color-success-dark: #047857;
+  --color-success-primary: #10b981;
+  --color-success-dark: #059669;
 
   --color-warning-bg: #fffbeb;
   --color-warning-text: #92400e;
-  --color-warning-primary: #d97706;
+  --color-warning-primary: #f59e0b;
 
   --color-danger-bg: #fef2f2;
   --color-danger-text: #991b1b;
-  --color-danger-primary: #dc2626;
+  --color-danger-primary: #ef4444;
 
-  /* Clean Modern Light Theme Surfaces */
-  --color-bg-main: #f1f5f9;      /* Modern soft light slate canvas */
+  /* Clean Modern Surfaces (from Mockup: #F8FAFC, #64748B) */
+  --color-bg-main: #f8fafc;      /* Background #F8FAFC */
   --color-bg-surface: #ffffff;   /* Pure white cards / header */
   --color-bg-card: #ffffff;
   --color-bg-card-hover: #f8fafc;
-  --color-bg-card-blue: linear-gradient(135deg, #1d4ed8 0%, #2563eb 55%, #0284c7 100%); /* Signature Cobalt Wallet Hero Card */
+  --color-bg-card-blue: linear-gradient(135deg, #1d4ed8 0%, #2563eb 55%, #3b82f6 100%);
   
   --color-border: #e2e8f0;
   --color-border-light: #cbd5e1;
   --color-border-accent: #3b82f6;
 
   --color-text-main: #0f172a;    /* Deep dark slate for maximum readability */
-  --color-text-muted: #64748b;  /* Slate gray */
+  --color-text-muted: #64748b;   /* Neutral slate gray #64748B */
   --color-text-dim: #94a3b8;
 
-  /* Typography */
+  /* Typography (from Mockup: Inter) */
   --font-family-base: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --font-family-heading: 'Outfit', 'Inter', sans-serif;
+  --font-family-heading: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 
   /* Spacing */
   --space-1: 0.25rem;
@@ -62,16 +74,18 @@
   --radius-md: 0.625rem;
   --radius-lg: 1rem;
   --radius-xl: 1.25rem;
+  --radius-2xl: 1.5rem;
   --radius-full: 9999px;
 
-  /* Refined Elevation Shadows */
+  /* Elevation Shadows */
   --shadow-sm: 0 1px 2px 0 rgba(15, 23, 42, 0.05);
   --shadow-md: 0 4px 12px -2px rgba(15, 23, 42, 0.06), 0 2px 4px -2px rgba(15, 23, 42, 0.04);
   --shadow-lg: 0 12px 24px -4px rgba(15, 23, 42, 0.08), 0 4px 8px -2px rgba(15, 23, 42, 0.04);
-  --shadow-card-blue: 0 14px 28px -4px rgba(29, 78, 216, 0.35);
-  --shadow-glow-primary: 0 4px 14px 0 rgba(29, 78, 216, 0.3);
+  --shadow-xl: 0 20px 30px -6px rgba(15, 23, 42, 0.1), 0 8px 12px -4px rgba(15, 23, 42, 0.05);
+  --shadow-card-blue: 0 14px 28px -4px rgba(37, 99, 235, 0.3);
+  --shadow-glow-primary: 0 4px 14px 0 rgba(37, 99, 235, 0.25);
 
-  /* Outdoor Touch Targets */
+  /* Touch Targets */
   --touch-target-min: 48px;
   --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
   --transition-normal: 0.25s cubic-bezier(0.4, 0, 0.2, 1);

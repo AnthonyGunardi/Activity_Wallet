@@ -16,11 +16,11 @@ describe('ExportToolbar Component Tests', () => {
   it('should render all four export buttons', () => {
     renderWithProviders(<ExportToolbar />);
 
-    expect(screen.getByText(/Ekspor Laporan & Rekonsiliasi Finansial/i)).toBeInTheDocument();
+    expect(screen.getByText(/Ekspor Data & Laporan/i)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Peserta \(CSV\)/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Peserta \(Excel\)/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /Ledger \(CSV\)/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /Ledger \(Excel\)/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Transaksi \(CSV\)/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Transaksi \(Excel\)/i })).toBeInTheDocument();
   });
 
   it('should trigger participant CSV download and show success toast', async () => {
@@ -46,7 +46,7 @@ describe('ExportToolbar Component Tests', () => {
 
     renderWithProviders(<ExportToolbar />);
 
-    const btn = screen.getByRole('button', { name: /Ledger \(Excel\)/i });
+    const btn = screen.getByRole('button', { name: /Transaksi \(Excel\)/i });
     fireEvent.click(btn);
 
     await waitFor(() => {
@@ -64,7 +64,7 @@ describe('ExportToolbar Component Tests', () => {
 
     renderWithProviders(<ExportToolbar />);
 
-    const btn = screen.getByRole('button', { name: /Ledger \(CSV\)/i });
+    const btn = screen.getByRole('button', { name: /Transaksi \(CSV\)/i });
     fireEvent.click(btn);
 
     expect(await screen.findByText(/Network error/i)).toBeInTheDocument();

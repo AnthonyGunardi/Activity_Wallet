@@ -253,7 +253,7 @@ export function BulkImportModal({ isOpen, isSubmitting, onSubmit, onClose }) {
               <FileUp size={22} />
             </div>
             <div style={{ fontWeight: 700, fontSize: '0.9375rem', color: 'var(--color-text-main)' }}>
-              {file ? file.name : 'Klik atau seret file Excel ke sini'}
+              {file ? file.name : 'Klik atau drag file Excel ke sini'}
             </div>
             <div style={{ fontSize: '0.8125rem', color: 'var(--color-text-muted)', marginTop: '0.25rem' }}>
               {file ? `${(file.size / 1024).toFixed(1)} KB • Klik untuk mengganti file` : 'Mendukung format .xlsx dan .xls'}

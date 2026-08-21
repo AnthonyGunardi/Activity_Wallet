@@ -17,7 +17,7 @@ describe('ActivityModal Component Tests', () => {
     );
 
     expect(screen.getByText('Tambah Aktivitas Baru')).toBeInTheDocument();
-    expect(screen.getByLabelText(/nama aktivitas \/ wahana/i)).toHaveValue('');
+    expect(screen.getByLabelText(/nama aktivitas/i)).toHaveValue('');
     expect(screen.getByLabelText(/harga per tiket/i)).toHaveValue(150000);
   });
 
@@ -27,7 +27,7 @@ describe('ActivityModal Component Tests', () => {
       <ActivityModal isOpen={true} isSubmitting={false} onSubmit={onSubmit} onClose={vi.fn()} />
     );
 
-    fireEvent.change(screen.getByLabelText(/nama aktivitas \/ wahana/i), {
+    fireEvent.change(screen.getByLabelText(/nama aktivitas/i), {
       target: { value: 'Donut Boat' }
     });
     fireEvent.change(screen.getByLabelText(/harga per tiket/i), {
@@ -68,8 +68,8 @@ describe('ActivityModal Component Tests', () => {
       />
     );
 
-    expect(screen.getByText('Edit Aktivitas Wahana')).toBeInTheDocument();
-    expect(screen.getByLabelText(/nama aktivitas \/ wahana/i)).toHaveValue('Jet Ski');
+    expect(screen.getByText('Edit Aktivitas')).toBeInTheDocument();
+    expect(screen.getByLabelText(/nama aktivitas/i)).toHaveValue('Jet Ski');
     expect(screen.getByLabelText(/harga per tiket/i)).toHaveValue(350000);
 
     fireEvent.change(screen.getByLabelText(/harga per tiket/i), {

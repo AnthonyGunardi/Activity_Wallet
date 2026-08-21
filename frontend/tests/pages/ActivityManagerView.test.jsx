@@ -53,7 +53,7 @@ describe('ActivityManagerView Page Integration Tests', () => {
 
     renderComponent();
 
-    expect(screen.getByText('Katalog Aktivitas & Harga Wahana')).toBeInTheDocument();
+    expect(screen.getByText('Katalog Aktivitas')).toBeInTheDocument();
 
     await waitFor(() => {
       expect(screen.getByText('Jet Ski')).toBeInTheDocument();
@@ -103,7 +103,7 @@ describe('ActivityManagerView Page Integration Tests', () => {
     fireEvent.click(addBtn);
 
     expect(screen.getByText('Tambah Aktivitas Baru')).toBeInTheDocument();
-    fireEvent.change(screen.getByLabelText(/nama aktivitas \/ wahana/i), {
+    fireEvent.change(screen.getByLabelText(/nama aktivitas/i), {
       target: { value: 'Banana Boat' }
     });
     fireEvent.change(screen.getByLabelText(/harga per tiket/i), {
@@ -158,7 +158,7 @@ describe('ActivityManagerView Page Integration Tests', () => {
     const editBtn = screen.getByRole('button', { name: /edit jet ski/i });
     fireEvent.click(editBtn);
 
-    expect(screen.getByText('Edit Aktivitas Wahana')).toBeInTheDocument();
+    expect(screen.getByText('Edit Aktivitas')).toBeInTheDocument();
     fireEvent.change(screen.getByLabelText(/harga per tiket/i), {
       target: { value: '380000' }
     });

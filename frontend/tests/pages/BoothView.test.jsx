@@ -82,10 +82,10 @@ describe('BoothView Page Integration Tests', () => {
 
     renderComponent();
 
-    expect(screen.getByText('Scanner Booth Aktivitas')).toBeInTheDocument();
+    expect(screen.getByText('Scanner Aktivitas')).toBeInTheDocument();
 
     const input = screen.getByPlaceholderText('Contoh: SEPA-001');
-    const scanBtn = screen.getByRole('button', { name: /cari peserta/i });
+    const scanBtn = screen.getByRole('button', { name: /verifikasi peserta/i });
 
     fireEvent.change(input, { target: { value: 'SEPA-BOOTH-001' } });
     fireEvent.click(scanBtn);
@@ -126,7 +126,7 @@ describe('BoothView Page Integration Tests', () => {
 
     // 1. Manual scan
     const input = screen.getByPlaceholderText('Contoh: SEPA-001');
-    const scanBtn = screen.getByRole('button', { name: /cari peserta/i });
+    const scanBtn = screen.getByRole('button', { name: /verifikasi peserta/i });
     fireEvent.change(input, { target: { value: 'SEPA-BOOTH-001' } });
     fireEvent.click(scanBtn);
 

@@ -34,7 +34,6 @@ export function useParticipantWallet(initialQrCode = '') {
     try {
       const data = await participantApi.getWallet(code.trim());
       setWallet(data);
-      localStorage.setItem('sepa_participant_token', code.trim());
     } catch (err) {
       setWallet(null);
       setError(err.message || 'Gagal memuat informasi dompet peserta.');
@@ -46,6 +45,10 @@ export function useParticipantWallet(initialQrCode = '') {
   useEffect(() => {
     if (qrCode) {
       fetchWallet(qrCode);
+    } else {
+      setWallet(null);
+      setError(null);
+      setIsLoading(false);
     }
   }, [qrCode, fetchWallet]);
 

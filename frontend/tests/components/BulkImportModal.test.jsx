@@ -21,11 +21,11 @@ describe('BulkImportModal Component Tests', () => {
 
     expect(screen.getByText('Impor Data Peserta (Excel / .xlsx)')).toBeInTheDocument();
     expect(screen.getByText(/Download Template/i)).toBeInTheDocument();
-    expect(screen.getByText(/Klik atau seret file Excel ke sini/i)).toBeInTheDocument();
+    expect(screen.getByText(/Klik atau drag file Excel ke sini/i)).toBeInTheDocument();
   });
 
   it('should trigger template download when download button is clicked', () => {
-    const templateSpy = vi.spyOn(excelHelperModule, 'generateParticipantTemplate').mockImplementation(() => {});
+    const templateSpy = vi.spyOn(excelHelperModule, 'generateParticipantTemplate').mockImplementation(() => { });
 
     render(
       <BulkImportModal

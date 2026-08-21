@@ -37,12 +37,12 @@ describe('RefundModal Component Tests', () => {
     expect(screen.getAllByText('Rp 350.000').length).toBeGreaterThanOrEqual(1);
 
     fireEvent.change(screen.getByLabelText(/alasan refund/i), {
-      target: { value: 'Salah input wahana oleh staff' }
+      target: { value: 'Salah input aktivitas oleh staff' }
     });
 
     const submitBtn = screen.getByRole('button', { name: /setujui & refund/i });
     fireEvent.click(submitBtn);
 
-    expect(onConfirm).toHaveBeenCalledWith('tx-1000', 'Salah input wahana oleh staff');
+    expect(onConfirm).toHaveBeenCalledWith('tx-1000', 'Salah input aktivitas oleh staff');
   });
 });

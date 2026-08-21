@@ -40,6 +40,60 @@ describe('ParticipantTable Component Tests', () => {
     expect(screen.getByText('Zulkifli Hasan')).toBeInTheDocument();
   });
 
+  it('should trigger onViewDetail when Detail button is clicked', () => {
+    const handleDetail = vi.fn();
+    render(
+      <ParticipantTable
+        participants={mockParticipants}
+        onViewDetail={handleDetail}
+        onEdit={vi.fn()}
+        onDelete={vi.fn()}
+        onReissue={vi.fn()}
+        onToggleStatus={vi.fn()}
+      />
+    );
+
+    const detailBtn = screen.getByRole('button', { name: /detail budi handoko/i });
+    fireEvent.click(detailBtn);
+    expect(handleDetail).toHaveBeenCalledWith(mockParticipants[0]);
+  });
+
+  it('should trigger onEdit when Edit button is clicked', () => {
+    const handleEdit = vi.fn();
+    render(
+      <ParticipantTable
+        participants={mockParticipants}
+        onViewDetail={vi.fn()}
+        onEdit={handleEdit}
+        onDelete={vi.fn()}
+        onReissue={vi.fn()}
+        onToggleStatus={vi.fn()}
+      />
+    );
+
+    const editBtn = screen.getByRole('button', { name: /edit budi handoko/i });
+    fireEvent.click(editBtn);
+    expect(handleEdit).toHaveBeenCalledWith(mockParticipants[0]);
+  });
+
+  it('should trigger onDelete when Delete button is clicked', () => {
+    const handleDelete = vi.fn();
+    render(
+      <ParticipantTable
+        participants={mockParticipants}
+        onViewDetail={vi.fn()}
+        onEdit={vi.fn()}
+        onDelete={handleDelete}
+        onReissue={vi.fn()}
+        onToggleStatus={vi.fn()}
+      />
+    );
+
+    const deleteBtn = screen.getByRole('button', { name: /hapus budi handoko/i });
+    fireEvent.click(deleteBtn);
+    expect(handleDelete).toHaveBeenCalledWith(mockParticipants[0]);
+  });
+
   it('should trigger onReissue when Reissue QR button is clicked', () => {
     const handleReissue = vi.fn();
     render(

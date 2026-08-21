@@ -125,7 +125,7 @@ export function BoothView() {
             <div>
               <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', display: 'block' }}>Aktivitas</span>
               <strong style={{ fontSize: '1rem', color: 'var(--color-text-main)' }}>
-                {lastReceipt.transaction?.activity_name || 'Wahana Air'}
+                {lastReceipt.transaction?.activity_name || 'Water Activity'}
               </strong>
             </div>
 

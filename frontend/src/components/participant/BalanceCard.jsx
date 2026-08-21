@@ -62,7 +62,7 @@ export function BalanceCard({ participant }) {
               gap: '0.375rem'
             }}
           >
-            <Sparkles size={14} /> Sepa Activity Pass
+            <Sparkles size={14} /> Sepa Island Activity Wallet
           </span>
           <h2 style={{ fontSize: '1.5rem', fontWeight: 700, margin: '0.25rem 0 0 0', color: isBlocked ? 'var(--color-danger-text)' : '#ffffff' }}>
             {participant.name}
@@ -85,7 +85,7 @@ export function BalanceCard({ participant }) {
           >
             {isBlocked ? (
               <>
-                <ShieldAlert size={12} /> Diblokir
+                <ShieldAlert size={12} /> Blocked
               </>
             ) : (
               participant.qr_code
@@ -96,7 +96,7 @@ export function BalanceCard({ participant }) {
 
       <div style={{ marginBottom: '1.5rem' }}>
         <div style={{ fontSize: '0.8125rem', opacity: 0.85, marginBottom: '0.25rem' }}>
-          Sisa Saldo Aktivitas
+          Saldo Aktivitas
         </div>
         <div
           style={{
@@ -127,7 +127,7 @@ export function BalanceCard({ participant }) {
           </div>
         </div>
         <div>
-          <div style={{ fontSize: '0.75rem', opacity: 0.8 }}>Total Terpakai</div>
+          <div style={{ fontSize: '0.75rem', opacity: 0.8 }}>Total Penggunaan</div>
           <div style={{ fontSize: '1rem', fontWeight: 600 }}>
             {formatCurrency(participant.total_spent)}
           </div>

@@ -82,7 +82,7 @@ describe('AdminDashboardView Page Integration Tests', () => {
 
     renderComponent();
 
-    expect(screen.getByText('Ringkasan Kredit & Audit Ledger')).toBeInTheDocument();
+    expect(screen.getByText('Ringkasan Kredit & Transaksi')).toBeInTheDocument();
 
     await waitFor(() => {
       expect(screen.getByText('Rp 80.000.000')).toBeInTheDocument();

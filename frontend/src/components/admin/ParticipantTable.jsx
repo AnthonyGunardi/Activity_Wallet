@@ -1,4 +1,4 @@
-import { RefreshCw, Ban, CheckCircle2, QrCode } from 'lucide-react';
+import { Eye, Edit3, Trash2, RefreshCw, Ban, CheckCircle2, QrCode } from 'lucide-react';
 import { formatCurrency } from '../../utils/formatters';
 
 /**
@@ -7,11 +7,21 @@ import { formatCurrency } from '../../utils/formatters';
  *
  * @param {{
  *   participants: Array<Object>,
+ *   onViewDetail: (participant: Object) => void,
+ *   onEdit: (participant: Object) => void,
+ *   onDelete: (participant: Object) => void,
  *   onReissue: (participant: Object) => void,
  *   onToggleStatus: (participant: Object, newStatus: string) => void
  * }} props
  */
-export function ParticipantTable({ participants = [], onReissue, onToggleStatus }) {
+export function ParticipantTable({
+  participants = [],
+  onViewDetail,
+  onEdit,
+  onDelete,
+  onReissue,
+  onToggleStatus
+}) {
   if (!participants || participants.length === 0) {
     return (
       <div
@@ -59,9 +69,9 @@ export function ParticipantTable({ participants = [], onReissue, onToggleStatus 
               }}
             >
               <th style={{ padding: '0.875rem 1rem', fontWeight: 700 }}>Nama Peserta</th>
-              <th style={{ padding: '0.875rem 1rem', fontWeight: 700 }}>Kode QR Token</th>
+              <th style={{ padding: '0.875rem 1rem', fontWeight: 700 }}>Kode Peserta</th>
               <th style={{ padding: '0.875rem 1rem', fontWeight: 700 }}>Sisa Saldo</th>
-              <th style={{ padding: '0.875rem 1rem', fontWeight: 700 }}>Total Terpakai</th>
+              <th style={{ padding: '0.875rem 1rem', fontWeight: 700 }}>Total Penggunaan</th>
               <th style={{ padding: '0.875rem 1rem', fontWeight: 700 }}>Status</th>
               <th style={{ padding: '0.875rem 1rem', fontWeight: 700, textAlign: 'right' }}>Aksi</th>
             </tr>
@@ -113,15 +123,38 @@ export function ParticipantTable({ participants = [], onReissue, onToggleStatus 
                     </span>
                   </td>
                   <td style={{ padding: '1rem', textAlign: 'right' }}>
-                    <div style={{ display: 'inline-flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
+                    <div style={{ display: 'inline-flex', gap: '0.375rem', justifyContent: 'flex-end', flexWrap: 'wrap' }}>
+                      <button
+                        type="button"
+                        className="btn btn-secondary"
+                        onClick={() => onViewDetail && onViewDetail(p)}
+                        aria-label={`Detail ${p.name}`}
+                        title="Lihat Detail & Riwayat Transaksi"
+                        style={{ fontSize: '0.75rem', padding: '0.35rem 0.5rem', display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}
+                      >
+                        <Eye size={14} /> Detail
+                      </button>
+
+                      <button
+                        type="button"
+                        className="btn btn-secondary"
+                        onClick={() => onEdit && onEdit(p)}
+                        aria-label={`Edit ${p.name}`}
+                        title="Ubah Data Peserta"
+                        style={{ fontSize: '0.75rem', padding: '0.35rem 0.5rem', display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}
+                      >
+                        <Edit3 size={14} /> Edit
+                      </button>
+
                       <button
                         type="button"
                         className="btn btn-secondary"
                         onClick={() => onReissue(p)}
                         aria-label={`Reissue QR ${p.name}`}
-                        style={{ fontSize: '0.75rem', padding: '0.35rem 0.65rem', display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}
+                        title="Cetak/Generate Ulang Kode QR Baru"
+                        style={{ fontSize: '0.75rem', padding: '0.35rem 0.5rem', display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}
                       >
-                        <RefreshCw size={14} /> Reissue QR
+                        <RefreshCw size={14} /> QR
                       </button>
 
                       {isBlocked ? (
@@ -130,21 +163,47 @@ export function ParticipantTable({ participants = [], onReissue, onToggleStatus 
                           className="btn btn-success"
                           onClick={() => onToggleStatus(p, 'ACTIVE')}
                           aria-label={`Aktifkan ${p.name}`}
-                          style={{ fontSize: '0.75rem', padding: '0.35rem 0.65rem', display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}
+                          title="Aktifkan Akun"
+                          style={{ fontSize: '0.75rem', padding: '0.35rem 0.5rem', display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}
                         >
                           <CheckCircle2 size={14} /> Aktifkan
                         </button>
                       ) : (
                         <button
                           type="button"
-                          className="btn btn-danger"
+                          className="btn btn-secondary"
                           onClick={() => onToggleStatus(p, 'BLOCKED')}
                           aria-label={`Blokir ${p.name}`}
-                          style={{ fontSize: '0.75rem', padding: '0.35rem 0.65rem', display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}
+                          title="Blokir Aktivitas Akun"
+                          style={{
+                            fontSize: '0.75rem',
+                            padding: '0.35rem 0.5rem',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '0.25rem',
+                            color: 'var(--color-danger-600, #ef4444)'
+                          }}
                         >
-                          <Ban size={14} /> Blokir
+                          <Ban size={14} /> Nonaktifkan
                         </button>
                       )}
+
+                      <button
+                        type="button"
+                        className="btn btn-ghost"
+                        onClick={() => onDelete && onDelete(p)}
+                        aria-label={`Hapus ${p.name}`}
+                        title="Hapus Peserta"
+                        style={{
+                          fontSize: '0.75rem',
+                          padding: '0.35rem 0.45rem',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          color: 'var(--color-danger-600, #ef4444)'
+                        }}
+                      >
+                        <Trash2 size={14} />
+                      </button>
                     </div>
                   </td>
                 </tr>

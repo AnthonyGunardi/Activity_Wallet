@@ -51,6 +51,22 @@ export function useAdminParticipants() {
     return result;
   };
 
+  const handleUpdate = async (participantId, payload) => {
+    const updated = await adminApi.updateParticipant(participantId, payload);
+    await fetchParticipants(pagination.page);
+    return updated;
+  };
+
+  const handleDelete = async (participantId) => {
+    const result = await adminApi.deleteParticipant(participantId);
+    await fetchParticipants(pagination.page);
+    return result;
+  };
+
+  const handleGetDetail = async (participantId) => {
+    return await adminApi.getParticipantById(participantId);
+  };
+
   const handleReissueQr = async (participantId) => {
     const result = await adminApi.reissueQr(participantId);
     await fetchParticipants(pagination.page);
@@ -75,6 +91,9 @@ export function useAdminParticipants() {
     fetchParticipants,
     handleCreate,
     handleBulkCreate,
+    handleUpdate,
+    handleDelete,
+    handleGetDetail,
     handleReissueQr,
     handleToggleStatus
   };

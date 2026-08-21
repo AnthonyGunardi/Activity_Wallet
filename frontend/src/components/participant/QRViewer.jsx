@@ -36,7 +36,7 @@ export function QRViewer({ qrCode, participantName }) {
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem', color: 'var(--color-primary-600)' }}>
           <QrCode size={20} />
           <span style={{ fontSize: '0.875rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-            QR Gelang / Pass
+            QR Peserta
           </span>
         </div>
 
@@ -80,7 +80,7 @@ export function QRViewer({ qrCode, participantName }) {
         </div>
 
         <p style={{ fontSize: '0.8125rem', color: 'var(--color-text-muted)', marginTop: '0.75rem', marginBottom: '1rem' }}>
-          Tunjukkan QR ini ke petugas booth aktivitas
+          Tunjukkan QR ini ke staff booth aktivitas
         </p>
 
         <button
