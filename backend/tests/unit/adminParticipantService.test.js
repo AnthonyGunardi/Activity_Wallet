@@ -1,4 +1,4 @@
-const { sequelize, Participant, User } = require('../../src/models');
+const { sequelize, Participant, User, Transaction } = require('../../src/models');
 const adminParticipantService = require('../../src/services/adminParticipantService');
 const { ParticipantStatus, UserRole } = require('../../src/constants/enums');
 
@@ -8,7 +8,7 @@ describe('Admin Participant Service Unit Tests', () => {
   beforeAll(async () => {
     await sequelize.sync({ force: true });
 
-    await User.create({
+    const admin = await User.create({
       username: 'unit_admin_p',
       password_hash: 'adminpass',
       name: 'Admin Tester',
@@ -42,6 +42,17 @@ describe('Admin Participant Service Unit Tests', () => {
       total_spent: 500000,
       status: ParticipantStatus.BLOCKED
     });
+
+    // Create a transaction on participant1 for testing deletion safeguard
+    await Transaction.create({
+      participant_id: participant1.id,
+      staff_id: admin.id,
+      type: 'DEDUCTION',
+      amount: 250000,
+      balance_before: 1000000,
+      balance_after: 750000,
+      created_at: new Date()
+    });
   });
 
   afterAll(async () => {
@@ -71,6 +82,87 @@ describe('Admin Participant Service Unit Tests', () => {
       const resultBlocked = await adminParticipantService.listParticipants({ status: ParticipantStatus.BLOCKED });
       expect(resultBlocked.participants.length).toBe(1);
       expect(resultBlocked.participants[0].name).toBe('Zulkifli Hasan');
+    });
+  });
+
+  describe('getParticipantById', () => {
+    test('should retrieve participant details with transaction history', async () => {
+      const found = await adminParticipantService.getParticipantById(participant1.id);
+      expect(found).toBeDefined();
+      expect(found.name).toBe('Budi Handoko');
+      expect(found.transactions).toBeDefined();
+      expect(found.transactions.length).toBe(1);
+    });
+
+    test('should throw 404 when participant ID does not exist', async () => {
+      await expect(
+        adminParticipantService.getParticipantById('00000000-0000-0000-0000-000000000000')
+      ).rejects.toMatchObject({
+        statusCode: 404,
+        code: 'PARTICIPANT_NOT_FOUND'
+      });
+    });
+  });
+
+  describe('updateParticipant', () => {
+    test('should update participant name and status', async () => {
+      const updated = await adminParticipantService.updateParticipant(participant2.id, {
+        name: 'Siti Aminah Updated',
+        status: ParticipantStatus.BLOCKED
+      });
+      expect(updated.name).toBe('Siti Aminah Updated');
+      expect(updated.status).toBe(ParticipantStatus.BLOCKED);
+
+      // Revert back for other tests
+      await adminParticipantService.updateParticipant(participant2.id, {
+        status: ParticipantStatus.ACTIVE
+      });
+    });
+
+    test('should throw 404 when updating non-existent participant', async () => {
+      await expect(
+        adminParticipantService.updateParticipant('00000000-0000-0000-0000-000000000000', { name: 'Ghost' })
+      ).rejects.toMatchObject({
+        statusCode: 404,
+        code: 'PARTICIPANT_NOT_FOUND'
+      });
+    });
+  });
+
+  describe('deleteParticipant', () => {
+    test('should reject deletion of participant with existing transactions with 422', async () => {
+      await expect(
+        adminParticipantService.deleteParticipant(participant1.id)
+      ).rejects.toMatchObject({
+        statusCode: 422,
+        code: 'CANNOT_DELETE_PARTICIPANT_WITH_TRANSACTIONS'
+      });
+    });
+
+    test('should throw 404 when deleting non-existent participant', async () => {
+      await expect(
+        adminParticipantService.deleteParticipant('00000000-0000-0000-0000-000000000000')
+      ).rejects.toMatchObject({
+        statusCode: 404,
+        code: 'PARTICIPANT_NOT_FOUND'
+      });
+    });
+
+    test('should safely delete participant who has 0 transactions', async () => {
+      const tempParticipant = await Participant.create({
+        name: 'Temporary Unused Participant',
+        qr_code: 'SEPA-TEMP-DEL',
+        initial_credit: 1000000,
+        current_balance: 1000000,
+        total_spent: 0,
+        status: ParticipantStatus.ACTIVE
+      });
+
+      const res = await adminParticipantService.deleteParticipant(tempParticipant.id);
+      expect(res.deleted).toBe(true);
+
+      const check = await Participant.findByPk(tempParticipant.id);
+      expect(check).toBeNull();
     });
   });
 

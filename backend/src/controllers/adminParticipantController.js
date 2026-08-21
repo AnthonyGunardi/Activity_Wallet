@@ -62,6 +62,48 @@ async function reissueQr(req, res, next) {
 }
 
 /**
+ * Retrieves a single participant by ID.
+ * GET /api/v1/admin/participants/:id
+ */
+async function getById(req, res, next) {
+  try {
+    const { id } = req.params;
+    const participant = await adminParticipantService.getParticipantById(id);
+    return res.status(200).json(formatSuccess(participant));
+  } catch (error) {
+    return next(error);
+  }
+}
+
+/**
+ * Updates an existing participant.
+ * PUT /api/v1/admin/participants/:id
+ */
+async function update(req, res, next) {
+  try {
+    const { id } = req.params;
+    const participant = await adminParticipantService.updateParticipant(id, req.body);
+    return res.status(200).json(formatSuccess(participant));
+  } catch (error) {
+    return next(error);
+  }
+}
+
+/**
+ * Deletes a participant (only if no transactions exist).
+ * DELETE /api/v1/admin/participants/:id
+ */
+async function remove(req, res, next) {
+  try {
+    const { id } = req.params;
+    const result = await adminParticipantService.deleteParticipant(id);
+    return res.status(200).json(formatSuccess(result));
+  } catch (error) {
+    return next(error);
+  }
+}
+
+/**
  * Updates participant status (ACTIVE / BLOCKED).
  * PUT /api/v1/admin/participants/:id/status
  */
@@ -78,8 +120,11 @@ async function updateStatus(req, res, next) {
 
 module.exports = {
   list,
+  getById,
   create,
   bulkCreate,
+  update,
+  remove,
   reissueQr,
   updateStatus
 };

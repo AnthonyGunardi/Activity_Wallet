@@ -186,7 +186,6 @@ describe('RefundService Unit Tests', () => {
     });
 
     test('should throw 404 PARTICIPANT_NOT_FOUND when participant is missing', async () => {
-      const origFindByPk = Participant.findByPk;
       jest.spyOn(Participant, 'findByPk').mockResolvedValueOnce(null);
 
       await expect(

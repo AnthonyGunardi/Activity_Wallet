@@ -1,6 +1,6 @@
 const crypto = require('crypto');
 const { Op } = require('sequelize');
-const { sequelize, Participant } = require('../models');
+const { sequelize, Participant, Transaction, Activity } = require('../models');
 const { ParticipantStatus, DEFAULT_INITIAL_CREDIT } = require('../constants/enums');
 const { AppError } = require('../utils/responseEnvelope');
 
@@ -101,9 +101,19 @@ async function createParticipant({ name, initial_credit = DEFAULT_INITIAL_CREDIT
 async function bulkCreateParticipants(participantsList = []) {
   return await sequelize.transaction(async (t) => {
     const toInsert = [];
+    const usedTokens = new Set();
 
     for (const item of participantsList) {
-      let token = item.qr_code ? item.qr_code.trim().toUpperCase() : generateQrToken();
+      let token = item.qr_code ? item.qr_code.trim().toUpperCase() : null;
+
+      if (!token) {
+        token = generateQrToken();
+        while (usedTokens.has(token) || (await Participant.findOne({ where: { qr_code: token }, transaction: t }))) {
+          token = generateQrToken();
+        }
+      }
+
+      usedTokens.add(token);
       const credit = typeof item.initial_credit === 'number' ? item.initial_credit : DEFAULT_INITIAL_CREDIT;
 
       toInsert.push({
@@ -167,6 +177,96 @@ async function reissueQrCode(participantId) {
 }
 
 /**
+ * Retrieves a single participant by ID including their transaction history.
+ *
+ * @param {string} participantId
+ * @returns {Promise<Participant>}
+ * @throws {AppError} 404 PARTICIPANT_NOT_FOUND
+ */
+async function getParticipantById(participantId) {
+  const participant = await Participant.findByPk(participantId, {
+    include: [
+      {
+        model: Transaction,
+        as: 'transactions',
+        include: [
+          { model: Activity, as: 'activity', attributes: ['id', 'name', 'price'] }
+        ]
+      }
+    ],
+    order: [[{ model: Transaction, as: 'transactions' }, 'created_at', 'DESC']]
+  });
+
+  if (!participant) {
+    throw new AppError('PARTICIPANT_NOT_FOUND', 'Peserta dengan ID tersebut tidak ditemukan.', 404);
+  }
+
+  return participant;
+}
+
+/**
+ * Updates participant information (e.g. name or status).
+ *
+ * @param {string} participantId
+ * @param {{ name?: string, status?: 'ACTIVE' | 'BLOCKED' }} payload
+ * @returns {Promise<Participant>}
+ * @throws {AppError} 404 PARTICIPANT_NOT_FOUND
+ */
+async function updateParticipant(participantId, { name, status } = {}) {
+  const participant = await Participant.findByPk(participantId);
+
+  if (!participant) {
+    throw new AppError('PARTICIPANT_NOT_FOUND', 'Peserta dengan ID tersebut tidak ditemukan.', 404);
+  }
+
+  if (name !== undefined) {
+    participant.name = name.trim();
+  }
+
+  if (status !== undefined) {
+    participant.status = status;
+  }
+
+  await participant.save();
+  return participant;
+}
+
+/**
+ * Deletes a participant if they have no existing transaction history in the audit ledger.
+ * If transactions exist, rejects with 422 to preserve immutable audit trail.
+ *
+ * @param {string} participantId
+ * @returns {Promise<{ deleted: boolean, id: string }>}
+ * @throws {AppError} 404 PARTICIPANT_NOT_FOUND, 422 CANNOT_DELETE_PARTICIPANT_WITH_TRANSACTIONS
+ */
+async function deleteParticipant(participantId) {
+  const participant = await Participant.findByPk(participantId);
+
+  if (!participant) {
+    throw new AppError('PARTICIPANT_NOT_FOUND', 'Peserta dengan ID tersebut tidak ditemukan.', 404);
+  }
+
+  const txCount = await Transaction.count({
+    where: { participant_id: participantId }
+  });
+
+  if (txCount > 0) {
+    throw new AppError(
+      'CANNOT_DELETE_PARTICIPANT_WITH_TRANSACTIONS',
+      'Peserta yang sudah memiliki riwayat transaksi tidak dapat dihapus. Silakan gunakan fitur Blokir (Status: BLOCKED) untuk menonaktifkan.',
+      422
+    );
+  }
+
+  await participant.destroy();
+
+  return {
+    deleted: true,
+    id: participantId
+  };
+}
+
+/**
  * Updates participant account status (ACTIVE or BLOCKED).
  *
  * @param {string} participantId
@@ -190,8 +290,11 @@ async function updateParticipantStatus(participantId, status) {
 module.exports = {
   generateQrToken,
   listParticipants,
+  getParticipantById,
   createParticipant,
   bulkCreateParticipants,
+  updateParticipant,
+  deleteParticipant,
   reissueQrCode,
   updateParticipantStatus
 };

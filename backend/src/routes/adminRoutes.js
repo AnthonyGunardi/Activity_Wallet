@@ -9,7 +9,8 @@ const {
   listParticipantsQuerySchema,
   createParticipantSchema,
   bulkParticipantsSchema,
-  updateStatusSchema
+  updateStatusSchema,
+  updateParticipantSchema
 } = require('../schemas/adminSchemas');
 const {
   listActivitiesQuerySchema,
@@ -48,6 +49,12 @@ router.get(
 );
 
 /**
+ * @route GET /api/v1/admin/participants/:id
+ * @desc Retrieve single participant profile and transaction history
+ */
+router.get('/participants/:id', adminParticipantController.getById);
+
+/**
  * @route POST /api/v1/admin/participants
  * @desc Create a single participant
  */
@@ -66,6 +73,22 @@ router.post(
   validateBody(bulkParticipantsSchema),
   adminParticipantController.bulkCreate
 );
+
+/**
+ * @route PUT /api/v1/admin/participants/:id
+ * @desc Update participant profile details
+ */
+router.put(
+  '/participants/:id',
+  validateBody(updateParticipantSchema),
+  adminParticipantController.update
+);
+
+/**
+ * @route DELETE /api/v1/admin/participants/:id
+ * @desc Delete participant without transactions
+ */
+router.delete('/participants/:id', adminParticipantController.remove);
 
 /**
  * @route PUT /api/v1/admin/participants/:id/reissue-qr

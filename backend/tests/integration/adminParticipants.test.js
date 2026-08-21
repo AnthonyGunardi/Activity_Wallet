@@ -113,6 +113,81 @@ describe('Admin Participants API Integration Tests', () => {
     });
   });
 
+  describe('GET /api/v1/admin/participants/:id', () => {
+    test('should retrieve single participant with details', async () => {
+      const res = await request(app)
+        .get(`/api/v1/admin/participants/${testParticipant.id}`)
+        .set('Authorization', `Bearer ${adminToken}`);
+
+      expect(res.status).toBe(200);
+      expect(res.body.success).toBe(true);
+      expect(res.body.data.id).toBe(testParticipant.id);
+      expect(res.body.data.name).toBe('Indra Bekti');
+    });
+
+    test('should return 404 for non-existent participant ID', async () => {
+      const res = await request(app)
+        .get('/api/v1/admin/participants/00000000-0000-0000-0000-000000000000')
+        .set('Authorization', `Bearer ${adminToken}`);
+
+      expect(res.status).toBe(404);
+      expect(res.body.error.code).toBe('PARTICIPANT_NOT_FOUND');
+    });
+  });
+
+  describe('PUT /api/v1/admin/participants/:id', () => {
+    test('should update participant name', async () => {
+      const res = await request(app)
+        .put(`/api/v1/admin/participants/${testParticipant.id}`)
+        .set('Authorization', `Bearer ${adminToken}`)
+        .send({ name: 'Indra Bekti Bekti' });
+
+      expect(res.status).toBe(200);
+      expect(res.body.success).toBe(true);
+      expect(res.body.data.name).toBe('Indra Bekti Bekti');
+    });
+
+    test('should reject invalid update payload with 400', async () => {
+      const res = await request(app)
+        .put(`/api/v1/admin/participants/${testParticipant.id}`)
+        .set('Authorization', `Bearer ${adminToken}`)
+        .send({ name: '' });
+
+      expect(res.status).toBe(400);
+      expect(res.body.error.code).toBe('VALIDATION_ERROR');
+    });
+  });
+
+  describe('DELETE /api/v1/admin/participants/:id', () => {
+    test('should allow deleting participant with no transaction records', async () => {
+      const unused = await Participant.create({
+        name: 'Unused Test Participant',
+        qr_code: 'SEPA-UNUSED-DEL',
+        initial_credit: 1000000,
+        current_balance: 1000000,
+        total_spent: 0,
+        status: ParticipantStatus.ACTIVE
+      });
+
+      const res = await request(app)
+        .delete(`/api/v1/admin/participants/${unused.id}`)
+        .set('Authorization', `Bearer ${adminToken}`);
+
+      expect(res.status).toBe(200);
+      expect(res.body.success).toBe(true);
+      expect(res.body.data.deleted).toBe(true);
+    });
+
+    test('should return 404 when deleting non-existent participant', async () => {
+      const res = await request(app)
+        .delete('/api/v1/admin/participants/00000000-0000-0000-0000-000000000000')
+        .set('Authorization', `Bearer ${adminToken}`);
+
+      expect(res.status).toBe(404);
+      expect(res.body.error.code).toBe('PARTICIPANT_NOT_FOUND');
+    });
+  });
+
   describe('PUT /api/v1/admin/participants/:id/reissue-qr', () => {
     test('should reissue a new QR code token preserving wallet balance', async () => {
       const res = await request(app)

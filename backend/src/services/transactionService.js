@@ -126,11 +126,11 @@ async function processDeduction({ qr_code, activity_id, staff_id, notes }) {
       });
 
       if (!activity) {
-        throw new AppError('ACTIVITY_NOT_FOUND', 'Wahana aktivitas yang dipilih tidak ditemukan.', 404);
+        throw new AppError('ACTIVITY_NOT_FOUND', 'Aktivitas yang dipilih tidak ditemukan.', 404);
       }
 
       if (activity.status !== ActivityStatus.ACTIVE) {
-        throw new AppError('ACTIVITY_INACTIVE', 'Wahana aktivitas saat ini sedang tidak beroperasi atau nonaktif.', 422);
+        throw new AppError('ACTIVITY_INACTIVE', 'Aktivitas saat ini sedang tidak beroperasi atau nonaktif.', 422);
       }
 
       // 3. Balance Invariant Check

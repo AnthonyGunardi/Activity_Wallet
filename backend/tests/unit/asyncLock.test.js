@@ -69,4 +69,40 @@ describe('asyncLock Utility Tests', () => {
     await Promise.all([t1, t2, t3]);
     expect(results).toEqual([1, 2, 3]);
   });
+
+  test('should execute queued task even if the preceding concurrent task rejected', async () => {
+    const task1 = withKeyLock('concurrent-fail', async () => {
+      await new Promise((r) => setTimeout(r, 20));
+      throw new Error('Concurrent task 1 failed');
+    });
+
+    const task2 = withKeyLock('concurrent-fail', async () => {
+      return 'task2-success';
+    });
+
+    await expect(task1).rejects.toThrow('Concurrent task 1 failed');
+    const res2 = await task2;
+    expect(res2).toBe('task2-success');
+  });
+
+  test('should delete key from locks map when all queued operations complete', async () => {
+    const { locks } = require('../../src/utils/asyncLock');
+
+    const task1 = withKeyLock('cleanup-test', async () => {
+      await new Promise((r) => setTimeout(r, 20));
+      return 1;
+    });
+
+    const task2 = withKeyLock('cleanup-test', async () => {
+      await new Promise((r) => setTimeout(r, 10));
+      return 2;
+    });
+
+    expect(locks.has('cleanup-test')).toBe(true);
+
+    await Promise.all([task1, task2]);
+
+    expect(locks.has('cleanup-test')).toBe(false);
+  });
 });
+

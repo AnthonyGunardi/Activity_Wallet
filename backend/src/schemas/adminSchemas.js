@@ -47,9 +47,22 @@ const updateStatusSchema = Joi.object({
   })
 });
 
+const updateParticipantSchema = Joi.object({
+  name: Joi.string().trim().min(2).max(128).optional().messages({
+    'string.base': 'Nama peserta harus berupa teks.',
+    'string.empty': 'Nama peserta tidak boleh kosong.',
+    'string.min': 'Nama peserta minimal 2 karakter.',
+    'string.max': 'Nama peserta maksimal 128 karakter.'
+  }),
+  status: Joi.string().valid(ParticipantStatus.ACTIVE, ParticipantStatus.BLOCKED).optional()
+}).min(1).messages({
+  'object.min': 'Minimal satu bidang harus disediakan untuk diperbarui.'
+});
+
 module.exports = {
   listParticipantsQuerySchema,
   createParticipantSchema,
   bulkParticipantsSchema,
-  updateStatusSchema
+  updateStatusSchema,
+  updateParticipantSchema
 };
