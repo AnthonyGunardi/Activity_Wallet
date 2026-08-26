@@ -36,4 +36,17 @@ describe('ActivityCatalog Component Tests', () => {
     render(<ActivityCatalog activities={[]} currentBalance={500000} />);
     expect(screen.getByText('Belum ada aktivitas yang tersedia.')).toBeInTheDocument();
   });
+
+  it('should render activities sorted by id ascending', () => {
+    const unsortedActivities = [
+      { id: 3, name: 'Snorkeling', price: 200000, is_affordable: true },
+      { id: 1, name: 'Banana Boat', price: 150000, is_affordable: true },
+      { id: 2, name: 'Donut Boat', price: 175000, is_affordable: true }
+    ];
+
+    render(<ActivityCatalog activities={unsortedActivities} currentBalance={500000} />);
+
+    const titles = screen.getAllByRole('heading', { level: 4 }).map((el) => el.textContent);
+    expect(titles).toEqual(['Banana Boat', 'Donut Boat', 'Snorkeling']);
+  });
 });

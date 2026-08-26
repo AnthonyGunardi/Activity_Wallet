@@ -1,9 +1,20 @@
-import { useState } from 'react';
-import { QrCode, Search, Camera, RefreshCw } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { Html5Qrcode } from 'html5-qrcode';
+import {
+  QrCode,
+  Search,
+  CameraOff,
+  RefreshCw,
+  SwitchCamera,
+  AlertCircle,
+  Video,
+  VideoOff
+} from 'lucide-react';
 
 /**
  * ScannerView Component
- * Provides camera scanner UI and fast manual QR token input fallback for outdoor booth reliability.
+ * Provides live HTML5 camera QR scanner with automatic device detection,
+ * camera flipping, permission/error recovery, and fast manual QR token input fallback.
  *
  * @param {{
  *   onScan: (code: string) => void,
@@ -12,6 +23,147 @@ import { QrCode, Search, Camera, RefreshCw } from 'lucide-react';
  */
 export function ScannerView({ onScan, isScanning }) {
   const [manualCode, setManualCode] = useState('');
+  const [cameraActive, setCameraActive] = useState(true);
+  const [cameraStatus, setCameraStatus] = useState('idle'); // 'idle' | 'initializing' | 'active' | 'error' | 'disabled'
+  const [cameraError, setCameraError] = useState('');
+  const [cameras, setCameras] = useState([]);
+  const [selectedCameraIndex, setSelectedCameraIndex] = useState(0);
+
+  const scannerRef = useRef(null);
+  const lastScannedRef = useRef({ code: '', time: 0 });
+
+  // Initialize and handle camera stream lifecycle
+  useEffect(() => {
+    let isMounted = true;
+    let html5QrCode = null;
+
+    const initScanner = async () => {
+      if (!cameraActive) {
+        setCameraStatus('disabled');
+        return;
+      }
+
+      setCameraStatus('initializing');
+      setCameraError('');
+
+      // Guard for non-browser or environments without mediaDevices
+      if (typeof window === 'undefined' || !navigator?.mediaDevices?.getUserMedia) {
+        if (isMounted) {
+          setCameraStatus('error');
+          setCameraError('Kamera tidak didukung atau izin tidak tersedia di peramban ini.');
+        }
+        return;
+      }
+
+      try {
+        const qrContainer = document.getElementById('booth-qr-reader');
+        if (!qrContainer) {
+          if (isMounted) setCameraStatus('error');
+          return;
+        }
+
+        html5QrCode = new Html5Qrcode('booth-qr-reader');
+        scannerRef.current = html5QrCode;
+
+        // Query available video input devices
+        let availableDevices = [];
+        try {
+          availableDevices = await Html5Qrcode.getCameras();
+          if (isMounted && availableDevices && availableDevices.length > 0) {
+            setCameras(availableDevices);
+          }
+        } catch (_devicesErr) {
+          // Fallback to environment facingMode if device enumeration fails
+        }
+
+        const cameraConfig = availableDevices.length > 0 && availableDevices[selectedCameraIndex]
+          ? { deviceId: { exact: availableDevices[selectedCameraIndex].id } }
+          : { facingMode: 'environment' };
+
+        const scanConfig = {
+          fps: 10,
+          qrbox: { width: 200, height: 200 },
+          aspectRatio: 1.6
+        };
+
+        await html5QrCode.start(
+          cameraConfig,
+          scanConfig,
+          (decodedText) => {
+            const now = Date.now();
+            // Debounce rapid repeated frames and skip when network request is in-flight
+            if (
+              decodedText &&
+              !isScanning &&
+              (decodedText !== lastScannedRef.current.code || now - lastScannedRef.current.time > 2500)
+            ) {
+              lastScannedRef.current = { code: decodedText, time: now };
+              onScan(decodedText.trim());
+            }
+          },
+          () => {
+            // Ignore per-frame qr decode misses
+          }
+        );
+
+        if (isMounted) {
+          setCameraStatus('active');
+        }
+      } catch (err) {
+        if (isMounted) {
+          setCameraStatus('error');
+          const errorMsg = err?.message || String(err);
+          if (errorMsg.includes('NotAllowedError') || errorMsg.includes('Permission')) {
+            setCameraError('Izin akses kamera ditolak. Silakan izinkan kamera di pengaturan browser.');
+          } else if (errorMsg.includes('NotFoundError') || errorMsg.includes('DevicesNotFoundError')) {
+            setCameraError('Kamera tidak terdeteksi pada perangkat.');
+          } else {
+            setCameraError('Tidak dapat membuka kamera. Pastikan kamera tidak digunakan oleh tab/aplikasi lain.');
+          }
+        }
+      }
+    };
+
+    initScanner();
+
+    return () => {
+      isMounted = false;
+      if (scannerRef.current) {
+        const instance = scannerRef.current;
+        scannerRef.current = null;
+        if (instance.isScanning) {
+          instance
+            .stop()
+            .then(() => {
+              try {
+                instance.clear();
+              } catch (_clearErr) {
+                // Ignore DOM clear errors on unmount
+              }
+            })
+            .catch((_stopErr) => {
+              // Ignore stream stop errors on unmount
+            });
+        } else {
+          try {
+            instance.clear();
+          } catch (_clearErr) {
+            // Ignore DOM clear errors on unmount
+          }
+        }
+      }
+    };
+  }, [cameraActive, selectedCameraIndex, isScanning, onScan]);
+
+  const handleSwitchCamera = () => {
+    if (cameras.length > 1) {
+      setSelectedCameraIndex((prev) => (prev + 1) % cameras.length);
+    }
+  };
+
+  const toggleCamera = () => {
+    setCameraActive((prev) => !prev);
+  };
 
   const handleManualSubmit = (e) => {
     e.preventDefault();
@@ -36,51 +188,206 @@ export function ScannerView({ onScan, isScanning }) {
         boxShadow: 'var(--shadow-sm)'
       }}
     >
-      <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', marginBottom: '1.25rem', color: 'var(--color-primary-600)' }}>
-        <QrCode size={24} />
-        <h2 style={{ fontSize: '1.25rem', fontWeight: 800, margin: 0, color: 'var(--color-text-main)' }}>
-          Scanner Aktivitas
-        </h2>
-      </div>
-
-      {/* Camera Viewfinder Mock / Interactive Scanner */}
+      {/* Header & Camera Control Toolbar */}
       <div
         style={{
-          width: '100%',
-          aspectRatio: '16/10',
-          maxHeight: '260px',
-          background: '#0f172a',
-          borderRadius: 'var(--radius-lg)',
-          position: 'relative',
           display: 'flex',
-          flexDirection: 'column',
           alignItems: 'center',
-          justifyContent: 'center',
-          color: '#ffffff',
-          overflow: 'hidden',
-          marginBottom: '1.5rem',
-          boxShadow: 'inset 0 2px 8px rgba(0,0,0,0.5)'
+          justifyContent: 'space-between',
+          marginBottom: '1.25rem'
         }}
       >
-        {/* Animated Green Viewfinder Box */}
-        <div
-          style={{
-            width: '180px',
-            height: '180px',
-            border: '2px dashed var(--color-success-primary)',
-            borderRadius: 'var(--radius-md)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            position: 'relative'
-          }}
-        >
-          <Camera size={36} style={{ opacity: 0.7 }} />
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', color: 'var(--color-primary-600)' }}>
+          <QrCode size={24} />
+          <h2 style={{ fontSize: '1.25rem', fontWeight: 800, margin: 0, color: 'var(--color-text-main)' }}>
+            Scanner Aktivitas
+          </h2>
         </div>
 
-        <span style={{ fontSize: '0.75rem', marginTop: '0.75rem', opacity: 0.8, fontWeight: 500 }}>
-          Scan QR peserta atau masukkan kode peserta secara manual.
-        </span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          {cameras.length > 1 && cameraActive && (
+            <button
+              type="button"
+              onClick={handleSwitchCamera}
+              className="btn btn-secondary"
+              title="Ganti Kamera"
+              aria-label="Ganti Kamera"
+              style={{ padding: '0.375rem 0.625rem', fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.25rem' }}
+            >
+              <SwitchCamera size={15} />
+              <span className="hide-mobile">Kamera ({selectedCameraIndex + 1}/{cameras.length})</span>
+            </button>
+          )}
+
+          <button
+            type="button"
+            onClick={toggleCamera}
+            className={`btn ${cameraActive ? 'btn-secondary' : 'btn-primary'}`}
+            style={{ padding: '0.375rem 0.625rem', fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.25rem' }}
+            title={cameraActive ? 'Matikan Kamera' : 'Nyalakan Kamera'}
+          >
+            {cameraActive ? (
+              <>
+                <VideoOff size={15} />
+                <span>Matikan</span>
+              </>
+            ) : (
+              <>
+                <Video size={15} />
+                <span>Aktifkan</span>
+              </>
+            )}
+          </button>
+        </div>
+      </div>
+
+      {/* Live Camera Viewfinder Viewport */}
+      <div className="qr-scanner-viewport">
+        {/* Html5Qrcode Mount Target Container */}
+        <div
+          id="booth-qr-reader"
+          style={{
+            width: '100%',
+            height: '100%',
+            display: cameraStatus === 'active' ? 'block' : 'none'
+          }}
+        />
+
+        {/* Viewfinder Laser & Frame Overlay when Camera is Active */}
+        {cameraStatus === 'active' && (
+          <>
+            <div className="scanner-laser-line" />
+            <div
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                pointerEvents: 'none'
+              }}
+            >
+              <div
+                style={{
+                  width: '190px',
+                  height: '190px',
+                  border: '2px dashed var(--color-success-primary)',
+                  borderRadius: 'var(--radius-md)',
+                  boxShadow: '0 0 0 9999px rgba(15, 23, 42, 0.45)',
+                  position: 'relative'
+                }}
+              />
+            </div>
+            <div
+              style={{
+                position: 'absolute',
+                bottom: '10px',
+                left: 0,
+                right: 0,
+                textAlign: 'center',
+                pointerEvents: 'none',
+                zIndex: 11
+              }}
+            >
+              <span
+                style={{
+                  background: 'rgba(15, 23, 42, 0.75)',
+                  backdropFilter: 'blur(4px)',
+                  padding: '0.25rem 0.75rem',
+                  borderRadius: 'var(--radius-full)',
+                  fontSize: '0.75rem',
+                  color: '#ffffff',
+                  fontWeight: 500
+                }}
+              >
+                Arahkan QR peserta ke dalam kotak
+              </span>
+            </div>
+          </>
+        )}
+
+        {/* Initializing State */}
+        {cameraStatus === 'initializing' && (
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '0.75rem',
+              color: '#ffffff',
+              padding: '1.5rem'
+            }}
+          >
+            <RefreshCw size={32} className="loading-spin" style={{ color: 'var(--color-primary-500)' }} />
+            <span style={{ fontSize: '0.875rem', fontWeight: 600 }}>Memulai kamera...</span>
+          </div>
+        )}
+
+        {/* Camera Disabled State */}
+        {cameraStatus === 'disabled' && (
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '0.75rem',
+              color: '#ffffff',
+              padding: '1.5rem',
+              textAlign: 'center'
+            }}
+          >
+            <CameraOff size={36} style={{ opacity: 0.6 }} />
+            <div style={{ fontSize: '0.875rem', fontWeight: 600 }}>Kamera Dinonaktifkan</div>
+            <p style={{ fontSize: '0.75rem', color: '#94a3b8', margin: 0, maxWidth: '280px' }}>
+              Nyalakan kamera di atas atau gunakan input kode peserta di bawah.
+            </p>
+          </div>
+        )}
+
+        {/* Camera Error / No Permission State */}
+        {cameraStatus === 'error' && (
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '0.625rem',
+              color: '#ffffff',
+              padding: '1.5rem',
+              textAlign: 'center'
+            }}
+          >
+            <AlertCircle size={36} style={{ color: 'var(--color-warning-primary)' }} />
+            <div style={{ fontSize: '0.875rem', fontWeight: 700 }}>Kamera Tidak Aktif</div>
+            <p style={{ fontSize: '0.75rem', color: '#cbd5e1', margin: 0, maxWidth: '300px', lineHeight: 1.4 }}>
+              {cameraError || 'Akses kamera tidak tersedia atau izin belum diberikan.'}
+            </p>
+            <button
+              type="button"
+              onClick={() => {
+                setCameraActive(false);
+                setTimeout(() => setCameraActive(true), 150);
+              }}
+              className="btn btn-secondary"
+              style={{
+                fontSize: '0.75rem',
+                padding: '0.35rem 0.85rem',
+                marginTop: '0.25rem',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.375rem'
+              }}
+            >
+              <RefreshCw size={14} /> Coba Lagi
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Manual Input Fallback Form */}
@@ -164,3 +471,4 @@ export function ScannerView({ onScan, isScanning }) {
     </div>
   );
 }
+

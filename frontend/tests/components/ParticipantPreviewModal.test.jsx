@@ -65,4 +65,27 @@ describe('ParticipantPreviewModal Component Tests', () => {
     const flyboardBtn = screen.getByRole('button', { name: /pilih flyboard extreme/i });
     expect(flyboardBtn).toBeDisabled();
   });
+
+  it('should render activities sorted by id ascending', () => {
+    const unsortedActivities = [
+      { id: 'act-3', name: 'Snorkeling', price: 200000, is_affordable: true },
+      { id: 'act-1', name: 'Banana Boat', price: 150000, is_affordable: true },
+      { id: 'act-2', name: 'Donut Boat', price: 175000, is_affordable: true }
+    ];
+
+    render(
+      <ParticipantPreviewModal
+        isOpen={true}
+        participant={mockParticipant}
+        activities={unsortedActivities}
+        onSelectActivity={vi.fn()}
+        onClose={vi.fn()}
+      />
+    );
+
+    const buttons = screen.getAllByRole('button', { name: /^pilih /i });
+    expect(buttons[0]).toHaveAttribute('aria-label', 'Pilih Banana Boat');
+    expect(buttons[1]).toHaveAttribute('aria-label', 'Pilih Donut Boat');
+    expect(buttons[2]).toHaveAttribute('aria-label', 'Pilih Snorkeling');
+  });
 });

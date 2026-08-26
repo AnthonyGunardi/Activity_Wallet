@@ -43,7 +43,7 @@ async function scanParticipant(qrCode) {
 
   const activities = await Activity.findAll({
     where: { status: ActivityStatus.ACTIVE },
-    order: [['price', 'ASC']]
+    order: [['id', 'ASC']]
   });
 
   const eligibleActivities = activities.map((act) => ({

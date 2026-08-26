@@ -59,4 +59,20 @@ describe('ActivityTable Component Tests', () => {
     fireEvent.click(activateBtn);
     expect(onToggleStatus).toHaveBeenCalledWith(mockActivities[1], 'ACTIVE');
   });
+
+  it('should render activities sorted by id ascending', () => {
+    const unsortedActivities = [
+      { id: 3, name: 'Snorkeling', price: 200000, status: 'ACTIVE' },
+      { id: 1, name: 'Banana Boat', price: 150000, status: 'ACTIVE' },
+      { id: 2, name: 'Donut Boat', price: 175000, status: 'ACTIVE' }
+    ];
+
+    render(<ActivityTable activities={unsortedActivities} onEdit={vi.fn()} onToggleStatus={vi.fn()} />);
+
+    const rows = screen.getAllByRole('row');
+    // Header is row 0, rows 1-3 are data rows
+    expect(rows[1]).toHaveTextContent('Banana Boat');
+    expect(rows[2]).toHaveTextContent('Donut Boat');
+    expect(rows[3]).toHaveTextContent('Snorkeling');
+  });
 });

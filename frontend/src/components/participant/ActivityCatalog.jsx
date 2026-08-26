@@ -36,6 +36,13 @@ export function ActivityCatalog({ activities = [], currentBalance = 0 }) {
     );
   }
 
+  const sortedActivities = [...activities].sort((a, b) => {
+    if (typeof a.id === 'number' && typeof b.id === 'number') {
+      return a.id - b.id;
+    }
+    return String(a.id || '').localeCompare(String(b.id || ''), undefined, { numeric: true });
+  });
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.875rem' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.25rem' }}>
@@ -43,7 +50,7 @@ export function ActivityCatalog({ activities = [], currentBalance = 0 }) {
           Pilihan Water Activity
         </h3>
         <span style={{ fontSize: '0.8125rem', color: 'var(--color-text-muted)' }}>
-          {activities.length} Aktivitas
+          {sortedActivities.length} Aktivitas
         </span>
       </div>
 
@@ -54,7 +61,7 @@ export function ActivityCatalog({ activities = [], currentBalance = 0 }) {
           gap: '0.875rem'
         }}
       >
-        {activities.map((act) => {
+        {sortedActivities.map((act) => {
           const isAffordable = typeof act.is_affordable === 'boolean'
             ? act.is_affordable
             : (currentBalance >= act.price);

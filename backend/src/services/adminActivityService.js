@@ -18,7 +18,7 @@ async function listActivities({ status } = {}) {
 
   const activities = await Activity.findAll({
     where,
-    order: [['created_at', 'DESC']]
+    order: [['id', 'ASC']]
   });
 
   return activities;

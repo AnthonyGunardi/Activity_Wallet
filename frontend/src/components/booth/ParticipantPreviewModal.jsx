@@ -32,6 +32,13 @@ export function ParticipantPreviewModal({
 }) {
   if (!isOpen || !participant) return null;
 
+  const sortedActivities = [...activities].sort((a, b) => {
+    if (typeof a.id === 'number' && typeof b.id === 'number') {
+      return a.id - b.id;
+    }
+    return String(a.id || '').localeCompare(String(b.id || ''), undefined, { numeric: true });
+  });
+
   return (
     <div
       role="dialog"
@@ -144,7 +151,7 @@ export function ParticipantPreviewModal({
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.625rem' }}>
-            {activities.map((act) => {
+            {sortedActivities.map((act) => {
               const isAffordable = typeof act.is_affordable === 'boolean'
                 ? act.is_affordable
                 : (participant.current_balance >= act.price);

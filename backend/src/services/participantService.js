@@ -55,7 +55,7 @@ async function getWalletByQrCode(qrCode) {
   const [activities, transactions] = await Promise.all([
     Activity.findAll({
       where: { status: ActivityStatus.ACTIVE },
-      order: [['price', 'ASC']]
+      order: [['id', 'ASC']]
     }),
     Transaction.findAll({
       where: { participant_id: participant.id },
