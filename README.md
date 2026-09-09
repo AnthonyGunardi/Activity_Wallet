@@ -142,24 +142,21 @@ npm run build
 │   └── tests/               # Vitest component and page integration tests
 ├── docs/
 │   ├── EVENT_SETUP_GUIDE.md # Pre-event setup, database provisioning & wristband printing
-│   └── OPERATIONAL_RUNBOOK.md # Day-of-event operations, schedules, and emergency guides
+│   ├── OPERATIONAL_RUNBOOK.md # Day-of-event operations, schedules, and emergency guides
+│   ├── PRD.md               # Product Requirements Document
+│   └── SPEC.md              # System Technical Specification
 ├── tasks/
 │   ├── plan.md              # 10-slice implementation plan & acceptance matrix
 │   └── todo.md              # Granular task tracking checklist
-├── PRD.md                   # Product Requirements Document
-└── SPEC.md                  # System Technical Specification
 ```
 
 ---
 
 ## 📚 Operational Documentation
 
-- 📖 **[Event Setup Guide](file:///c:/Users/Admin/Documents/Repositories/Activity_Wallet/docs/EVENT_SETUP_GUIDE.md)**: Pre-event database provisioning, 80-participant bulk onboarding, and wristband label printing.
-- 📖 **[Operational Runbook](file:///c:/Users/Admin/Documents/Repositories/Activity_Wallet/docs/OPERATIONAL_RUNBOOK.md)**: Daily event schedule, booth operation workflows, lost wristband reissuance, and emergency refund handling.
-- 📖 **[System Specification (SPEC.md)](file:///c:/Users/Admin/Documents/Repositories/Activity_Wallet/SPEC.md)**: Technical architecture, data dictionaries, API contracts, and security boundaries.
+- 📖 **[Event Setup Guide](./docs/EVENT_SETUP_GUIDE.md)**: Pre-event database provisioning, 80-participant bulk onboarding, and wristband label printing.
+- 📖 **[Operational Runbook](./docs/OPERATIONAL_RUNBOOK.md)**: Daily event schedule, booth operation workflows, lost wristband reissuance, and emergency refund handling.
+- 📖 **[Product Requirements Document (PRD.md)](./docs/PRD.md)**: Product requirements, user roles, business invariants, and event scope.
+- 📖 **[System Specification (SPEC.md)](./docs/SPEC.md)**: Technical architecture, data dictionaries, API contracts, and security boundaries.
 
 ---
-
-## 📄 License
-
-ISC License © 2026 Sepa Island Event Management.

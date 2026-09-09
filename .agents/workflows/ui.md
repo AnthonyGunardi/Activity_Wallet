@@ -2,22 +2,44 @@
 description: Build or improve a user interface using local design skills, stack-appropriate rules, and visual verification
 ---
 
-Route skills by the user's UI requirement; do not load every UI skill by default.
+Build, review, or improve UI using one lead design skill, the target project's conventions, and evidence-based verification.
 
-Select `frontend-design` for UI implementation work: builds, pages, layouts, app shells, and scoped components.
+Inspect the project before selecting rules or editing code. Identify the framework, existing design system, product/design contracts, component
+ownership, relevant commands, and the exact requested scope.
 
-Select `hallmark` instead when the request is only a Hallmark-specific read-only task such as visual audit or design-DNA study. Also load `hallmark` with implementation work when the request needs page-level greenfield design, anti-AI-slop direction, or redesign.
+Choose exactly one lead skill:
 
-Select `impeccable` instead when the request is only critique or UI quality analysis. Also load `impeccable` with implementation work when the request needs accessibility, responsive behavior, browser iteration, polish, or final UI quality checks.
+- `frontend-design`: lightweight or scoped visual implementation when no specialized design lifecycle is required.
+- `hallmark`: page-level greenfield design, structural redesign, anti-AI-slop direction, visual audit, or design-DNA study.
+- `impeccable`: complex product UI, design-system or product-context work, critique, technical audit, accessibility, responsive adaptation,
+  hardening, performance, browser iteration, or final polish.
+- An explicitly requested skill or command always wins.
 
-When `hallmark` applies, do not run it as a parallel full design flow beside `frontend-design`. Treat `frontend-design` as the general implementation baseline, and let `hallmark` own page structure, theme, anti-slop gates, audit/redesign/study behavior, and Hallmark-specific output contracts.
+Do not run multiple full design flows on the same surface. A second skill may only run afterward in a named, bounded verification mode and must not
+reopen the lead skill's visual direction unless it finds an objective usability, accessibility, responsiveness, or correctness defect.
 
-When more than one applies, use them in this order: `frontend-design` for implementation baseline, `hallmark` for distinctive page structure or anti-slop decisions, then `impeccable` for verification and polish.
+Authority order:
 
-Inspect the target project before applying framework rules. Follow `.agents/rules/30-frontend-react.md` only when the work is in a React codebase or touches React files (`.jsx` / `.tsx` or React dependencies/config). For Laravel, Blade, Vue, Svelte, static HTML, or any other non-React UI stack, preserve that stack's conventions and do not apply React-only component, hook, or data-fetching requirements.
+1. User's explicit requirements
+2. Existing product truth, design system, and project constraints
+3. Selected lead skill
+4. Optional verification skill
+5. Workflow defaults
 
-Inspect the existing design system and architecture, define observable acceptance criteria, and implement the smallest coherent UI slice.
+Do not duplicate or override the selected skill's own setup, context-loading, or clarification protocol.
 
-Verify relevant states, keyboard and focus behavior, responsiveness, contrast, motion preferences, console, network, tests, lint, typecheck, and build. Use browser evidence when available and disclose when it is not.
+Follow `.agents/rules/30-frontend-react.md` only when the project uses React or the change touches React files, dependencies, or configuration. Otherwise
+preserve the target stack's conventions.
 
-Do not replace the design system, use placeholders, move business logic into components, or claim unperformed visual verification.
+Define observable acceptance criteria, then implement the smallest coherent slice. Preserve routes, business logic, component ownership, factual content,
+and the existing design system unless the user explicitly requests otherwise.
+
+Never invent product facts, metrics, testimonials, or customer claims. Use clearly labelled TBD values only when temporary content is necessary.
+
+When the UI can run locally, verify relevant interactions and states, keyboard navigation, visible focus, representative desktop and mobile widths,
+contrast, reduced motion, and relevant console or network failures. Run applicable tests, lint, typecheck, and build commands.
+
+Use one inspection pass, one consolidated fix pass, and at most one confirmation pass. Report what was verified and what remains unverified.
+Never claim visual verification without browser or rendered evidence.
+
+Do not delete production structure, modify files outside scope, or move business logic into UI components without explicit authorization.

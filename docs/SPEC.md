@@ -2,8 +2,8 @@
 
 **Document Status:** Approved  
 **Version:** 1.0.0  
-**Source Document:** [`PRD.md`](file:///c:/Users/Admin/Documents/Repositories/Activity_Wallet/PRD.md)  
-**Governing Architecture:** [`AGENTS.md`](file:///c:/Users/Admin/Documents/Repositories/Activity_Wallet/AGENTS.md)  
+**Source Document:** [`PRD.md`](./PRD.md)  
+**Governing Architecture:** [`AGENTS.md`](../AGENTS.md)  
 **Target Event:** Sepa Island Water Activity (~80 participants)
 
 ---
@@ -116,10 +116,12 @@ Activity_Wallet/
 │   │   └── main.jsx            # Entry point
 │   ├── package.json
 │   └── vite.config.js
-├── docs/                       # Adoption guides, architecture diagrams
-├── AGENTS.md                   # Agent guidelines & project invariants
-├── PRD.md                      # Product Requirements Document
-└── SPEC.md                     # Technical Specification (Source of Truth)
+├── docs/
+│   ├── PRD.md                  # Product Requirements Document
+│   ├── SPEC.md                 # Technical Specification (Source of Truth)
+│   ├── EVENT_SETUP_GUIDE.md    # Pre-event setup & wristband printing
+│   └── OPERATIONAL_RUNBOOK.md  # Day-of-event operations & emergency guides
+└── AGENTS.md                   # Agent guidelines & project invariants
 ```
 
 ---

@@ -2,8 +2,8 @@
 
 **Document Status:** Pending Approval  
 **Version:** 1.0.0  
-**Source Specification:** [`SPEC.md`](file:///c:/Users/Admin/Documents/Repositories/Activity_Wallet/SPEC.md)  
-**Governing Rules:** [`AGENTS.md`](file:///c:/Users/Admin/Documents/Repositories/Activity_Wallet/AGENTS.md)  
+**Source Specification:** [`SPEC.md`](../docs/SPEC.md)  
+**Governing Rules:** [`AGENTS.md`](../AGENTS.md)  
 
 ---
 

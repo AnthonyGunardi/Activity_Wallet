@@ -12,7 +12,7 @@ Project documentation and instructions for AI agents working in this repository.
 - **Supported Activities:** Jet Ski, Banana Boat, Donut Boat, Snorkeling, and other outdoor water sports.
 - **Target Platforms:** Progressive Web App (PWA) for Participants & Booth Staff + Web Dashboard for Supervisors/Admins.
 - **Core Principle:** Simplicity, speed at outdoor booths, operational reliability, and strict financial auditability.
-- **Source of Truth:** Refer to [`PRD.md`](file:///c:/Users/Admin/Documents/Repositories/Activity_Wallet/PRD.md) for full functional requirements and out-of-scope boundaries.
+- **Source of Truth:** Refer to [`PRD.md`](./docs/PRD.md) for full functional requirements and out-of-scope boundaries.
 
 ---
 
@@ -84,9 +84,9 @@ All agents modifying code, schemas, or APIs MUST enforce these invariants:
 
 For all coding, testing, styling, and operational standards, refer directly to the designated project rules:
 
-- **Safety & Behavioral Guardrails:** Refer to [01-safety-guardrails.md](file:///c:/Users/Admin/Documents/Repositories/Activity_Wallet/.agents/rules/01-safety-guardrails.md) for thinking before coding, volume constraints, surgical changes, and rule invariants.
-- **CLI & Command Execution:** Refer to [02-antigravity-rtk-rules.md](file:///c:/Users/Admin/Documents/Repositories/Activity_Wallet/.agents/rules/02-antigravity-rtk-rules.md) (prefix shell commands with `rtk`).
-- **General Fullstack Standards:** Refer to [10-fullstack-general-standards.md](file:///c:/Users/Admin/Documents/Repositories/Activity_Wallet/.agents/rules/10-fullstack-general-standards.md) for formatting (2 spaces, semicolons, 120-char max), output purity, validation, error handling, JSDoc, and debugging protocols.
-- **Backend Standards (Node.js / Express / Sequelize):** Refer to [20-backend-node-express-sequelize.md](file:///c:/Users/Admin/Documents/Repositories/Activity_Wallet/.agents/rules/20-backend-node-express-sequelize.md) for architectural layer boundaries (controllers, services, models), response envelope (`{ success, data, meta }`), database indexing, transactions, and Winston logging.
-- **Frontend Standards (React):** Refer to [30-frontend-react.md](file:///c:/Users/Admin/Documents/Repositories/Activity_Wallet/.agents/rules/30-frontend-react.md) for functional components, hook strategy, external data lifecycle, and forbidden JSX business logic.
-- **Testing Standards:** Refer to [40-testing-standards.md](file:///c:/Users/Admin/Documents/Repositories/Activity_Wallet/.agents/rules/40-testing-standards.md) for test quality requirements (success, failure, edge cases), ignore directive justification, and coverage minimums (90% lines/funcs, 85% branches).
+- **Safety & Behavioral Guardrails:** Refer to [01-safety-guardrails.md](.agents/rules/01-safety-guardrails.md) for thinking before coding, volume constraints, surgical changes, and rule invariants.
+- **CLI & Command Execution:** Refer to [02-antigravity-rtk-rules.md](.agents/rules/02-antigravity-rtk-rules.md) (prefix shell commands with `rtk`).
+- **General Fullstack Standards:** Refer to [10-fullstack-general-standards.md](.agents/rules/10-fullstack-general-standards.md) for formatting (2 spaces, semicolons, 120-char max), output purity, validation, error handling, JSDoc, and debugging protocols.
+- **Backend Standards (Node.js / Express / Sequelize):** Refer to [20-backend-node-express-sequelize.md](.agents/rules/20-backend-node-express-sequelize.md) for architectural layer boundaries (controllers, services, models), response envelope (`{ success, data, meta }`), database indexing, transactions, and Winston logging.
+- **Frontend Standards (React):** Refer to [30-frontend-react.md](.agents/rules/30-frontend-react.md) for functional components, hook strategy, external data lifecycle, and forbidden JSX business logic.
+- **Testing Standards:** Refer to [40-testing-standards.md](.agents/rules/40-testing-standards.md) for test quality requirements (success, failure, edge cases), ignore directive justification, and coverage minimums (90% lines/funcs, 85% branches).
