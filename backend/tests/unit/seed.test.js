@@ -25,9 +25,9 @@ describe('Database Seeder Unit Tests', () => {
     const isMatch = await admin.comparePassword('admin123');
     expect(isMatch).toBe(true);
 
-    const jetSki = await Activity.findOne({ where: { name: 'Jet Ski (15 Menit)' } });
+    const jetSki = await Activity.findOne({ where: { name: 'Jetski' } });
     expect(jetSki).toBeDefined();
-    expect(jetSki.price).toBe(350000);
+    expect(jetSki.price).toBe(650000);
 
     const firstParticipant = await Participant.findOne({ where: { qr_code: 'SEPA-001' } });
     expect(firstParticipant).toBeDefined();
