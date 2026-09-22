@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Users, Waves } from 'lucide-react';
+import { LayoutDashboard, BarChart3, Users, Waves } from 'lucide-react';
 
 /**
  * AdminNavTabs Component
@@ -13,6 +13,7 @@ export function AdminNavTabs() {
     location.pathname === '/admin/' ||
     location.pathname.startsWith('/admin/dashboard');
 
+  const isActivitySummaryActive = location.pathname.startsWith('/admin/activity-summary');
   const isParticipantsActive = location.pathname.startsWith('/admin/participants');
   const isActivitiesActive = location.pathname.startsWith('/admin/activities');
 
@@ -44,6 +45,26 @@ export function AdminNavTabs() {
         }}
       >
         <LayoutDashboard size={16} /> Ringkasan
+      </Link>
+
+      <Link
+        to="/admin/activity-summary"
+        style={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: '0.5rem',
+          padding: '0.75rem 1.125rem',
+          textDecoration: 'none',
+          fontWeight: 700,
+          fontSize: '0.875rem',
+          color: isActivitySummaryActive ? 'var(--color-primary-600)' : 'var(--color-text-muted)',
+          borderBottom: isActivitySummaryActive ? '2px solid var(--color-primary-600)' : '2px solid transparent',
+          marginBottom: '-1px',
+          whiteSpace: 'nowrap',
+          transition: 'all 0.15s ease'
+        }}
+      >
+        <BarChart3 size={16} /> Rekap Wahana
       </Link>
 
       <Link

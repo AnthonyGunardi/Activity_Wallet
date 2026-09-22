@@ -9,6 +9,7 @@ import { ParticipantView } from './pages/ParticipantView';
 import { BoothView } from './pages/BoothView';
 import { ParticipantManagerView } from './pages/admin/ParticipantManagerView';
 import { ActivityManagerView } from './pages/admin/ActivityManagerView';
+import { ActivitySummaryView } from './pages/admin/ActivitySummaryView';
 import { AdminDashboardView } from './pages/admin/AdminDashboardView';
 import {
   Wallet,
@@ -304,6 +305,14 @@ export default function App() {
                 element={
                   <ProtectedRoute allowedRoles={['ADMIN']}>
                     <AdminDashboardView />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/admin/activity-summary"
+                element={
+                  <ProtectedRoute allowedRoles={['ADMIN']}>
+                    <ActivitySummaryView />
                   </ProtectedRoute>
                 }
               />
