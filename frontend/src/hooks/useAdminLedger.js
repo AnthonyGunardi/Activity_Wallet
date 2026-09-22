@@ -12,6 +12,7 @@ export function useAdminLedger() {
   const [transactions, setTransactions] = useState([]);
   const [pagination, setPagination] = useState({ total: 0, page: 1, limit: 20, totalPages: 1 });
   const [typeFilter, setTypeFilter] = useState('');
+  const [activityFilter, setActivityFilter] = useState('');
   const [search, setSearch] = useState('');
   const [isLoadingTransactions, setIsLoadingTransactions] = useState(true);
   const [error, setError] = useState(null);
@@ -36,6 +37,7 @@ export function useAdminLedger() {
         page,
         limit: pagination.limit,
         type: typeFilter || undefined,
+        activity_id: activityFilter || undefined,
         search: search.trim() || undefined
       });
 
@@ -48,7 +50,7 @@ export function useAdminLedger() {
     } finally {
       setIsLoadingTransactions(false);
     }
-  }, [pagination.limit, typeFilter, search]);
+  }, [pagination.limit, typeFilter, activityFilter, search]);
 
   useEffect(() => {
     fetchSummary();
@@ -75,6 +77,8 @@ export function useAdminLedger() {
     pagination,
     typeFilter,
     setTypeFilter,
+    activityFilter,
+    setActivityFilter,
     search,
     setSearch,
     isLoadingTransactions,

@@ -203,5 +203,34 @@ export const adminApi = {
    * Export endpoints paths
    */
   getParticipantsExportUrl: (format = 'csv') => `/api/v1/admin/reports/participants/export?format=${format}`,
-  getTransactionsExportUrl: (format = 'csv') => `/api/v1/admin/reports/transactions/export?format=${format}`
+  getTransactionsExportUrl: (format = 'csv') => `/api/v1/admin/reports/transactions/export?format=${format}`,
+
+  /**
+   * Retrieves aggregated activity transactions summary.
+   * @param {{ start_date?: string, end_date?: string, status?: string }} [params={}]
+   * @returns {Promise<{ success: boolean, data: { summary: Object, activities: Array }, meta: Object }>}
+   */
+  getActivitySummary: (params = {}) => {
+    const query = new URLSearchParams();
+    if (params.start_date) query.append('start_date', params.start_date);
+    if (params.end_date) query.append('end_date', params.end_date);
+    if (params.status) query.append('status', params.status);
+
+    const queryString = query.toString() ? `?${query.toString()}` : '';
+    return apiClient(`/api/v1/admin/reports/activities/summary${queryString}`, { method: 'GET' });
+  },
+
+  /**
+   * Builds export URL for activity recap report.
+   * @param {{ format?: string, start_date?: string, end_date?: string, status?: string }} [params={}]
+   * @returns {string}
+   */
+  getActivitiesExportUrl: (params = {}) => {
+    const query = new URLSearchParams();
+    query.append('format', params.format || 'csv');
+    if (params.start_date) query.append('start_date', params.start_date);
+    if (params.end_date) query.append('end_date', params.end_date);
+    if (params.status) query.append('status', params.status);
+    return `/api/v1/admin/reports/activities/export?${query.toString()}`;
+  }
 };

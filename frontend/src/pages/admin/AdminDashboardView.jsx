@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { useAdminLedger } from '../../hooks/useAdminLedger';
+import { useAdminActivitySummary } from '../../hooks/useAdminActivitySummary';
 import { SummaryMetricCard } from '../../components/admin/SummaryMetricCard';
+import { ActivityRecapSection } from '../../components/admin/ActivityRecapSection';
 import { TransactionAuditTable } from '../../components/admin/TransactionAuditTable';
 import { RefundModal } from '../../components/admin/RefundModal';
 import { AdminNavTabs } from '../../components/admin/AdminNavTabs';
@@ -16,13 +18,14 @@ import {
   Search,
   ChevronLeft,
   ChevronRight,
-  ShieldAlert
+  ShieldAlert,
+  X
 } from 'lucide-react';
 
 /**
  * AdminDashboardView Page
  * Executive dashboard overview featuring real-time event credit KPIs,
- * financial totals, and live transaction audit ledger with refund actions.
+ * financial totals, activity recap section, and live transaction audit ledger with refund actions.
  */
 export function AdminDashboardView() {
   const {
@@ -32,6 +35,8 @@ export function AdminDashboardView() {
     pagination,
     typeFilter,
     setTypeFilter,
+    activityFilter,
+    setActivityFilter,
     search,
     setSearch,
     isLoadingTransactions,
@@ -39,6 +44,13 @@ export function AdminDashboardView() {
     fetchTransactions,
     handleRefund
   } = useAdminLedger();
+
+  const {
+    activities,
+    summary: activitySummary,
+    isLoading: isLoadingActivitySummary,
+    refetch: refetchActivitySummary
+  } = useAdminActivitySummary();
 
   const toast = useToast();
 
@@ -92,11 +104,12 @@ export function AdminDashboardView() {
           onClick={() => {
             fetchSummary();
             fetchTransactions(pagination.page);
+            refetchActivitySummary();
           }}
-          disabled={isLoadingSummary || isLoadingTransactions}
+          disabled={isLoadingSummary || isLoadingTransactions || isLoadingActivitySummary}
           style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.875rem' }}
         >
-          <RefreshCw size={16} className={isLoadingSummary || isLoadingTransactions ? 'loading-spin' : ''} /> Refresh Data
+          <RefreshCw size={16} className={isLoadingSummary || isLoadingTransactions || isLoadingActivitySummary ? 'loading-spin' : ''} /> Refresh Data
         </button>
       </div>
 
@@ -148,6 +161,16 @@ export function AdminDashboardView() {
           bgColor="rgba(139, 92, 246, 0.1)"
         />
       </div>
+
+      {/* Executive Activity Recap Section */}
+      <ActivityRecapSection
+        activities={activities}
+        summary={activitySummary}
+        isLoading={isLoadingActivitySummary}
+        activeFilterId={activityFilter}
+        onFilterLedger={(actId) => setActivityFilter(actId)}
+        onClearFilter={() => setActivityFilter('')}
+      />
 
       {/* Export Reports Toolbar */}
       <ExportToolbar />
@@ -201,7 +224,44 @@ export function AdminDashboardView() {
           />
         </div>
 
-        <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
+        <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap' }}>
+          {activityFilter && (
+            <div
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.4rem',
+                background: 'var(--color-primary-50)',
+                color: 'var(--color-primary-700)',
+                padding: '0.35rem 0.75rem',
+                borderRadius: '999px',
+                fontSize: '0.8125rem',
+                fontWeight: 600,
+                border: '1px solid var(--color-primary-200)'
+              }}
+            >
+              <span>
+                Wahana: <strong>{activities.find((a) => a.id === activityFilter)?.name || 'Terpilih'}</strong>
+              </span>
+              <button
+                type="button"
+                onClick={() => setActivityFilter('')}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  padding: 0,
+                  color: 'var(--color-primary-700)'
+                }}
+                title="Hapus filter wahana"
+              >
+                <X size={14} />
+              </button>
+            </div>
+          )}
+
           <select
             className="form-input"
             value={typeFilter}

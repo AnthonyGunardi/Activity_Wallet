@@ -34,7 +34,7 @@
 
 - [ ] **Checkpoint F: Rekapitulasi Transaksi per Activity (Wahana)**
   - [x] Task 11.1: Backend Activity Summary & Export Aggregation Engine (Service, Controller, Schemas, Routes)
-  - [ ] Task 11.2: Frontend API Client, Custom Hook & Dashboard ActivityRecapSection
+  - [x] Task 11.2: Frontend API Client, Custom Hook & Dashboard ActivityRecapSection
   - [ ] Task 11.3: Frontend Dedicated "Rekap Wahana" Tab (`ActivitySummaryView`), AdminNavTabs & Export Integration
   - [ ] Task 11.4: Comprehensive Automated Test Suite & Fullstack Verification
 

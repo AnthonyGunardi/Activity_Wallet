@@ -1,4 +1,4 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
+const API_BASE_URL = import.meta.env.MODE === 'test' ? '' : (import.meta.env.VITE_API_BASE_URL || '');
 
 /**
  * Custom API client wrapping fetch with JSON envelope parsing and JWT auth header attachment.

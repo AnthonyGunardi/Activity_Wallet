@@ -167,4 +167,81 @@ describe('AdminDashboardView Page Integration Tests', () => {
       expect(screen.getByText(/refund berhasil diproses/i)).toBeInTheDocument();
     });
   });
+
+  it('filters ledger by activity when Filter Ledger button is clicked in ActivityRecapSection', async () => {
+    const mockActivityRecap = {
+      summary: {
+        total_activities: 1,
+        total_deductions: 5,
+        total_refunds: 0,
+        total_gross_amount: 1750000,
+        total_refund_amount: 0,
+        total_net_amount: 1750000,
+        total_unique_participants: 5
+      },
+      activities: [
+        {
+          id: 'act-jetski',
+          name: 'Jet Ski Special',
+          price: 350000,
+          status: 'ACTIVE',
+          deduction_count: 5,
+          refund_count: 0,
+          gross_amount: 1750000,
+          refund_amount: 0,
+          net_amount: 1750000,
+          unique_participants_count: 5,
+          share_percentage: 100
+        }
+      ]
+    };
+
+    global.fetch = vi.fn().mockImplementation((url) => {
+      if (typeof url === 'string' && url.includes('/api/v1/admin/dashboard/summary')) {
+        return Promise.resolve({
+          ok: true,
+          status: 200,
+          json: async () => ({ success: true, data: mockSummary })
+        });
+      }
+      if (typeof url === 'string' && url.includes('/api/v1/admin/reports/activities/summary')) {
+        return Promise.resolve({
+          ok: true,
+          status: 200,
+          json: async () => ({ success: true, data: mockActivityRecap })
+        });
+      }
+      return Promise.resolve({
+        ok: true,
+        status: 200,
+        json: async () => ({
+          success: true,
+          data: mockTransactionsList,
+          meta: { total: 1, page: 1, limit: 20, totalPages: 1 }
+        })
+      });
+    });
+
+    renderComponent();
+
+    await waitFor(() => {
+      expect(screen.getByText('Jet Ski Special')).toBeInTheDocument();
+    });
+
+    const filterBtn = screen.getByRole('button', { name: /filter ledger/i });
+    fireEvent.click(filterBtn);
+
+    await waitFor(() => {
+      expect(screen.getByText(/sedang difilter/i)).toBeInTheDocument();
+      expect(screen.getByText(/Wahana:/i)).toBeInTheDocument();
+    });
+
+    // Reset filter
+    const removeFilterBtn = screen.getByTitle('Hapus filter wahana');
+    fireEvent.click(removeFilterBtn);
+
+    await waitFor(() => {
+      expect(screen.queryByTitle('Hapus filter wahana')).not.toBeInTheDocument();
+    });
+  });
 });
