@@ -13,7 +13,7 @@ describe('ExportToolbar Component Tests', () => {
     return render(<ToastProvider>{ui}</ToastProvider>);
   };
 
-  it('should render all six export buttons', () => {
+  it('should render all export buttons', () => {
     renderWithProviders(<ExportToolbar />);
 
     expect(screen.getByText(/Ekspor Data & Laporan/i)).toBeInTheDocument();
@@ -21,8 +21,6 @@ describe('ExportToolbar Component Tests', () => {
     expect(screen.getByRole('button', { name: /Peserta \(Excel\)/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Transaksi \(CSV\)/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Transaksi \(Excel\)/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /Rekap Wahana \(CSV\)/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /Rekap Wahana \(Excel\)/i })).toBeInTheDocument();
   });
 
   it('should trigger participant CSV download and show success toast', async () => {

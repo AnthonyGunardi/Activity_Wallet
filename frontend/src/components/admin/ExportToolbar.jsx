@@ -145,52 +145,6 @@ export function ExportToolbar() {
           )}
           Transaksi (Excel)
         </button>
-
-        {/* Activities Recap CSV */}
-        <button
-          type="button"
-          className="btn btn-secondary"
-          disabled={Boolean(downloadingType)}
-          onClick={() =>
-            handleDownload(
-              'Rekap Wahana',
-              'csv',
-              '/api/v1/admin/reports/activities/export?format=csv',
-              'activities-recap-report.csv'
-            )
-          }
-          style={{ fontSize: '0.8125rem', padding: '0.45rem 0.85rem', display: 'inline-flex', alignItems: 'center', gap: '0.375rem' }}
-        >
-          {downloadingType === 'Rekap Wahana-csv' ? (
-            <Loader2 size={14} className="loading-spin" />
-          ) : (
-            <FileText size={14} style={{ color: '#8b5cf6' }} />
-          )}
-          Rekap Wahana (CSV)
-        </button>
-
-        {/* Activities Recap Excel */}
-        <button
-          type="button"
-          className="btn btn-secondary"
-          disabled={Boolean(downloadingType)}
-          onClick={() =>
-            handleDownload(
-              'Rekap Wahana',
-              'excel',
-              '/api/v1/admin/reports/activities/export?format=excel',
-              'activities-recap-report.xls'
-            )
-          }
-          style={{ fontSize: '0.8125rem', padding: '0.45rem 0.85rem', display: 'inline-flex', alignItems: 'center', gap: '0.375rem' }}
-        >
-          {downloadingType === 'Rekap Wahana-excel' ? (
-            <Loader2 size={14} className="loading-spin" />
-          ) : (
-            <FileSpreadsheet size={14} style={{ color: '#8b5cf6' }} />
-          )}
-          Rekap Wahana (Excel)
-        </button>
       </div>
     </div>
   );

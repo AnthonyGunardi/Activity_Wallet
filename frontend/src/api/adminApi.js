@@ -203,7 +203,19 @@ export const adminApi = {
    * Export endpoints paths
    */
   getParticipantsExportUrl: (format = 'csv') => `/api/v1/admin/reports/participants/export?format=${format}`,
-  getTransactionsExportUrl: (format = 'csv') => `/api/v1/admin/reports/transactions/export?format=${format}`,
+  getTransactionsExportUrl: (params = 'csv') => {
+    if (typeof params === 'string') {
+      return `/api/v1/admin/reports/transactions/export?format=${params}`;
+    }
+    const query = new URLSearchParams();
+    query.append('format', params.format || 'csv');
+    if (params.activity_id) query.append('activity_id', params.activity_id);
+    if (params.type) query.append('type', params.type);
+    if (params.search) query.append('search', params.search);
+    if (params.start_date) query.append('start_date', params.start_date);
+    if (params.end_date) query.append('end_date', params.end_date);
+    return `/api/v1/admin/reports/transactions/export?${query.toString()}`;
+  },
 
   /**
    * Retrieves aggregated activity transactions summary.

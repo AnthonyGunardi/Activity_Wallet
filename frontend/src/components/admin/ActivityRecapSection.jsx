@@ -23,7 +23,12 @@ export function ActivityRecapSection({
   isLoading = false,
   activeFilterId = null,
   onFilterLedger = () => {},
-  onClearFilter = () => {}
+  onClearFilter = () => {},
+  showFullAnalyticsLink = false,
+  title = 'Rekapitulasi per Wahana',
+  subtitle = 'Performa pemakaian kredit, frekuensi main, dan pendapatan bersih tiap wahana air.',
+  filterButtonText = 'Filter Ledger',
+  selectedButtonText = 'Sedang Difilter'
 }) {
   return (
     <div style={{ marginBottom: '2.5rem' }}>
@@ -46,7 +51,7 @@ export function ActivityRecapSection({
             </span>
           </div>
           <h2 style={{ margin: '0.15rem 0 0 0', fontSize: '1.25rem', fontWeight: 800, color: 'var(--color-text-main)', display: 'flex', alignItems: 'center', gap: '0.625rem', flexWrap: 'wrap' }}>
-            <span>Rekapitulasi per Wahana</span>
+            <span>{title}</span>
             {summary && (
               <span
                 style={{
@@ -64,7 +69,7 @@ export function ActivityRecapSection({
             )}
           </h2>
           <p style={{ margin: '0.15rem 0 0 0', fontSize: '0.875rem', color: 'var(--color-text-muted)' }}>
-            Performa pemakaian kredit, frekuensi main, dan pendapatan bersih tiap wahana air.
+            {subtitle}
           </p>
         </div>
 
@@ -88,20 +93,22 @@ export function ActivityRecapSection({
             </button>
           )}
 
-          <Link
-            to="/admin/activity-summary"
-            className="btn btn-secondary"
-            style={{
-              fontSize: '0.8125rem',
-              padding: '0.35rem 0.75rem',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '0.35rem',
-              textDecoration: 'none'
-            }}
-          >
-            Lihat Analitik Penuh <ArrowRight size={14} />
-          </Link>
+          {showFullAnalyticsLink && (
+            <Link
+              to="/admin/activity-summary"
+              className="btn btn-secondary"
+              style={{
+                fontSize: '0.8125rem',
+                padding: '0.35rem 0.75rem',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.35rem',
+                textDecoration: 'none'
+              }}
+            >
+              Lihat Analitik Penuh <ArrowRight size={14} />
+            </Link>
+          )}
         </div>
       </div>
 
@@ -293,11 +300,11 @@ export function ActivityRecapSection({
                 >
                   {isSelected ? (
                     <>
-                      <Check size={14} /> Sedang Difilter
+                      <Check size={14} /> {selectedButtonText}
                     </>
                   ) : (
                     <>
-                      <Filter size={14} /> Filter Ledger
+                      <Filter size={14} /> {filterButtonText}
                     </>
                   )}
                 </button>
@@ -338,5 +345,10 @@ ActivityRecapSection.propTypes = {
   isLoading: PropTypes.bool,
   activeFilterId: PropTypes.string,
   onFilterLedger: PropTypes.func,
-  onClearFilter: PropTypes.func
+  onClearFilter: PropTypes.func,
+  showFullAnalyticsLink: PropTypes.bool,
+  title: PropTypes.string,
+  subtitle: PropTypes.string,
+  filterButtonText: PropTypes.string,
+  selectedButtonText: PropTypes.string
 };

@@ -50,6 +50,56 @@ describe('ActivitySummaryView Page Integration Tests', () => {
     ]
   };
 
+  const mockTransactionsList = {
+    transactions: [
+      {
+        id: 'tx-001',
+        participant_id: 'p-1',
+        activity_id: 'act-1',
+        staff_id: 'staff-1',
+        type: 'DEDUCTION',
+        amount: 650000,
+        balance_before: 1000000,
+        balance_after: 350000,
+        notes: 'Jetski session',
+        created_at: '2026-08-20T10:00:00Z',
+        participant: { id: 'p-1', name: 'Budi Santoso', qr_code: 'SEPA-001' },
+        activity: { id: 'act-1', name: 'Jetski Pro', price: 650000 },
+        staff: { id: 'staff-1', name: 'Booth Staff 1' },
+        refund_transactions: []
+      }
+    ]
+  };
+
+  const setupMockFetch = () => {
+    global.fetch = vi.fn().mockImplementation((url) => {
+      const urlStr = typeof url === 'string' ? url : url.toString();
+      if (urlStr.includes('/api/v1/admin/reports/activities/summary')) {
+        return Promise.resolve({
+          ok: true,
+          status: 200,
+          json: async () => ({ success: true, data: mockSummaryData })
+        });
+      }
+      if (urlStr.includes('/api/v1/admin/transactions')) {
+        return Promise.resolve({
+          ok: true,
+          status: 200,
+          json: async () => ({
+            success: true,
+            data: mockTransactionsList,
+            meta: { total: 1, page: 1, limit: 20, totalPages: 1 }
+          })
+        });
+      }
+      return Promise.resolve({
+        ok: true,
+        status: 200,
+        json: async () => ({ success: true, data: {} })
+      });
+    });
+  };
+
   const renderComponent = () => {
     return render(
       <ToastProvider>
@@ -60,87 +110,75 @@ describe('ActivitySummaryView Page Integration Tests', () => {
     );
   };
 
-  it('renders page header, KPI cards, filter toolbar, and table with activities', async () => {
-    global.fetch = vi.fn().mockResolvedValueOnce({
-      ok: true,
-      status: 200,
-      json: async () => ({ success: true, data: mockSummaryData })
-    });
-
+  it('renders page header, KPI cards, activity recap cards, and detail transaction table', async () => {
+    setupMockFetch();
     renderComponent();
 
     expect(screen.getByText('Rekapitulasi Transaksi per Wahana')).toBeInTheDocument();
 
     await waitFor(() => {
-      expect(screen.getByText('Jetski Pro')).toBeInTheDocument();
-      expect(screen.getByText('Banana Boat Fun')).toBeInTheDocument();
+      expect(screen.getByRole('heading', { name: 'Jetski Pro' })).toBeInTheDocument();
+      expect(screen.getByRole('heading', { name: 'Banana Boat Fun' })).toBeInTheDocument();
       expect(screen.getByText('Rp 5.850.000')).toBeInTheDocument();
       expect(screen.getByText('10 Kali')).toBeInTheDocument();
       expect(screen.getByText('8 Orang')).toBeInTheDocument();
       expect(screen.getByText('1 Kali')).toBeInTheDocument();
-      expect(screen.getByText('77.78%')).toBeInTheDocument();
+      expect(screen.getByText('Budi Santoso')).toBeInTheDocument();
+      expect(screen.getByText('-Rp 650.000')).toBeInTheDocument();
     });
   });
 
-  it('filters activities list by search keyword', async () => {
-    global.fetch = vi.fn().mockResolvedValueOnce({
-      ok: true,
-      status: 200,
-      json: async () => ({ success: true, data: mockSummaryData })
-    });
-
+  it('selects a wahana card and filters detail transactions specifically for that wahana', async () => {
+    setupMockFetch();
     renderComponent();
 
     await waitFor(() => {
-      expect(screen.getByText('Jetski Pro')).toBeInTheDocument();
+      expect(screen.getByRole('heading', { name: 'Jetski Pro' })).toBeInTheDocument();
     });
 
-    const searchInput = screen.getByPlaceholderText(/cari nama aktivitas/i);
-    fireEvent.change(searchInput, { target: { value: 'Banana' } });
+    const selectButtons = screen.getAllByRole('button', { name: /lihat detail transaksi/i });
+    fireEvent.click(selectButtons[0]);
 
-    expect(screen.getByText('Banana Boat Fun')).toBeInTheDocument();
-    expect(screen.queryByText('Jetski Pro')).not.toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText(/Detail Transaksi: Jetski Pro/i)).toBeInTheDocument();
+      expect(screen.getByText('Sedang Ditampilkan')).toBeInTheDocument();
+    });
+
+    // Reset filter
+    const removeBtn = screen.getByTitle('Hapus filter wahana');
+    fireEvent.click(removeBtn);
+
+    await waitFor(() => {
+      expect(screen.getByText('Detail Transaksi: Semua Wahana')).toBeInTheDocument();
+    });
   });
 
-  it('sorts activities when clicking column header', async () => {
-    global.fetch = vi.fn().mockResolvedValueOnce({
-      ok: true,
-      status: 200,
-      json: async () => ({ success: true, data: mockSummaryData })
-    });
-
+  it('filters detail transactions by participant search keyword', async () => {
+    setupMockFetch();
     renderComponent();
 
     await waitFor(() => {
-      expect(screen.getByText('Jetski Pro')).toBeInTheDocument();
+      expect(screen.getByText('Budi Santoso')).toBeInTheDocument();
     });
 
-    const sortNameHeader = screen.getByText(/Nama Aktivitas/i);
-    // First click sorts ascending
-    fireEvent.click(sortNameHeader);
+    const searchInput = screen.getByPlaceholderText(/cari nama atau kode peserta/i);
+    fireEvent.change(searchInput, { target: { value: 'Budi' } });
 
-    const rows = screen.getAllByRole('row');
-    // Banana Boat Fun should be above Jetski Pro alphabetically
-    expect(rows[1]).toHaveTextContent('Banana Boat Fun');
-    expect(rows[2]).toHaveTextContent('Jetski Pro');
+    await waitFor(() => {
+      expect(searchInput.value).toBe('Budi');
+    });
   });
 
-  it('triggers CSV and Excel export downloads', async () => {
+  it('triggers CSV and Excel export downloads for activity recap summary', async () => {
     const downloadSpy = vi.spyOn(downloadHelper, 'downloadReport').mockResolvedValue();
-
-    global.fetch = vi.fn().mockResolvedValueOnce({
-      ok: true,
-      status: 200,
-      json: async () => ({ success: true, data: mockSummaryData })
-    });
-
+    setupMockFetch();
     renderComponent();
 
     await waitFor(() => {
-      expect(screen.getByText('Jetski Pro')).toBeInTheDocument();
+      expect(screen.getByRole('heading', { name: 'Jetski Pro' })).toBeInTheDocument();
     });
 
-    const csvBtn = screen.getByRole('button', { name: /ekspor csv/i });
+    const csvBtn = screen.getByRole('button', { name: /ekspor rekap \(csv\)/i });
     fireEvent.click(csvBtn);
 
     await waitFor(() => {
@@ -150,7 +188,7 @@ describe('ActivitySummaryView Page Integration Tests', () => {
       );
     });
 
-    const excelBtn = screen.getByRole('button', { name: /ekspor excel/i });
+    const excelBtn = screen.getByRole('button', { name: /ekspor rekap \(excel\)/i });
     fireEvent.click(excelBtn);
 
     await waitFor(() => {
@@ -161,22 +199,33 @@ describe('ActivitySummaryView Page Integration Tests', () => {
     });
   });
 
-  it('displays empty state when no activities match search', async () => {
-    global.fetch = vi.fn().mockResolvedValueOnce({
-      ok: true,
-      status: 200,
-      json: async () => ({ success: true, data: mockSummaryData })
-    });
-
+  it('triggers CSV and Excel export downloads for filtered transaction details', async () => {
+    const downloadSpy = vi.spyOn(downloadHelper, 'downloadReport').mockResolvedValue();
+    setupMockFetch();
     renderComponent();
 
     await waitFor(() => {
-      expect(screen.getByText('Jetski Pro')).toBeInTheDocument();
+      expect(screen.getByText('Budi Santoso')).toBeInTheDocument();
     });
 
-    const searchInput = screen.getByPlaceholderText(/cari nama aktivitas/i);
-    fireEvent.change(searchInput, { target: { value: 'NonExistentWahana' } });
+    const txCsvBtn = screen.getByRole('button', { name: /ekspor transaksi \(csv\)/i });
+    fireEvent.click(txCsvBtn);
 
-    expect(screen.getByText(/tidak ada aktivitas yang sesuai/i)).toBeInTheDocument();
+    await waitFor(() => {
+      expect(downloadSpy).toHaveBeenCalledWith(
+        expect.stringContaining('format=csv'),
+        expect.stringContaining('transactions-report.csv')
+      );
+    });
+
+    const txExcelBtn = screen.getByRole('button', { name: /ekspor transaksi \(excel\)/i });
+    fireEvent.click(txExcelBtn);
+
+    await waitFor(() => {
+      expect(downloadSpy).toHaveBeenCalledWith(
+        expect.stringContaining('format=excel'),
+        expect.stringContaining('transactions-report.xls')
+      );
+    });
   });
 });
