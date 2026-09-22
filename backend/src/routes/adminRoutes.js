@@ -25,6 +25,10 @@ const {
   exportParticipantsQuerySchema,
   exportTransactionsQuerySchema
 } = require('../schemas/exportSchemas');
+const {
+  activitySummaryQuerySchema,
+  exportActivitiesQuerySchema
+} = require('../schemas/activitySummarySchemas');
 const { UserRole } = require('../constants/enums');
 
 const router = express.Router();
@@ -180,6 +184,26 @@ router.get(
   '/reports/transactions/export',
   validateQuery(exportTransactionsQuerySchema),
   exportController.exportTransactions
+);
+
+/**
+ * @route GET /api/v1/admin/reports/activities/summary
+ * @desc Retrieve aggregated activity transaction summary and metrics
+ */
+router.get(
+  '/reports/activities/summary',
+  validateQuery(activitySummaryQuerySchema),
+  adminTransactionController.getActivitySummary
+);
+
+/**
+ * @route GET /api/v1/admin/reports/activities/export
+ * @desc Export activity transactions recap report (CSV / Excel)
+ */
+router.get(
+  '/reports/activities/export',
+  validateQuery(exportActivitiesQuerySchema),
+  exportController.exportActivities
 );
 
 module.exports = router;

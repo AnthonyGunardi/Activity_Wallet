@@ -53,7 +53,30 @@ async function exportTransactions(req, res, next) {
   }
 }
 
+/**
+ * Handles CSV / Excel report export for activity recap summary.
+ * GET /api/v1/admin/reports/activities/export
+ */
+async function exportActivities(req, res, next) {
+  try {
+    const { format, start_date, end_date, status } = req.query;
+    const result = await exportService.generateActivitiesRecapExport({
+      format,
+      start_date,
+      end_date,
+      status
+    });
+
+    res.setHeader('Content-Type', result.contentType);
+    res.setHeader('Content-Disposition', `attachment; filename="${result.filename}"`);
+    return res.status(200).send(result.data);
+  } catch (error) {
+    return next(error);
+  }
+}
+
 module.exports = {
   exportParticipants,
-  exportTransactions
+  exportTransactions,
+  exportActivities
 };

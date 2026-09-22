@@ -4,7 +4,8 @@ const {
   buildCsv,
   buildXmlSpreadsheet,
   generateParticipantsExport,
-  generateTransactionsExport
+  generateTransactionsExport,
+  generateActivitiesRecapExport
 } = require('../../src/services/exportService');
 const { sequelize, Participant, Transaction, Activity, User } = require('../../src/models');
 const { ParticipantStatus, TransactionType, UserRole } = require('../../src/constants/enums');
@@ -241,6 +242,65 @@ describe('ExportService Unit Tests', () => {
       const exportRes = await generateTransactionsExport({ format: 'csv' });
       expect(exportRes.data).toContain(orphanTx.id);
       expect(exportRes.data).toContain('N/A');
+    });
+  });
+
+  describe('generateActivitiesRecapExport', () => {
+    beforeEach(async () => {
+      await Transaction.destroy({ where: {}, truncate: true });
+      await Activity.destroy({ where: {}, truncate: true });
+      await Participant.destroy({ where: {}, truncate: true });
+      await User.destroy({ where: {}, truncate: true });
+
+      const staff = await User.create({
+        name: 'Staff Wahana',
+        username: 'staff_w',
+        password_hash: 'hash',
+        role: UserRole.STAFF
+      });
+
+      const participant = await Participant.create({
+        name: 'Budi Wahana',
+        qr_code: 'SEPA-W1',
+        initial_credit: 1000000,
+        current_balance: 350000,
+        total_spent: 650000,
+        status: ParticipantStatus.ACTIVE
+      });
+
+      const activity = await Activity.create({
+        name: 'Jetski Pro',
+        price: 650000,
+        status: 'ACTIVE'
+      });
+
+      await Transaction.create({
+        participant_id: participant.id,
+        activity_id: activity.id,
+        staff_id: staff.id,
+        type: TransactionType.DEDUCTION,
+        amount: 650000,
+        balance_before: 1000000,
+        balance_after: 350000
+      });
+    });
+
+    it('generates CSV activity recap report with correct headers and data', async () => {
+      const result = await generateActivitiesRecapExport({ format: 'csv' });
+      expect(result.contentType).toBe('text/csv; charset=utf-8');
+      expect(result.filename).toMatch(/^activities-recap-report-.*\.csv$/);
+      expect(result.data).toContain('Nama Aktivitas');
+      expect(result.data).toContain('Jetski Pro');
+      expect(result.data).toContain('650000');
+      expect(result.data).toContain('100%');
+    });
+
+    it('generates Excel XML activity recap report when requested', async () => {
+      const result = await generateActivitiesRecapExport({ format: 'excel' });
+      expect(result.contentType).toBe('application/vnd.ms-excel; charset=utf-8');
+      expect(result.filename).toMatch(/^activities-recap-report-.*\.xls$/);
+      expect(result.data).toContain('<Worksheet ss:Name="Rekap Wahana">');
+      expect(result.data).toContain('Jetski Pro');
     });
   });
 });

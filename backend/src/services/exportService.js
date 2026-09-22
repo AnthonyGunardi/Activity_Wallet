@@ -300,11 +300,82 @@ async function generateTransactionsExport({
   };
 }
 
+/**
+ * Generates an export report for activity recap summary (per wahana)
+ * containing transaction statistics, gross/net revenue, unique participants, and share %.
+ *
+ * @param {Object} query
+ * @param {string} [query.format='csv'] - Output format ('csv', 'excel', 'xlsx', 'xls')
+ * @param {string} [query.start_date] - Filter by start date
+ * @param {string} [query.end_date] - Filter by end date
+ * @param {string} [query.status] - Filter by activity status
+ * @returns {Promise<{ data: string, contentType: string, filename: string }>}
+ */
+async function generateActivitiesRecapExport({
+  format = 'csv',
+  start_date,
+  end_date,
+  status
+} = {}) {
+  const adminReportService = require('./adminReportService');
+  const recap = await adminReportService.getActivityTransactionsSummary({
+    start_date,
+    end_date,
+    status
+  });
+
+  const headers = [
+    'No',
+    'Nama Aktivitas',
+    'Status',
+    'Tarif Satuan (Rp)',
+    'Total Main',
+    'Total Refund',
+    'Total Kotor (Rp)',
+    'Total Refund (Rp)',
+    'Total Bersih (Rp)',
+    'Peserta Unik',
+    'Pangsa (%)'
+  ];
+
+  const rows = recap.activities.map((act, idx) => [
+    idx + 1,
+    act.name,
+    act.status,
+    act.price,
+    act.deduction_count,
+    act.refund_count,
+    act.gross_amount,
+    act.refund_amount,
+    act.net_amount,
+    act.unique_participants_count,
+    `${act.share_percentage}%`
+  ]);
+
+  const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+  const isExcel = ['excel', 'xlsx', 'xls'].includes(format.toLowerCase());
+
+  if (isExcel) {
+    return {
+      data: buildXmlSpreadsheet('Rekap Wahana', headers, rows),
+      contentType: 'application/vnd.ms-excel; charset=utf-8',
+      filename: `activities-recap-report-${timestamp}.xls`
+    };
+  }
+
+  return {
+    data: buildCsv(headers, rows),
+    contentType: 'text/csv; charset=utf-8',
+    filename: `activities-recap-report-${timestamp}.csv`
+  };
+}
+
 module.exports = {
   escapeCsvValue,
   escapeXml,
   buildCsv,
   buildXmlSpreadsheet,
   generateParticipantsExport,
-  generateTransactionsExport
+  generateTransactionsExport,
+  generateActivitiesRecapExport
 };

@@ -73,8 +73,27 @@ async function refund(req, res, next) {
   }
 }
 
+/**
+ * Returns activity transactions summary and breakdown.
+ * GET /api/v1/admin/reports/activities/summary
+ */
+async function getActivitySummary(req, res, next) {
+  try {
+    const { start_date, end_date, status } = req.query;
+    const data = await adminReportService.getActivityTransactionsSummary({
+      start_date,
+      end_date,
+      status
+    });
+    return res.status(200).json(formatSuccess(data, { generated_at: new Date().toISOString() }));
+  } catch (error) {
+    return next(error);
+  }
+}
+
 module.exports = {
   getSummary,
   list,
-  refund
+  refund,
+  getActivitySummary
 };
