@@ -656,3 +656,120 @@ graph TD
 | **8.2** | PWA Shell & Export UI | Service worker caching, offline warning banner | Offline hook tests |
 | **9.1** | Quality Gate Audit | Full suite run across backend & frontend | ≥ 90% lines, ≥ 85% branches |
 | **9.2** | Runbook & Docs | Operational event runbook and admin user guide | Documentation review |
+| **11.1** | Backend Activity Summary & Export | Summary & Excel/CSV export routes and service | Service & route tests (≥ 90%) |
+| **11.2** | Frontend Dashboard Widget | Executive ActivityRecapSection with filter button | Component & hook tests |
+| **11.3** | Frontend Dedicated Tab & Export | ActivitySummaryView, NavTabs & ExportToolbar | View & integration tests |
+| **11.4** | Fullstack Verification | Full regression & end-to-end verification | Coverage & ESLint clean |
+
+---
+
+## 5. Checkpoint F: Rekapitulasi Transaksi per Activity (Wahana)
+
+### Task 11.1: Backend Activity Summary & Export Aggregation Engine
+- **Objective:** Implement aggregation queries, schema validations, and streaming CSV/Excel export for water sport activity transaction metrics.
+- **Dependencies:** None (builds upon existing Activity and Transaction Sequelize models).
+- **Likely Files:**
+  - `backend/src/schemas/activitySummarySchemas.js` (NEW)
+  - `backend/src/services/adminReportService.js` (MODIFY)
+  - `backend/src/services/exportService.js` (MODIFY)
+  - `backend/src/controllers/adminTransactionController.js` (MODIFY)
+  - `backend/src/controllers/exportController.js` (MODIFY)
+  - `backend/src/routes/adminRoutes.js` (MODIFY)
+  - `backend/tests/unit/adminReportService.test.js` (MODIFY)
+  - `backend/tests/integration/adminRoutes.test.js` (MODIFY)
+- **Implementation Outline:**
+  1. Create `activitySummarySchemas.js` defining query validation for `summary` (`start_date`, `end_date`, `status`) and `export` (`format`, `start_date`, `end_date`, `status`).
+  2. Implement `getActivityTransactionsSummary` in `adminReportService.js` calculating `deduction_count`, `refund_count`, `gross_amount`, `refund_amount`, `net_amount`, `unique_participants_count`, and `share_percentage` grouped by `activity.id`.
+  3. Implement `generateActivitiesRecapExport` in `exportService.js` generating CSV and Excel tables.
+  4. Expose endpoints `GET /api/v1/admin/reports/activities/summary` and `GET /api/v1/admin/reports/activities/export` in `adminRoutes.js`.
+  5. Add unit and integration tests covering positive calculation, date filtering, and error branches.
+- **Acceptance Criteria:**
+  - Endpoint returns aggregate metrics and per-activity list formatted per `SPEC.md`.
+  - Non-admin access is rejected with HTTP 403.
+  - Test coverage ≥ 90% lines.
+- **Verification Commands:**
+  - `rtk cd backend && npm test`
+  - `rtk cd backend && npm run lint`
+- **Risk & Rollback:** Low risk. Rollback: remove added route declarations and helper functions.
+
+---
+
+### Task 11.2: Frontend API Client, Custom Hook & Dashboard ActivityRecapSection
+- **Objective:** Add frontend API methods, stateful custom hook `useAdminActivitySummary`, and create high-contrast `ActivityRecapSection` widget on the Admin Dashboard (`/admin`).
+- **Dependencies:** Task 11.1
+- **Likely Files:**
+  - `frontend/src/api/adminApi.js` (MODIFY)
+  - `frontend/src/hooks/useAdminActivitySummary.js` (NEW)
+  - `frontend/src/components/admin/ActivityRecapSection.jsx` (NEW)
+  - `frontend/src/pages/admin/AdminDashboardView.jsx` (MODIFY)
+  - `frontend/tests/components/admin/ActivityRecapSection.test.jsx` (NEW)
+- **Implementation Outline:**
+  1. Add `getActivitySummary` and `getActivitiesExportUrl` to `adminApi.js`.
+  2. Create `useAdminActivitySummary` hook managing `summary`, `activities`, `isLoading`, `error`, and `refetch`.
+  3. Build `ActivityRecapSection.jsx` rendering:
+     - Header with total activities & total volume.
+     - Grid/cards per wahana showing icon, name, price, total plays, refunds, net amount, unique participants, and progress bar for volume share %.
+     - "Filter Ledger" button that triggers callback with `activity_id`.
+  4. Integrate `ActivityRecapSection` in `AdminDashboardView.jsx` between KPI Metric cards and Transaction Audit Ledger; wire filter button to pass selected `activity_id` into the ledger query.
+  5. Add unit tests for `ActivityRecapSection.jsx`.
+- **Acceptance Criteria:**
+  - Dashboard displays the recap widget with accurate totals.
+  - Clicking "Filter Ledger" on a card filters the ledger table below.
+  - High contrast and responsiveness preserved.
+- **Verification Commands:**
+  - `rtk cd frontend && npm test`
+  - `rtk cd frontend && npm run lint`
+- **Risk & Rollback:** Low risk. Rollback: revert `AdminDashboardView.jsx` and delete new component.
+
+---
+
+### Task 11.3: Dedicated Rekap Wahana Tab (`ActivitySummaryView`), AdminNavTabs & Export Integration
+- **Objective:** Create full-page deep-dive view `ActivitySummaryView.jsx` at `/admin/activity-summary`, register new tab in `AdminNavTabs`, and add export buttons in `ExportToolbar`.
+- **Dependencies:** Tasks 11.1, 11.2
+- **Likely Files:**
+  - `frontend/src/pages/admin/ActivitySummaryView.jsx` (NEW)
+  - `frontend/src/components/admin/AdminNavTabs.jsx` (MODIFY)
+  - `frontend/src/components/admin/ExportToolbar.jsx` (MODIFY)
+  - `frontend/src/App.jsx` (MODIFY)
+  - `frontend/tests/pages/admin/ActivitySummaryView.test.jsx` (NEW)
+- **Implementation Outline:**
+  1. Add `/admin/activity-summary` protected route in `App.jsx`.
+  2. Add "Rekap Wahana" link tab with icon in `AdminNavTabs.jsx`.
+  3. Build `ActivitySummaryView.jsx` featuring:
+     - Highlight metrics (Most Popular Wahana, Top Revenue Wahana, Total Plays).
+     - Filter toolbar (status filter, date range filter, search filter).
+     - Full analytical table with column sorting (by plays, revenue, participants).
+     - Quick export action buttons (CSV & Excel).
+  4. Update `ExportToolbar.jsx` to include "Rekap Wahana (CSV)" and "Rekap Wahana (Excel)" download buttons.
+  5. Add component tests for `ActivitySummaryView.test.jsx`.
+- **Acceptance Criteria:**
+  - Navigating to `/admin/activity-summary` displays complete analytical table and highlights.
+  - Export buttons initiate download of `activities-recap-report.csv` and `.xls`.
+  - Zero console errors or warnings.
+- **Verification Commands:**
+  - `rtk cd frontend && npm test`
+  - `rtk cd frontend && npm run lint`
+- **Risk & Rollback:** Low risk. Rollback: revert route and navtab changes.
+
+---
+
+### Task 11.4: Comprehensive Automated Test Suite & Fullstack Verification
+- **Objective:** Run full test suites on backend and frontend, verify code quality, ESLint compliance, and perform end-to-end audit.
+- **Dependencies:** Tasks 11.1, 11.2, 11.3
+- **Likely Files:**
+  - Backend and frontend test suites
+- **Implementation Outline:**
+  1. Run `rtk cd backend && npm test` ensuring coverage ≥ 90% lines/funcs and all test suites pass.
+  2. Run `rtk cd backend && npm run lint`.
+  3. Run `rtk cd frontend && npm test`.
+  4. Run `rtk cd frontend && npm run lint`.
+  5. Verify dual-placement UI behavior in browser.
+- **Acceptance Criteria:**
+  - 100% passing tests across backend and frontend.
+  - Zero ESLint violations.
+- **Verification Commands:**
+  - `rtk cd backend && npm test`
+  - `rtk cd backend && npm run lint`
+  - `rtk cd frontend && npm test`
+  - `rtk cd frontend && npm run lint`
+- **Risk & Rollback:** Low risk. Fix any uncovered branch or lint issue.
