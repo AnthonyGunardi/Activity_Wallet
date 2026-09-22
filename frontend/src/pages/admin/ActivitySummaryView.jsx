@@ -17,7 +17,6 @@ import {
   FileText,
   Loader2,
   TrendingUp,
-  RotateCcw,
   Users,
   Activity as ActivityIcon,
   ChevronLeft,
@@ -227,7 +226,7 @@ export function ActivitySummaryView() {
       <div
         style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
           gap: '1rem',
           marginBottom: '2rem'
         }}
@@ -257,15 +256,6 @@ export function ActivitySummaryView() {
           icon={<Users size={20} />}
           color="var(--color-success-primary)"
           bgColor="var(--color-success-bg)"
-        />
-
-        <SummaryMetricCard
-          title="Total Refund"
-          value={isLoadingSummary ? '...' : `${summary?.total_refunds || 0} Kali`}
-          subtitle={`Total: ${formatCurrency(summary?.total_refund_amount || 0)}`}
-          icon={<RotateCcw size={20} />}
-          color="var(--color-danger-primary)"
-          bgColor="var(--color-danger-bg)"
         />
       </div>
 

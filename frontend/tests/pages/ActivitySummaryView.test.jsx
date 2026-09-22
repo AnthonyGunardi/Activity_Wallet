@@ -122,7 +122,7 @@ describe('ActivitySummaryView Page Integration Tests', () => {
       expect(screen.getByText('Rp 5.850.000')).toBeInTheDocument();
       expect(screen.getByText('10 Kali')).toBeInTheDocument();
       expect(screen.getByText('8 Orang')).toBeInTheDocument();
-      expect(screen.getByText('1 Kali')).toBeInTheDocument();
+      expect(screen.queryByText('Total Refund')).not.toBeInTheDocument();
       expect(screen.getByText('Budi Santoso')).toBeInTheDocument();
       expect(screen.getByText('-Rp 650.000')).toBeInTheDocument();
     });
