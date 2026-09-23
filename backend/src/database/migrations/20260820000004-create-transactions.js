@@ -32,16 +32,16 @@ module.exports = {
       },
       staff_id: {
         type: Sequelize.UUID,
-        allowNull: false,
+        allowNull: true,
         references: {
           model: 'users',
           key: 'id'
         },
         onUpdate: 'CASCADE',
-        onDelete: 'RESTRICT'
+        onDelete: 'SET NULL'
       },
       type: {
-        type: Sequelize.ENUM('DEDUCTION', 'REFUND', 'ADJUSTMENT'),
+        type: Sequelize.ENUM('DEDUCTION', 'REFUND', 'ADJUSTMENT', 'TRANSFER_OUT', 'TRANSFER_IN'),
         allowNull: false
       },
       amount: {

@@ -105,6 +105,48 @@ async function getWalletByQrCode(qrCode) {
   };
 }
 
+/**
+ * Looks up and validates a transfer recipient by QR code token string.
+ *
+ * @param {string} qrCode - Recipient's unique QR code token.
+ * @param {string} [senderQrCode] - Optional sender QR code to prevent self-transfer lookup.
+ * @returns {Promise<{
+ *   id: string,
+ *   name: string,
+ *   qr_code: string,
+ *   status: string
+ * }>}
+ * @throws {AppError} 404 RECIPIENT_NOT_FOUND if recipient does not exist.
+ * @throws {AppError} 403 RECIPIENT_BLOCKED if recipient is blocked.
+ * @throws {AppError} 400 SELF_TRANSFER_NOT_ALLOWED if senderQrCode equals qrCode.
+ */
+async function getTransferRecipient(qrCode, senderQrCode) {
+  if (senderQrCode && qrCode.trim() === senderQrCode.trim()) {
+    throw new AppError('SELF_TRANSFER_NOT_ALLOWED', 'Tidak dapat mentransfer saldo ke akun sendiri.', 400);
+  }
+
+  const recipient = await Participant.findOne({
+    where: { qr_code: qrCode.trim() }
+  });
+
+  if (!recipient) {
+    throw new AppError('RECIPIENT_NOT_FOUND', 'Peserta penerima dengan kode tersebut tidak ditemukan.', 404);
+  }
+
+  if (recipient.status === ParticipantStatus.BLOCKED) {
+    throw new AppError('RECIPIENT_BLOCKED', 'Akun peserta penerima sedang diblokir oleh administrator.', 403);
+  }
+
+  return {
+    id: recipient.id,
+    name: recipient.name,
+    qr_code: recipient.qr_code,
+    status: recipient.status
+  };
+}
+
 module.exports = {
-  getWalletByQrCode
+  getWalletByQrCode,
+  getTransferRecipient
 };
+

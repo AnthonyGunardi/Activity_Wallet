@@ -39,7 +39,7 @@
   - [x] Task 11.4: Comprehensive Automated Test Suite & Fullstack Verification
 
 - [ ] **Checkpoint G: Transfer Saldo Kredit Aktivitas Antar Peserta**
-  - [ ] Task 12.1: Backend Transfer Database Schema, Enums, Validation Schemas & Recipient Verification API
+  - [x] Task 12.1: Backend Transfer Database Schema, Enums, Validation Schemas & Recipient Verification API
   - [ ] Task 12.2: Backend Atomic Peer-to-Peer Transfer Engine & Concurrency Locking
   - [ ] Task 12.3: Frontend Transfer Modal with Scanner & Manual Token Input Fallback
   - [ ] Task 12.4: Frontend Participant Portal Integration & Transaction History Ledger Reflection

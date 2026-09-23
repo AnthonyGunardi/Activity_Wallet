@@ -36,14 +36,20 @@ function initTransaction(sequelize) {
       },
       staff_id: {
         type: DataTypes.UUID,
-        allowNull: false,
+        allowNull: true,
         references: {
           model: 'users',
           key: 'id'
         }
       },
       type: {
-        type: DataTypes.ENUM(TransactionType.DEDUCTION, TransactionType.REFUND, TransactionType.ADJUSTMENT),
+        type: DataTypes.ENUM(
+          TransactionType.DEDUCTION,
+          TransactionType.REFUND,
+          TransactionType.ADJUSTMENT,
+          TransactionType.TRANSFER_OUT,
+          TransactionType.TRANSFER_IN
+        ),
         allowNull: false
       },
       amount: {
