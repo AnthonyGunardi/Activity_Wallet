@@ -42,4 +42,40 @@ describe('TransactionList Component Tests', () => {
     render(<TransactionList transactions={[]} />);
     expect(screen.getByText('Belum ada riwayat transaksi.')).toBeInTheDocument();
   });
+
+  it('should render TRANSFER_OUT and TRANSFER_IN with distinct badges and formatting', () => {
+    const transferTransactions = [
+      {
+        id: 'tx-out-1',
+        type: 'TRANSFER_OUT',
+        amount: 100000,
+        balance_before: 500000,
+        balance_after: 400000,
+        activity_name: null,
+        notes: 'Transfer saldo ke Budi (SEPA-002)',
+        created_at: '2026-08-19T14:00:00Z'
+      },
+      {
+        id: 'tx-in-1',
+        type: 'TRANSFER_IN',
+        amount: 75000,
+        balance_before: 400000,
+        balance_after: 475000,
+        activity_name: null,
+        notes: 'Transfer saldo dari Citra (SEPA-003)',
+        created_at: '2026-08-19T14:30:00Z'
+      }
+    ];
+
+    render(<TransactionList transactions={transferTransactions} />);
+
+    expect(screen.getByText('Transfer saldo ke Budi (SEPA-002)')).toBeInTheDocument();
+    expect(screen.getByText('Transfer Keluar')).toBeInTheDocument();
+    expect(screen.getByText('-Rp 100.000')).toBeInTheDocument();
+
+    expect(screen.getByText('Transfer saldo dari Citra (SEPA-003)')).toBeInTheDocument();
+    expect(screen.getByText('Transfer Masuk')).toBeInTheDocument();
+    expect(screen.getByText('+Rp 75.000')).toBeInTheDocument();
+  });
 });
+

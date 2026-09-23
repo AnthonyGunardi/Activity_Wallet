@@ -1,4 +1,4 @@
-import { Wallet, ShieldAlert, Sparkles } from 'lucide-react';
+import { Wallet, ShieldAlert, Sparkles, Send } from 'lucide-react';
 import { formatCurrency } from '../../utils/formatters';
 
 /**
@@ -13,10 +13,11 @@ import { formatCurrency } from '../../utils/formatters';
  *     current_balance: number,
  *     total_spent: number,
  *     status: string
- *   }
+ *   },
+ *   onOpenTransfer?: () => void
  * }} props
  */
-export function BalanceCard({ participant }) {
+export function BalanceCard({ participant, onOpenTransfer }) {
   if (!participant) return null;
 
   const isBlocked = participant.status === 'BLOCKED';
@@ -133,6 +134,34 @@ export function BalanceCard({ participant }) {
           </div>
         </div>
       </div>
+
+      {!isBlocked && onOpenTransfer && (
+        <div style={{ marginTop: '1.25rem' }}>
+          <button
+            type="button"
+            onClick={onOpenTransfer}
+            className="btn"
+            style={{
+              width: '100%',
+              background: '#ffffff',
+              color: 'var(--color-primary-700)',
+              fontWeight: 800,
+              fontSize: '0.9375rem',
+              padding: '0.625rem 1rem',
+              borderRadius: 'var(--radius-lg)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '0.5rem',
+              boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+              border: 'none',
+              cursor: 'pointer'
+            }}
+          >
+            <Send size={16} /> Transfer Saldo ke Peserta Lain
+          </button>
+        </div>
+      )}
     </div>
   );
 }

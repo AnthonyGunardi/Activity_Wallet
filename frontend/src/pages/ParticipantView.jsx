@@ -5,6 +5,7 @@ import { BalanceCard } from '../components/participant/BalanceCard';
 import { QRViewer } from '../components/participant/QRViewer';
 import { ActivityCatalog } from '../components/participant/ActivityCatalog';
 import { TransactionList } from '../components/participant/TransactionList';
+import { TransferModal } from '../components/participant/TransferModal';
 import { Wallet, RefreshCw, ArrowLeft, Search, AlertCircle } from 'lucide-react';
 import { useToast } from '../hooks/useToast';
 import { useAuth } from '../hooks/useAuth';
@@ -16,6 +17,7 @@ export function ParticipantView() {
   const { isAdmin } = useAuth();
 
   const [inputToken, setInputToken] = useState('');
+  const [isTransferModalOpen, setIsTransferModalOpen] = useState(false);
   const effectiveInitialToken = routeQrCode || '';
 
   const {
@@ -64,6 +66,18 @@ export function ParticipantView() {
       toast.show('Saldo dan riwayat berhasil diperbarui.', 'success');
     } catch (_err) {
       toast.show('Gagal memperbarui saldo.', 'error');
+    }
+  };
+
+  const handleTransferSuccess = async (transferResult) => {
+    try {
+      await refreshWallet();
+      toast.show(
+        `Berhasil mentransfer saldo sebesar Rp ${(transferResult?.amount || 0).toLocaleString('id-ID')} ke ${transferResult?.recipient_name || 'penerima'}!`,
+        'success'
+      );
+    } catch (_err) {
+      toast.show('Transfer berhasil, silakan muat ulang halaman untuk memperbarui saldo.', 'info');
     }
   };
 
@@ -247,7 +261,10 @@ export function ParticipantView() {
               gap: '1.25rem'
             }}
           >
-            <BalanceCard participant={wallet.participant} />
+            <BalanceCard
+              participant={wallet.participant}
+              onOpenTransfer={() => setIsTransferModalOpen(true)}
+            />
             <QRViewer qrCode={wallet.participant.qr_code} participantName={wallet.participant.name} />
           </div>
 
@@ -266,6 +283,14 @@ export function ParticipantView() {
             />
             <TransactionList transactions={wallet.recent_transactions} />
           </div>
+
+          {/* Peer-to-Peer Transfer Modal */}
+          <TransferModal
+            isOpen={isTransferModalOpen}
+            onClose={() => setIsTransferModalOpen(false)}
+            sender={wallet.participant}
+            onTransferSuccess={handleTransferSuccess}
+          />
         </div>
       )}
     </div>

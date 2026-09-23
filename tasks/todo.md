@@ -42,7 +42,7 @@
   - [x] Task 12.1: Backend Transfer Database Schema, Enums, Validation Schemas & Recipient Verification API
   - [x] Task 12.2: Backend Atomic Peer-to-Peer Transfer Engine & Concurrency Locking
   - [x] Task 12.3: Frontend Transfer Modal with Scanner & Manual Token Input Fallback
-  - [ ] Task 12.4: Frontend Participant Portal Integration & Transaction History Ledger Reflection
+  - [x] Task 12.4: Frontend Participant Portal Integration & Transaction History Ledger Reflection
   - [ ] Task 12.5: Admin Participant Detail Ledger Reflection & Full System Verification
 
 

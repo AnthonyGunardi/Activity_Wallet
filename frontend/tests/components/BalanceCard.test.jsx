@@ -28,4 +28,16 @@ describe('BalanceCard Component Tests', () => {
 
     expect(screen.getByText(/blocked/i)).toBeInTheDocument();
   });
+
+  it('should render Transfer Saldo button when onOpenTransfer is provided and participant is ACTIVE', () => {
+    const onOpenTransfer = vi.fn();
+    render(<BalanceCard participant={mockParticipant} onOpenTransfer={onOpenTransfer} />);
+
+    const transferBtn = screen.getByRole('button', { name: /transfer saldo/i });
+    expect(transferBtn).toBeInTheDocument();
+
+    transferBtn.click();
+    expect(onOpenTransfer).toHaveBeenCalledTimes(1);
+  });
 });
+

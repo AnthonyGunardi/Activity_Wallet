@@ -53,6 +53,9 @@ export function TransactionList({ transactions = [] }) {
         {transactions.map((tx) => {
           const isRefund = tx.type === 'REFUND';
           const isAdjustment = tx.type === 'ADJUSTMENT';
+          const isTransferOut = tx.type === 'TRANSFER_OUT';
+          const isTransferIn = tx.type === 'TRANSFER_IN';
+          const isPositive = isRefund || isTransferIn;
 
           return (
             <div
@@ -77,11 +80,19 @@ export function TransactionList({ transactions = [] }) {
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    background: isRefund ? 'var(--color-success-bg)' : isAdjustment ? 'var(--color-primary-50)' : 'var(--color-danger-bg)',
-                    color: isRefund ? 'var(--color-success-primary)' : isAdjustment ? 'var(--color-primary-500)' : 'var(--color-danger-primary)'
+                    background: isPositive
+                      ? 'var(--color-success-bg)'
+                      : isAdjustment
+                        ? 'var(--color-primary-50)'
+                        : 'var(--color-danger-bg)',
+                    color: isPositive
+                      ? 'var(--color-success-primary)'
+                      : isAdjustment
+                        ? 'var(--color-primary-500)'
+                        : 'var(--color-danger-primary)'
                   }}
                 >
-                  {isRefund ? (
+                  {isPositive ? (
                     <ArrowUpRight size={20} />
                   ) : isAdjustment ? (
                     <Receipt size={20} />
@@ -96,10 +107,24 @@ export function TransactionList({ transactions = [] }) {
                       {tx.activity_name || tx.notes || 'Transaksi Aktivitas'}
                     </span>
                     <span
-                      className={`badge ${isRefund ? 'badge-success' : isAdjustment ? 'badge-blue' : 'badge-amber'}`}
+                      className={`badge ${
+                        isPositive
+                          ? 'badge-success'
+                          : isAdjustment
+                            ? 'badge-blue'
+                            : 'badge-amber'
+                      }`}
                       style={{ fontSize: '0.625rem', padding: '0.125rem 0.375rem' }}
                     >
-                      {isRefund ? 'Refund' : isAdjustment ? 'Penyesuaian' : 'Debit'}
+                      {isRefund
+                        ? 'Refund'
+                        : isAdjustment
+                          ? 'Penyesuaian'
+                          : isTransferIn
+                            ? 'Transfer Masuk'
+                            : isTransferOut
+                              ? 'Transfer Keluar'
+                              : 'Debit'}
                     </span>
                   </div>
                   <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginTop: '0.125rem' }}>
@@ -113,10 +138,10 @@ export function TransactionList({ transactions = [] }) {
                   style={{
                     fontSize: '1rem',
                     fontWeight: 700,
-                    color: isRefund ? 'var(--color-success-primary)' : 'var(--color-text-main)'
+                    color: isPositive ? 'var(--color-success-primary)' : 'var(--color-text-main)'
                   }}
                 >
-                  {isRefund ? `+${formatCurrency(tx.amount)}` : `-${formatCurrency(tx.amount)}`}
+                  {isPositive ? `+${formatCurrency(tx.amount)}` : `-${formatCurrency(tx.amount)}`}
                 </div>
                 {typeof tx.balance_after === 'number' && (
                   <div style={{ fontSize: '0.6875rem', color: 'var(--color-text-muted)', marginTop: '0.125rem' }}>

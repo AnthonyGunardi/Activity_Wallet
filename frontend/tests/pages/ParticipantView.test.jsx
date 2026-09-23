@@ -154,4 +154,35 @@ describe('ParticipantView Page Tests', () => {
       expect(screen.getByText('Peserta dengan kode QR tersebut tidak ditemukan.')).toBeInTheDocument();
     });
   });
+
+  it('should open transfer modal when Transfer Saldo button is clicked', async () => {
+    global.fetch = vi.fn().mockResolvedValueOnce({
+      ok: true,
+      status: 200,
+      json: async () => ({
+        success: true,
+        data: mockWallet
+      })
+    });
+
+    renderWithAuth(
+      <MemoryRouter initialEntries={['/participant/SEPA-001']}>
+        <Routes>
+          <Route path="/participant/:qrCode" element={<ParticipantView />} />
+        </Routes>
+      </MemoryRouter>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText('Budi Santoso')).toBeInTheDocument();
+    });
+
+    const transferBtn = screen.getByRole('button', { name: /transfer saldo/i });
+    expect(transferBtn).toBeInTheDocument();
+    fireEvent.click(transferBtn);
+
+    await waitFor(() => {
+      expect(screen.getByText('Transfer Saldo Aktivitas')).toBeInTheDocument();
+    });
+  });
 });
