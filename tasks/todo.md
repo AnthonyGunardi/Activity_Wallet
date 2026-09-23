@@ -32,10 +32,18 @@
   - [x] Task 10.2: Upgrade BulkImportModal to Excel Upload, Preview Table & Template Download
   - [x] Task 10.3: Update ParticipantManagerView Header & End-to-End Tests
 
-- [x] **Checkpoint F: Rekapitulasi Transaksi per Activity (Wahana)**
+- [x] **Checkpoint F: Rekapitulasi Transaksi per Activity (Aktivitas)**
   - [x] Task 11.1: Backend Activity Summary & Export Aggregation Engine (Service, Controller, Schemas, Routes)
   - [x] Task 11.2: Frontend API Client, Custom Hook & Dashboard ActivityRecapSection
-  - [x] Task 11.3: Frontend Dedicated "Rekap Wahana" Tab (`ActivitySummaryView`), AdminNavTabs & Export Integration
+  - [x] Task 11.3: Frontend Dedicated "Rekap Aktivitas" Tab (`ActivitySummaryView`), AdminNavTabs & Export Integration
   - [x] Task 11.4: Comprehensive Automated Test Suite & Fullstack Verification
+
+- [ ] **Checkpoint G: Transfer Saldo Kredit Aktivitas Antar Peserta**
+  - [ ] Task 12.1: Backend Transfer Database Schema, Enums, Validation Schemas & Recipient Verification API
+  - [ ] Task 12.2: Backend Atomic Peer-to-Peer Transfer Engine & Concurrency Locking
+  - [ ] Task 12.3: Frontend Transfer Modal with Scanner & Manual Token Input Fallback
+  - [ ] Task 12.4: Frontend Participant Portal Integration & Transaction History Ledger Reflection
+  - [ ] Task 12.5: Admin Participant Detail Ledger Reflection & Full System Verification
+
 
 

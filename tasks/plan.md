@@ -660,10 +660,15 @@ graph TD
 | **11.2** | Frontend Dashboard Widget | Executive ActivityRecapSection with filter button | Component & hook tests |
 | **11.3** | Frontend Dedicated Tab & Export | ActivitySummaryView, NavTabs & ExportToolbar | View & integration tests |
 | **11.4** | Fullstack Verification | Full regression & end-to-end verification | Coverage & ESLint clean |
+| **12.1** | Transfer Schema, Model & Recipient API | Transaction model update, Joi schemas & recipient lookup API | Unit & integration tests (≥ 90%) |
+| **12.2** | Atomic Transfer Engine | Concurrent double-entry transfer engine with deterministic row lock | Concurrency & race condition tests |
+| **12.3** | Frontend Transfer Modal | Modal with scanner, manual input, and nominal form | Component & interaction tests |
+| **12.4** | Participant Portal & History | Transfer button on wallet card & transfer ledger badges | Component & view tests |
+| **12.5** | Admin Detail & System Verification | Admin participant detail ledger & full regression suite | Coverage & ESLint clean |
 
 ---
 
-## 5. Checkpoint F: Rekapitulasi Transaksi per Activity (Wahana)
+## 5. Checkpoint F: Rekapitulasi Transaksi per Activity (Aktivitas)
 
 ### Task 11.1: Backend Activity Summary & Export Aggregation Engine
 - **Objective:** Implement aggregation queries, schema validations, and streaming CSV/Excel export for water sport activity transaction metrics.
@@ -708,7 +713,7 @@ graph TD
   2. Create `useAdminActivitySummary` hook managing `summary`, `activities`, `isLoading`, `error`, and `refetch`.
   3. Build `ActivityRecapSection.jsx` rendering:
      - Header with total activities & total volume.
-     - Grid/cards per wahana showing icon, name, price, total plays, refunds, net amount, unique participants, and progress bar for volume share %.
+     - Grid/cards per aktivitas showing icon, name, price, total plays, refunds, net amount, unique participants, and progress bar for volume share %.
      - "Filter Ledger" button that triggers callback with `activity_id`.
   4. Integrate `ActivityRecapSection` in `AdminDashboardView.jsx` between KPI Metric cards and Transaction Audit Ledger; wire filter button to pass selected `activity_id` into the ledger query.
   5. Add unit tests for `ActivityRecapSection.jsx`.
@@ -723,7 +728,7 @@ graph TD
 
 ---
 
-### Task 11.3: Dedicated Rekap Wahana Tab (`ActivitySummaryView`), AdminNavTabs & Export Integration
+### Task 11.3: Dedicated Rekap Aktivitas Tab (`ActivitySummaryView`), AdminNavTabs & Export Integration
 - **Objective:** Create full-page deep-dive view `ActivitySummaryView.jsx` at `/admin/activity-summary`, register new tab in `AdminNavTabs`, and add export buttons in `ExportToolbar`.
 - **Dependencies:** Tasks 11.1, 11.2
 - **Likely Files:**
@@ -734,13 +739,13 @@ graph TD
   - `frontend/tests/pages/admin/ActivitySummaryView.test.jsx` (NEW)
 - **Implementation Outline:**
   1. Add `/admin/activity-summary` protected route in `App.jsx`.
-  2. Add "Rekap Wahana" link tab with icon in `AdminNavTabs.jsx`.
+  2. Add "Rekap Aktivitas" link tab with icon in `AdminNavTabs.jsx`.
   3. Build `ActivitySummaryView.jsx` featuring:
-     - Highlight metrics (Most Popular Wahana, Top Revenue Wahana, Total Plays).
+     - Highlight metrics (Most Popular Aktivitas, Top Revenue Aktivitas, Total Plays).
      - Filter toolbar (status filter, date range filter, search filter).
      - Full analytical table with column sorting (by plays, revenue, participants).
      - Quick export action buttons (CSV & Excel).
-  4. Update `ExportToolbar.jsx` to include "Rekap Wahana (CSV)" and "Rekap Wahana (Excel)" download buttons.
+  4. Update `ExportToolbar.jsx` to include "Rekap Aktivitas (CSV)" and "Rekap Aktivitas (Excel)" download buttons.
   5. Add component tests for `ActivitySummaryView.test.jsx`.
 - **Acceptance Criteria:**
   - Navigating to `/admin/activity-summary` displays complete analytical table and highlights.
@@ -773,3 +778,181 @@ graph TD
   - `rtk cd frontend && npm test`
   - `rtk cd frontend && npm run lint`
 - **Risk & Rollback:** Low risk. Fix any uncovered branch or lint issue.
+
+---
+
+## 6. Checkpoint G: Transfer Saldo Kredit Aktivitas Antar Peserta
+
+### Task 12.1: Backend Transfer Database Schema, Enums, Validation Schemas & Recipient Verification API
+- **Objective:** Update `Transaction` model to make `staff_id` nullable and add `TRANSFER_OUT` & `TRANSFER_IN` to `TransactionType` enum; implement Joi schemas and recipient verification endpoint `GET /api/v1/participants/transfer/recipient/:qrCode`.
+- **Dependencies:** None (builds upon existing Participant and Transaction models).
+- **Likely Files:**
+  - `backend/src/constants/enums.js` (MODIFY)
+  - `backend/src/models/Transaction.js` (MODIFY)
+  - `backend/src/schemas/transferSchemas.js` (NEW)
+  - `backend/src/services/participantService.js` (MODIFY)
+  - `backend/src/controllers/participantController.js` (MODIFY)
+  - `backend/src/routes/participantRoutes.js` (MODIFY)
+  - `backend/tests/unit/transferSchemas.test.js` (NEW)
+  - `backend/tests/integration/participantTransferRecipient.test.js` (NEW)
+- **Implementation Outline:**
+  1. Add `TRANSFER_OUT: 'TRANSFER_OUT'` and `TRANSFER_IN: 'TRANSFER_IN'` to `TransactionType` in `enums.js`.
+  2. Update `Transaction.js`: set `staff_id: { allowNull: true }` and include `TRANSFER_OUT` & `TRANSFER_IN` in ENUM definition.
+  3. Create `transferSchemas.js` validating:
+     - `recipientParamSchema`: `qrCode` required string.
+     - `transferPayloadSchema`: `sender_qr_code` (required), `recipient_qr_code` (required, cannot equal sender), `amount` (integer, min 1), `notes` (optional string, max 255).
+  4. Implement `getTransferRecipient(qrCode, senderQrCode)` in `participantService.js`:
+     - Lookup recipient by `qr_code`.
+     - Check status === `ACTIVE` (throw 403 if `BLOCKED`).
+     - Throw 404 if not found.
+     - Return `{ id, name, qr_code, status }`.
+  5. Expose `GET /api/v1/participants/transfer/recipient/:qrCode` in `participantRoutes.js`.
+  6. Add unit and integration tests.
+- **Acceptance Criteria:**
+  - `Transaction` model accepts null `staff_id` and new transfer enum types.
+  - Endpoint returns recipient summary for active participant.
+  - Rejects with 404 for non-existent token, 403 for blocked recipient.
+  - Test coverage ≥ 90% lines.
+- **Verification Commands:**
+  - `rtk cd backend && npm test`
+  - `rtk cd backend && npm run lint`
+- **Risk & Rollback:** Low risk. Rollback: revert `Transaction.js`, `enums.js`, and `participantRoutes.js`.
+
+---
+
+### Task 12.2: Backend Atomic Peer-to-Peer Transfer Engine & Concurrency Locking
+- **Objective:** Implement domain service `transferService.js` to execute atomic balance transfer between participants with deterministic row locking, non-negative balance checks, and linked immutable ledger entries (`TRANSFER_OUT` & `TRANSFER_IN`).
+- **Dependencies:** Task 12.1
+- **Likely Files:**
+  - `backend/src/services/transferService.js` (NEW)
+  - `backend/src/controllers/participantController.js` (MODIFY)
+  - `backend/src/routes/participantRoutes.js` (MODIFY)
+  - `backend/tests/unit/transferService.test.js` (NEW)
+  - `backend/tests/integration/participantTransfer.test.js` (NEW)
+  - `backend/tests/concurrency/transferDeadlockAndRace.test.js` (NEW)
+- **Implementation Outline:**
+  1. Implement `transferService.executeTransfer({ sender_qr_code, recipient_qr_code, amount, notes })`:
+     - Run inside managed `sequelize.transaction(async (t) => { ... })`.
+     - Validate `sender_qr_code !== recipient_qr_code`.
+     - Query both participants with deterministic lock ordering (sort by ID ascending: `const [first, second] = ...`) using `t.LOCK.UPDATE`.
+     - Verify both participants exist and have status `ACTIVE`.
+     - Verify `sender.current_balance >= amount`; throw 422 `INSUFFICIENT_BALANCE` if insufficient.
+     - Mutate balances:
+       `sender.current_balance -= amount;`
+       `recipient.current_balance += amount;`
+       (Note: `total_spent` is NOT altered).
+     - Save both participant records.
+     - Create `TRANSFER_OUT` transaction record for sender (`staff_id: null`, amount, balances before/after, notes).
+     - Create `TRANSFER_IN` transaction record for recipient (`staff_id: null`, amount, balances before/after, reference_id: transferOutTx.id, notes).
+     - Return transfer receipt and updated sender balance.
+  2. Implement `transferBalance` controller method in `participantController.js`.
+  3. Mount `POST /api/v1/participants/transfer` in `participantRoutes.js` with Joi body validation.
+  4. Write unit tests, API integration tests, and concurrency tests (verifying race conditions and deadlock freedom on reciprocal transfers).
+- **Acceptance Criteria:**
+  - Transfer atomically debits sender and credits recipient.
+  - Double spend is prevented; attempts exceeding balance fail with 422.
+  - Reciprocal concurrent transfers (A->B and B->A) execute without deadlocks.
+  - Linked immutable transaction records created accurately.
+  - Test coverage ≥ 90% lines.
+- **Verification Commands:**
+  - `rtk cd backend && npm test`
+  - `rtk cd backend && npm run lint`
+- **Risk & Rollback:** High risk (financial transaction integrity). Rollback: revert `transferService.js` and route.
+
+---
+
+### Task 12.3: Frontend Transfer Modal with Scanner & Manual Token Input Fallback
+- **Objective:** Build `TransferModal.jsx` featuring HTML5 camera viewfinder matching staff scanner layout, manual token input fallback, recipient preview, and balance-constrained nominal input form.
+- **Dependencies:** Task 12.1, Task 12.2
+- **Likely Files:**
+  - `frontend/src/api/participantApi.js` (MODIFY)
+  - `frontend/src/components/participant/TransferModal.jsx` (NEW)
+  - `frontend/tests/components/participant/TransferModal.test.jsx` (NEW)
+- **Implementation Outline:**
+  1. Add `getTransferRecipient(qrCode)` and `transferBalance(payload)` to `participantApi.js`.
+  2. Implement `TransferModal.jsx`:
+     - Step 1: Scanner View:
+       - Mount `Html5Qrcode` inside container `<div id="participant-transfer-qr-reader" />`.
+       - Viewfinder laser line, camera switch, and toggle on/off.
+       - Clean unmount on modal close (`stop()` and `clear()`).
+       - Form input manual kode peserta (e.g. `SEPA-002`) below scanner.
+     - Step 2: Nominal Input:
+       - Display verified recipient name & QR code.
+       - Display sender's current balance.
+       - Numeric input for nominal transfer.
+       - Quick chips: Rp50.000, Rp100.000, Rp200.000, "Semua Saldo" (Max).
+       - Enforce validation: `1 <= nominal <= current_balance`. Disable button and display warning if nominal exceeds balance.
+       - Note input (optional).
+     - Step 3: Success state with auto-closing callback.
+  3. Write unit & component tests in `TransferModal.test.jsx`.
+- **Acceptance Criteria:**
+  - Scanner starts, stops, and handles camera permissions cleanly without interfering with booth scanner.
+  - Manual code input allows entering recipient token without camera.
+  - Nominal input strictly prohibits values > current_balance or <= 0.
+  - Test suite passes.
+- **Verification Commands:**
+  - `rtk cd frontend && npm test`
+  - `rtk cd frontend && npm run lint`
+- **Risk & Rollback:** Medium risk. Rollback: delete `TransferModal.jsx` and API methods.
+
+---
+
+### Task 12.4: Frontend Participant Portal Integration & Transaction History Ledger Reflection
+- **Objective:** Add "Transfer Saldo" button on `BalanceCard.jsx` / `ParticipantView.jsx`, wire `TransferModal` to refresh wallet upon completion, and update `TransactionList.jsx` to render `TRANSFER_OUT` and `TRANSFER_IN` badges.
+- **Dependencies:** Task 12.3
+- **Likely Files:**
+  - `frontend/src/components/participant/BalanceCard.jsx` (MODIFY)
+  - `frontend/src/components/participant/TransactionList.jsx` (MODIFY)
+  - `frontend/src/pages/ParticipantView.jsx` (MODIFY)
+  - `frontend/tests/components/participant/BalanceCard.test.jsx` (MODIFY / NEW)
+  - `frontend/tests/components/participant/TransactionList.test.jsx` (NEW)
+  - `frontend/tests/pages/ParticipantView.test.jsx` (MODIFY)
+- **Implementation Outline:**
+  1. Add "Transfer Saldo" button with Send/ArrowRightLeft icon on `BalanceCard.jsx`.
+  2. In `ParticipantView.jsx`:
+     - Maintain `isTransferModalOpen` state.
+     - On successful transfer, trigger `refreshWallet()` to immediately update balance and recent transactions.
+     - Display success toast notification.
+  3. In `TransactionList.jsx`:
+     - Detect `tx.type === 'TRANSFER_OUT'`: render badge `Transfer Keluar` (amber/red), icon ArrowDownRight/Send, `-Rp...`, description notes (e.g. `Transfer ke Budi (SEPA-002)`).
+     - Detect `tx.type === 'TRANSFER_IN'`: render badge `Transfer Masuk` (green), icon ArrowUpRight/Receive, `+Rp...`, description notes (e.g. `Transfer dari Andi (SEPA-001)`).
+  4. Write component tests for `BalanceCard`, `TransactionList`, and `ParticipantView`.
+- **Acceptance Criteria:**
+  - Participant can tap "Transfer Saldo", complete transfer, and see balance decrease immediately.
+  - Transaction list immediately shows `TRANSFER_OUT` or `TRANSFER_IN` with proper badge and formatting.
+  - Activity affordability in catalog updates dynamically according to new balance.
+- **Verification Commands:**
+  - `rtk cd frontend && npm test`
+  - `rtk cd frontend && npm run lint`
+- **Risk & Rollback:** Low risk. Rollback: revert `BalanceCard.jsx`, `TransactionList.jsx`, and `ParticipantView.jsx`.
+
+---
+
+### Task 12.5: Admin Participant Detail Ledger Reflection & Full System Verification
+- **Objective:** Update `ParticipantDetailModal.jsx` to render transfer transactions in Admin "Detail & Riwayat Peserta", verify export reporting compatibility, and execute full end-to-end regression test suite.
+- **Dependencies:** Tasks 12.1 through 12.4
+- **Likely Files:**
+  - `frontend/src/components/admin/ParticipantDetailModal.jsx` (MODIFY)
+  - `frontend/tests/components/ParticipantDetailModal.test.jsx` (MODIFY)
+  - Backend and frontend full test suites
+- **Implementation Outline:**
+  1. In `ParticipantDetailModal.jsx`:
+     - Format `TRANSFER_OUT` as debit with `-Rp...` and icon/badge.
+     - Format `TRANSFER_IN` as credit with `+Rp...` and icon/badge.
+     - Display counterparty details from `notes` when `activity` is null.
+  2. Verify `exportService.js` and `adminReportService.js` correctly handle null `activity_id` and null `staff_id` without errors.
+  3. Run full backend test suite (`npm test`) ensuring coverage ≥ 90% lines/funcs and ≥ 85% branches.
+  4. Run backend linter (`npm run lint`).
+  5. Run full frontend test suite (`npm test`).
+  6. Run frontend linter (`npm run lint`).
+- **Acceptance Criteria:**
+  - Admin modal "Detail & Riwayat Peserta" clearly displays all peer-to-peer transfers.
+  - Export reports run without error and reflect transfer transactions.
+  - 100% test suites pass with zero lint violations.
+- **Verification Commands:**
+  - `rtk cd backend && npm test`
+  - `rtk cd backend && npm run lint`
+  - `rtk cd frontend && npm test`
+  - `rtk cd frontend && npm run lint`
+- **Risk & Rollback:** Low risk. Rollback: revert `ParticipantDetailModal.jsx`.
+

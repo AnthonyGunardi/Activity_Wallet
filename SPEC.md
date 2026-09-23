@@ -1,152 +1,230 @@
-# SPEC.md - Rekapitulasi Transaksi per Activity (Wahana)
+# SPEC.md - Transfer Saldo Kredit Aktivitas Antar Peserta
 
-**Document Status:** Approved  
-**Feature:** Rekapitulasi Transaksi per Activity (Wahana) pada Portal Admin  
+**Document Status:** Pending Approval  
+**Feature:** Peer-to-Peer Transfer Saldo Kredit Aktivitas Antar Peserta  
 **Governing Architecture:** [`AGENTS.md`](./AGENTS.md)  
-**Parent PRD:** [`docs/PRD.md`](./docs/PRD.md) (Section 11: Admin Dashboard & Section 12: Reporting)  
+**Parent PRD & Global Spec:** [`docs/PRD.md`](./docs/PRD.md) & [`docs/SPEC.md`](./docs/SPEC.md) (v1.1.0)  
 
 ---
 
 ## 1. Objective & Target Users
 
 ### 1.1 Objective
-Memberikan visibilitas performa operasional dan finansial per wahana (water sport activity) kepada Event Supervisor/Admin secara real-time. Fitur ini menyajikan rekapitulasi transaksi pemotongan kredit (Deduction), pengembalian (Refund), total nominal rupiah (Gross & Net), jumlah peserta unik yang bermain di tiap wahana, serta persentase kontribusi penggunaan kredit event, dilengkapi kemampuan ekspor laporan (CSV & Excel) dan integrasi filter langsung ke riwayat transaksi.
+Memungkinkan peserta event Sepa Island Water Activity untuk saling mentransfer sisa saldo kredit aktivitas secara langsung (peer-to-peer) dari portal peserta mereka. Fitur ini dirancang untuk situasi lapangan di mana anggota keluarga, teman sekamar, atau rekan tim ingin menggabungkan atau membagikan sisa saldo kredit mereka agar dapat menikmati aktivitas air bersama (misal: Jet Ski yang bernilai lebih besar).
 
-### 1.2 Target Users & Interface
-- **Target User:** Event Supervisor / Admin (Role: `ADMIN`).
-- **Antarmuka Utama:**
-  1. **Admin Dashboard (`/admin`):** Widget visual *"Rekapitulasi per Wahana"* di antara KPI Cards dan Audit Ledger untuk monitoring instan dan interaktif.
-  2. **Dedicated Navigation Tab (`/admin/activity-summary`):** Tab *"Rekap Wahana"* pada `AdminNavTabs` untuk audit komprehensif, filtering rentang tanggal, pencarian, dan perbandingan performa.
-  3. **Export Toolbar (`ExportToolbar`):** Tombol ekspor terintegrasi untuk mengunduh rekapitulasi wahana dalam format CSV dan Excel (.xls).
+Fitur ini menyediakan pemindai QR kamera interaktif (dengan antarmuka konsisten dengan scanner staf) serta opsi input manual kode peserta, formulir input nominal transfer dengan validasi saldo ketat, dan pencatatan audit ganda (double-entry ledger) yang transparan di riwayat transaksi peserta maupun dashboard admin.
+
+### 1.2 Target Users & Antarmuka Utama
+1. **Peserta Pengirim (Portal Peserta - `/participant/:qrCode`):**
+   - Menemukan tombol **"Transfer Saldo"** yang jelas dan kontras tinggi pada halaman dompet peserta.
+   - Membuka modal/tampilan pemindai QR untuk memindai kode QR gelang/portal peserta penerima atau mengetikkan kode token peserta penerima di bawah viewfinder.
+   - Melihat identitas peserta penerima yang diverifikasi (Nama dan Kode Peserta).
+   - Memasukkan nominal saldo yang ingin ditransfer dengan batasan maksimal sebesar saldo yang tersedia.
+   - Mengonfirmasi transfer dan melihat saldo terpotong secara instan.
+   - Melihat catatan transaksi bertipe `TRANSFER_OUT` bertanda `-` (merah/amber) dengan rincian penerima di **Riwayat Transaksi**.
+2. **Peserta Penerima (Portal Peserta - `/participant/:qrCode`):**
+   - Menerima penambahan saldo secara real-time.
+   - Melihat catatan transaksi bertipe `TRANSFER_IN` bertanda `+` (hijau) dengan rincian pengirim di **Riwayat Transaksi**.
+3. **Supervisor / Admin (Admin Dashboard - `/admin`):**
+   - Melihat seluruh mutasi transfer keluar (`TRANSFER_OUT`) dan transfer masuk (`TRANSFER_IN`) di modal **"Detail & Riwayat Peserta"** dengan label pengirim/penerima yang jelas.
+   - Audit trail lengkap dan tidak dapat dimanipulasi (immutable ledger).
 
 ---
 
-## 2. UI/UX Placement & Design Decisions (Best Practices)
+## 2. UI/UX Flow & Desain Komponen
 
-### 2.1 Evaluasi & Justifikasi Penempatan
-Berdasarkan prinsip UI/UX untuk dashboard operasional event:
-1. **At-a-Glance Executive Summary di Dashboard Utama (`/admin`):**
-   - Penempatan: Diletakkan tepat di bawah 4 kartu KPI utama dan di atas tabel Riwayat Transaksi.
-   - Mengapa: Admin tidak perlu berpindah halaman saat memantau event; performa wahana terpopuler dan serapan kredit langsung terlihat.
-   - Interaksi: Mengklik tombol *"Filter Ledger"* pada salah satu wahana akan memfilter tabel riwayat transaksi di bawahnya khusus untuk wahana tersebut secara seamless.
-2. **Dedicated Deep-Dive View (`/admin/activity-summary`):**
-   - Penempatan: Ditambahkan ke tab navigasi utama admin (`AdminNavTabs`):  
-     `Ringkasan` | `Rekap Wahana` | `Peserta & QR` | `Daftar Aktivitas`.
-   - Mengapa: Saat admin/supervisor ingin melakukan audit mendalam bersama vendor/operator perahu, mereka membutuhkan layar penuh dengan filter tanggal, pencarian wahana, metrik statistik lengkap, dan tombol ekspor langsung.
-3. **Penyempurnaan `ExportToolbar`:**
-   - Menambahkan opsi unduh *"Rekap Wahana (CSV)"* dan *"Rekap Wahana (Excel)"* untuk laporan formal pasca-event.
+### 2.1 Alur Pengguna (User Journey)
+```text
+[ Tombol "Transfer Saldo" di BalanceCard / Portal Peserta ]
+                          │
+                          ▼
+[ Modal / Tampilan Scanner Peserta (Mirip Scanner Staf) ]
+  ├── Live Camera Viewfinder (Html5Qrcode)
+  ├── Tombol Switch Camera & Toggle On/Off
+  └── Form Input Manual Kode Peserta (Contoh: SEPA-002)
+                          │
+                          ▼ (Hasil Scan / Submit Kode)
+[ Verifikasi Penerima (GET /api/v1/participants/transfer/recipient/:qrCode) ]
+  ├── Validasi: Peserta ditemukan? Status ACTIVE? Bukan diri sendiri?
+                          │
+                          ▼
+[ Formulir Input Nominal Transfer ]
+  ├── Info Penerima: Nama & Kode Token Peserta
+  ├── Saldo Tersedia Pengirim: RpXXX.XXX
+  ├── Input Nominal Transfer (Rp)
+  │     └── Quick buttons: Rp50.000, Rp100.000, Rp200.000, "Semua Saldo" (Max)
+  │     └── Helper text: "Maksimal transfer: RpXXX.XXX"
+  └── Tombol "Konfirmasi & Kirim Saldo" (Disabled jika nominal > saldo atau <= 0)
+                          │
+                          ▼ (Submit POST /api/v1/participants/transfer)
+[ Notifikasi Berhasil & Refresh Otomatis ]
+  ├── Toast / Alert Sukses: "Berhasil mentransfer RpXXX ke [Nama Penerima]"
+  ├── Saldo pengirim langsung berkurang
+  └── Riwayat transaksi otomatis menampilkan transaksi "Transfer Keluar"
+```
 
-### 2.2 Desain Visual & Hierarki UI
-- **Stat Cards & Progress Share:** Setiap wahana menampilkan visual progress bar yang mengindikasikan pangsa nominal dari total belanja event.
-- **High-Contrast Island Theme:** Konsisten dengan palet warna outdoor sistem (Cyan/Blue, Emerald Green, Sport Orange, Violet).
-- **Zero Jargon & Clarity:** Label metrik jelas: *Tarif Satuan*, *Frekuensi Main*, *Refund*, *Pendapatan Bersih (Net)*, dan *Peserta Unik*.
+### 2.2 Desain Visual & Standar High-Contrast Outdoor
+- **Konsistensi Tampilan Scanner:** Memanfaatkan komponen scanner yang memiliki desain, viewfinder laser, dan tata letak identik dengan scanner staf (`ScannerView`), termasuk fallback input manual kode token di bagian bawah.
+- **Pencegahan Human Error:**
+  - Menampilkan nama penerima yang jelas sebelum nominal diinput agar pengirim yakin tidak salah sasaran.
+  - Memvalidasi agar peserta tidak bisa mentransfer ke kode QR milik dirinya sendiri.
+  - Input nominal dibatasi secara interaktif (tidak bisa minus, tidak bisa melebihi saldo pengirim).
+- **Badge Riwayat Transaksi:**
+  - `TRANSFER_OUT`: Badge `Transfer Keluar` (warna amber/merah dengan icon arrow down/send), nominal `-RpXXX.XXX`, keterangan: `Transfer ke [Nama Penerima] ([Kode QR])`.
+  - `TRANSFER_IN`: Badge `Transfer Masuk` (warna emerald/hijau dengan icon arrow up/receive), nominal `+RpXXX.XXX`, keterangan: `Transfer dari [Nama Pengirim] ([Kode QR])`.
 
 ---
 
 ## 3. Public Contracts & API Specifications
 
-### 3.1 Endpoint 1: Agregasi Rekap Wahana
-- **Route:** `GET /api/v1/admin/reports/activities/summary`
-- **Auth:** `requireAuth`, `requireRole('ADMIN')`
-- **Query Parameters:**
-  - `start_date` (ISO Date string, optional)
-  - `end_date` (ISO Date string, optional)
-  - `status` (`ACTIVE` | `INACTIVE`, optional)
-- **Response Envelope:**
+### 3.1 Endpoint 1: Verifikasi Penerima Transfer
+- **Route:** `GET /api/v1/participants/transfer/recipient/:qrCode`
+- **Auth:** Public / Token
+- **Tujuan:** Memvalidasi keberadaan dan kesiapan akun penerima sebelum membuka form nominal.
+- **Validasi Params:** `qrCode` required string (alphanumeric & dashes).
+- **Response Success (200 OK):**
   ```json
   {
     "success": true,
     "data": {
-      "summary": {
-        "total_activities": 10,
-        "total_deductions": 45,
-        "total_refunds": 2,
-        "total_gross_amount": 12500000,
-        "total_refund_amount": 500000,
-        "total_net_amount": 12000000,
-        "total_unique_participants": 38
-      },
-      "activities": [
-        {
-          "id": "c1f7a0b2-...",
-          "name": "Jetski",
-          "price": 650000,
-          "status": "ACTIVE",
-          "deduction_count": 12,
-          "refund_count": 1,
-          "gross_amount": 7800000,
-          "refund_amount": 650000,
-          "net_amount": 7150000,
-          "unique_participants_count": 11,
-          "share_percentage": 59.58
-        }
-      ]
-    },
-    "meta": {
-      "generated_at": "2026-09-22T04:30:00.000Z"
+      "recipient": {
+        "id": "e8a93b45-...",
+        "name": "Budi Santoso",
+        "qr_code": "SEPA-002",
+        "status": "ACTIVE"
+      }
     }
   }
   ```
+- **Error Codes:**
+  - `404 PARTICIPANT_NOT_FOUND`: "Peserta penerima dengan kode tersebut tidak ditemukan."
+  - `403 PARTICIPANT_BLOCKED`: "Akun penerima sedang diblokir dan tidak dapat menerima transfer."
 
-### 3.2 Endpoint 2: Ekspor Rekap Wahana (CSV / Excel)
-- **Route:** `GET /api/v1/admin/reports/activities/export`
-- **Auth:** `requireAuth`, `requireRole('ADMIN')`
-- **Query Parameters:**
-  - `format` (`csv` | `excel`, required)
-  - `start_date` (optional)
-  - `end_date` (optional)
-  - `status` (optional)
-- **Response:**
-  - `Content-Type`: `text/csv; charset=utf-8` atau `application/vnd.ms-excel`
-  - `Content-Disposition`: `attachment; filename="activities-recap-report.[csv|xls]"`
-  - Data tabel: No, Nama Aktivitas, Status, Tarif Satuan, Total Main, Total Refund, Total Kotor (Rp), Total Refund (Rp), Total Bersih (Rp), Peserta Unik, Pangsa (%).
+### 3.2 Endpoint 2: Eksekusi Transfer Saldo Kredit
+- **Route:** `POST /api/v1/participants/transfer`
+- **Auth:** Public / Token (identitas pengirim diidentifikasi via `sender_qr_code`)
+- **Request Body (JSON):**
+  ```json
+  {
+    "sender_qr_code": "SEPA-001",
+    "recipient_qr_code": "SEPA-002",
+    "amount": 200000,
+    "notes": "Patungan Jet Ski"
+  }
+  ```
+- **Validation Rules (Joi Schema):**
+  - `sender_qr_code`: string, required, uppercase trim.
+  - `recipient_qr_code`: string, required, uppercase trim, tidak boleh sama dengan `sender_qr_code`.
+  - `amount`: integer, min 1, required.
+  - `notes`: string, max 255 chars, optional.
+- **Response Success (200 OK):**
+  ```json
+  {
+    "success": true,
+    "data": {
+      "transfer": {
+        "amount": 200000,
+        "sender_balance": 800000,
+        "recipient_name": "Budi Santoso",
+        "recipient_qr_code": "SEPA-002",
+        "transfer_out_id": "7fa12...",
+        "transfer_in_id": "8bc34..."
+      }
+    }
+  }
+  ```
+- **Error Codes:**
+  - `400 SELF_TRANSFER_NOT_ALLOWED`: "Tidak dapat melakukan transfer ke akun sendiri."
+  - `404 SENDER_NOT_FOUND`: "Akun pengirim tidak ditemukan."
+  - `404 RECIPIENT_NOT_FOUND`: "Akun penerima tidak ditemukan."
+  - `403 SENDER_BLOCKED`: "Akun Anda sedang diblokir oleh administrator."
+  - `403 RECIPIENT_BLOCKED`: "Akun penerima sedang diblokir oleh administrator."
+  - `422 INSUFFICIENT_BALANCE`: "Saldo tidak mencukupi untuk melakukan transfer ini."
 
 ---
 
-## 4. Architecture & Data Flow
+## 4. Architecture, Database & Ledger Mutation
 
-```text
-[ Admin UI (Dashboard / Rekap Wahana Tab) ]
-                   │
-                   ▼  GET /api/v1/admin/reports/activities/summary
-       [ adminRoutes.js ]
-                   │
-                   ▼  (requireAuth, requireRole('ADMIN'))
-    [ adminTransactionController.js ]
-                   │
-                   ▼
-       [ adminReportService.js ]
-                   │  Aggregates Activity LEFT JOIN Transaction
-                   │  (Group by activity.id, calculate DEDUCTION & REFUND)
-                   ▼
-     [ Sequelize: SQLite / MySQL ]
-                   │
-                   ▼
-       [ Response Envelope JSON ]
-```
+### 4.1 Perubahan Database Schema
+1. **Model `Transaction` (`src/models/Transaction.js`):**
+   - Kolom `staff_id`: diubah menjadi `allowNull: true` (karena transfer saldo diinisiasi mandiri oleh peserta tanpa token login staf).
+   - Kolom `type`: ditambahkan nilai ENUM `TRANSFER_OUT` dan `TRANSFER_IN`.
+   - Kolom `activity_id`: tetap `null` untuk transaksi transfer.
+   - Kolom `reference_id`: pada transaksi `TRANSFER_IN`, diisi foreign key menuju ID transaksi `TRANSFER_OUT` milik pengirim (menghubungkan audit trail secara erat).
+2. **Konstanta `enums.js`:**
+   ```javascript
+   const TransactionType = Object.freeze({
+     DEDUCTION: 'DEDUCTION',
+     REFUND: 'REFUND',
+     ADJUSTMENT: 'ADJUSTMENT',
+     TRANSFER_OUT: 'TRANSFER_OUT',
+     TRANSFER_IN: 'TRANSFER_IN'
+   });
+   ```
+
+### 4.2 Alur Transaksi Atomik & Pencegahan Deadlock
+Untuk mencegah *race condition* dan *deadlock* saat terjadi transfer bersamaan:
+1. Jalankan `sequelize.transaction(async (t) => { ... })`.
+2. Lakukan row locking (`t.LOCK.UPDATE`) terhadap data pengirim dan penerima dalam **urutan id deterministik** (misal: `ORDER BY id ASC`):
+   ```javascript
+   const firstId = sender.id < recipient.id ? sender.id : recipient.id;
+   const secondId = sender.id < recipient.id ? recipient.id : sender.id;
+   // Lock first, then lock second
+   ```
+3. Cek kembali saldo pengirim: `sender.current_balance >= amount`.
+4. Mutasi saldo:
+   - `sender.current_balance = sender.current_balance - amount;`
+   - `recipient.current_balance = recipient.current_balance + amount;`
+   - Simpan kedua participant record (`await sender.save({ transaction: t })`, `await recipient.save({ transaction: t })`).
+   - Catatan: `total_spent` peserta **TIDAK** diubah karena transfer saldo bukan pemakaian aktivitas air.
+5. Buat 2 record transaksi immutable:
+   - **Record 1 (`TRANSFER_OUT`):**
+     - `participant_id`: `sender.id`
+     - `type`: `TransactionType.TRANSFER_OUT`
+     - `amount`: `amount`
+     - `balance_before`: `balance_before_sender`
+     - `balance_after`: `balance_after_sender`
+     - `staff_id`: `null`
+     - `notes`: `Transfer ke ${recipient.name} (${recipient.qr_code})` + (notes ? ` - ${notes}` : '')
+   - **Record 2 (`TRANSFER_IN`):**
+     - `participant_id`: `recipient.id`
+     - `type`: `TransactionType.TRANSFER_IN`
+     - `amount`: `amount`
+     - `balance_before`: `balance_before_recipient`
+     - `balance_after`: `balance_after_recipient`
+     - `staff_id`: `null`
+     - `reference_id`: `txOut.id`
+     - `notes`: `Transfer dari ${sender.name} (${sender.qr_code})` + (notes ? ` - ${notes}` : '')
 
 ---
 
 ## 5. Security & Invariant Boundaries
 
-1. **Role Enforcement:** Hanya pengguna dengan peran `ADMIN` yang memiliki izin mengakses endpoint summary dan export.
-2. **Immutable Ledger Consistency:** Perhitungan pemakaian dan pengembalian bersumber langsung dari tabel `transactions` tanpa mengubah data sedikit pun.
-3. **Zero Balance Mutation:** Endpoint ini 100% read-only (idempotent), tidak mengubah state wallet atau aktivitas.
-4. **Resilience & Sanitization:** Parameter tanggal dan format divalidasi dengan schema Joi sebelum dieksekusi.
+1. **Non-Negative Balance Invariant:** Saldo tidak pernah boleh menjadi negatif. Kondisi `amount > sender.current_balance` selalu ditolak di database level dengan transaction lock.
+2. **Self-Transfer Prohibition:** Pengirim tidak boleh mentransfer ke diri sendiri (`sender_qr_code !== recipient_qr_code`).
+3. **No Phantom Transfers:** Akun diblokir (`BLOCKED`) tidak dapat mengirim ataupun menerima saldo.
+4. **Append-Only Immutable Ledger:** Mutasi saldo saldo tidak boleh dilakukan tanpa pencatatan berpasangan `TRANSFER_OUT` dan `TRANSFER_IN`.
+5. **Staff-Only Activity Deductions Preserved:** Izin memotong saldo untuk bermain aktivitas (Jet Ski, Banana Boat, dll) tetap eksklusif milik Booth Staff / Admin. Portal peserta hanya memiliki kewenangan transfer antar-rekan peserta.
 
 ---
 
 ## 6. Acceptance & Success Criteria
 
-- [ ] **Dashboard Integration:** Pada halaman `/admin`, terdapat widget/section *Rekapitulasi per Wahana* yang menampilkan rekap ringkas seluruh wahana (nama, tarif, total main, pendapatan bersih, visual progress bar).
-- [ ] **Quick-Filter Interaction:** Mengklik tombol filter pada kartu wahana di dashboard langsung memfilter tabel Riwayat Transaksi untuk wahana tersebut.
-- [ ] **Dedicated Rekap Tab:** Tab *Rekap Wahana* aktif pada `AdminNavTabs` dan dapat diakses melalui rute `/admin/activity-summary`, menampilkan tabel analitik lengkap dengan sorting dan filter.
-- [ ] **Export Functionality:** Pengguna admin dapat mengekspor rekap wahana ke CSV dan Excel baik dari ExportToolbar maupun dari halaman Rekap Wahana.
-- [ ] **API Reliability & Test Coverage:** Unit test dan integration test untuk service, controller, route, dan React component lulus dengan cakupan minimum 90% lines.
+- [ ] **Tombol Transfer di Portal Peserta:** Tersedia tombol *"Transfer Saldo"* yang jelas pada antarmuka dompet peserta (`ParticipantView` / `BalanceCard`).
+- [ ] **Scanner Peserta Berfungsi Penuh:** Menampilkan antarmuka pemindai kamera (HTML5 camera viewfinder) yang mirip scanner staf, lengkap dengan pemilih kamera dan form input manual kode peserta di bawahnya.
+- [ ] **Validasi Identitas Penerima:** Sistem memeriksa validitas kode peserta penerima sebelum memasukkan nominal. Menampilkan pesan error jika kode tidak ada, terblokir, atau kode milik sendiri.
+- [ ] **Validasi Batas Nominal:** Input nominal memvalidasi agar nilai transfer > 0 dan tidak boleh melebihi saldo pengirim saat ini. Tombol submit dinonaktifkan jika input melebihi saldo.
+- [ ] **Eksekusi Atomik & Update UI Instan:** Setelah konfirmasi, saldo pengirim berkurang dan riwayat transaksi pengirim langsung menampilkan catatan `TRANSFER_OUT`.
+- [ ] **Riwayat Transaksi Peserta:**
+  - Pengirim melihat `TRANSFER_OUT` dengan badge *"Transfer Keluar"*, tanda `-Rp...`, dan nama/kode penerima.
+  - Penerima melihat `TRANSFER_IN` dengan badge *"Transfer Masuk"*, tanda `+Rp...`, dan nama/kode pengirim.
+- [ ] **Riwayat Transaksi Admin:** Modal *"Detail & Riwayat Peserta"* di dashboard admin menampilkan kedua transaksi (`TRANSFER_OUT` dan `TRANSFER_IN`) dengan nominal, status saldo, dan rincian yang benar.
+- [ ] **Test Coverage Minimum:** Seluruh kode baru diuji dengan unit test dan integration test (schema validation, transfer service, race condition prevention, controller, and frontend components) dengan coverage ≥ 90% lines.
 
 ---
 
 ## 7. Out of Scope
 
-- Pembagian komisi otomatis kepada pihak ketiga/vendor perahu di luar pencatatan rekap nominal.
-- Modifikasi manual terhadap angka transaksi rekap (angka selalu dihitung otomatis dari transaksi immutable).
+- Pembatalan (reversal) sepihak transfer oleh peserta (jika ada salah transfer, harus diselesaikan melalui administrator / refund flow).
+- Transfer saldo secara offline tanpa sambungan internet.
+- Biaya administrasi transfer (transfer saldo 100% nominal murni tanpa potongan).

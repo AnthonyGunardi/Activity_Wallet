@@ -1,7 +1,7 @@
 # Specification: Sepa Island Activity Wallet
 
-**Document Status:** Approved  
-**Version:** 1.0.0  
+**Document Status:** Pending Approval  
+**Version:** 1.1.0  
 **Source Document:** [`PRD.md`](./PRD.md)  
 **Governing Architecture:** [`AGENTS.md`](../AGENTS.md)  
 **Target Event:** Sepa Island Water Activity (~80 participants)
@@ -11,15 +11,16 @@
 ## 1. Objective & Target Users
 
 ### 1.1 Objective
-Sepa Island Activity Wallet is a digital activity credit management system designed for events. It replaces cash payments with a controlled, digital prepaid activity wallet (Rp1.000.000 starting credit per participant) for outdoor water sports (Jet Ski, Banana Boat, Donut Boat, Snorkeling, etc.). The system delivers instant booth transactions, immutable auditability, non-negative balance guarantees, and operational resilience in outdoor island conditions.
+Sepa Island Activity Wallet is a digital activity credit management system designed for events. It replaces cash payments with a controlled, digital prepaid activity wallet (Rp1.000.000 starting credit per participant) for outdoor water sports (Jet Ski, Banana Boat, Donut Boat, Snorkeling, etc.). The system delivers instant booth transactions, immutable auditability, non-negative balance guarantees, peer-to-peer credit transfer between participants, and operational resilience in outdoor island conditions.
 
 ### 1.2 Target Users & Interfaces
 1. **Participant (Participant PWA):**
    - View current balance and total spent credit.
    - Browse activity catalog with real-time affordability indicators.
    - Display personal QR identification code.
-   - View chronological personal transaction history.
-   - *Constraint:* Read-only balance; cannot initiate payments, deductions, or peer-to-peer transfers.
+   - View chronological personal transaction history (including activity deductions, refunds, and transfer history).
+   - Transfer activity credit to other active participants by scanning their QR code or entering their participant token.
+   - *Constraint:* Activity deductions remain staff-only; participants cannot deduct their own balance for activities, cannot transfer to themselves, and cannot transfer more than their available balance.
 2. **Booth Staff (Booth Scanner PWA):**
    - Scan participant QR codes via camera or direct input.
    - View participant identity, status, and current balance.
@@ -172,14 +173,14 @@ Activity_Wallet/
 |---|---|---|---|
 | `id` | UUID / INTEGER | PK, Auto | Unique Transaction ID |
 | `participant_id` | UUID / INTEGER | FK -> Participant.id, Indexed | Affected participant |
-| `activity_id` | UUID / INTEGER | FK -> Activity.id, Nullable | Associated activity (null for adjustments) |
-| `staff_id` | UUID / INTEGER | FK -> User.id, Not Null | Staff/Admin who executed action |
-| `type` | ENUM('DEDUCTION', 'REFUND', 'ADJUSTMENT') | Not Null | Ledger operation type |
+| `activity_id` | UUID / INTEGER | FK -> Activity.id, Nullable | Associated activity (null for adjustments and transfers) |
+| `staff_id` | UUID / INTEGER | FK -> User.id, Nullable | Staff/Admin who executed action (null for peer-to-peer transfers) |
+| `type` | ENUM('DEDUCTION', 'REFUND', 'ADJUSTMENT', 'TRANSFER_OUT', 'TRANSFER_IN') | Not Null | Ledger operation type |
 | `amount` | INTEGER | Not Null, Min: 1 | Transaction amount in IDR |
 | `balance_before` | INTEGER | Not Null | Snapshot balance prior to tx |
 | `balance_after` | INTEGER | Not Null | Snapshot balance post tx |
-| `reference_id` | UUID / INTEGER | FK -> Transaction.id, Nullable | Original transaction ID (for refunds) |
-| `notes` | STRING | Nullable | Reason for adjustment/refund |
+| `reference_id` | UUID / INTEGER | FK -> Transaction.id, Nullable | Linked transaction ID (original tx for refunds; counter-transfer tx for transfers) |
+| `notes` | STRING | Nullable | Reason / details (e.g. transfer counterparty) |
 | `created_at` | DATE | Not Null, Immutable | Transaction timestamp |
 
 ---
@@ -225,6 +226,21 @@ All REST API endpoints adhere to the project envelope format:
 - `GET /api/v1/participants/wallet/:qrCode`
   - Lookup participant balance, available activities, and personal history by QR token string.
   - Response: `{ participant: { id, name, balance, total_spent, qr_code, status }, activities: [...], recent_transactions: [...] }`
+- `GET /api/v1/participants/transfer/recipient/:qrCode`
+  - Validates recipient QR code token for transfer and returns public recipient summary (name, QR code, status).
+  - Rejects if recipient does not exist (404) or is BLOCKED (403).
+  - Response: `{ recipient: { id, name, qr_code, status } }`
+- `POST /api/v1/participants/transfer`
+  - Transfers activity credit between participants atomically.
+  - Body: `{ sender_qr_code: string, recipient_qr_code: string, amount: number, notes?: string }`
+  - Behavior:
+    - Validates sender and recipient are not identical (`SELF_TRANSFER_NOT_ALLOWED`, 400).
+    - Locks both participant rows in deterministic order (by ID) to avoid deadlocks.
+    - Validates sender `current_balance >= amount` (`INSUFFICIENT_BALANCE`, 422).
+    - Validates both participants are `ACTIVE` (`SENDER_BLOCKED` / `RECIPIENT_BLOCKED`, 403).
+    - Deducts sender balance and increments recipient balance atomically.
+    - Creates linked immutable ledger records: `TRANSFER_OUT` for sender and `TRANSFER_IN` for recipient.
+  - Response: `{ transfer: { sender_balance: number, amount: number, recipient_name: string, transfer_out_id: string, transfer_in_id: string } }`
 
 #### Staff / Booth Operations
 - `POST /api/v1/booth/scan`
@@ -279,17 +295,27 @@ All REST API endpoints adhere to the project envelope format:
    - Any transaction where `activity.price > participant.current_balance` MUST fail with `INSUFFICIENT_BALANCE`.
 2. **Immutable Append-Only Transaction Ledger:**
    - Transaction records are write-once. `UPDATE` and `DELETE` queries on `transactions` are strictly prohibited.
-   - Refunds and adjustments produce a new `Transaction` record referencing the original `reference_id`.
-3. **Staff-Initiated Deductions Only:**
-   - Participant UI is read-only.
-   - Deductions require authenticated Staff/Admin JWT tokens.
+   - Refunds, adjustments, and peer-to-peer transfers produce distinct new `Transaction` records.
+3. **Staff-Initiated Activity Deductions Only:**
+   - Participant UI cannot initiate direct deductions for water sports activities (only authenticated Booth Staff or Admins can post activity `DEDUCTION` records).
+   - Participants may only initiate peer-to-peer balance transfers to another participant via the secure transfer endpoint.
 4. **Concurrency Safety & Race Condition Prevention:**
-   - Balance mutation operations MUST use database transactions (`sequelize.transaction`) with row locking (`LOCK.UPDATE`) to prevent double-spending when multiple booths scan the same QR simultaneously.
+   - Balance mutation operations MUST use database transactions (`sequelize.transaction`) with row locking (`LOCK.UPDATE`) to prevent double-spending when multiple booths or transfer requests access the same wallet simultaneously.
+   - When locking multiple participant rows (such as during a transfer), rows MUST be locked in a deterministic order (sorted by primary key / UUID) to eliminate deadlock risks.
 5. **QR Code as Lookup Identifier:**
    - The QR code contains an opaque, secure token identifier (e.g. `SEPA-ABC123XYZ`), not balance amounts or signed state.
    - If a wristband/QR code is lost or corrupted, Admin triggers `reissue-qr`, updating `qr_code` on the participant record while preserving ID, balance, and transaction history.
 6. **Outdoor & High-Contrast Visual Standards:**
-   - Participant and Booth UI must feature high contrast (sunlight readable), large touch targets (minimum 48x48px), and instant feedback sounds/visual cues upon successful scan/deduction.
+   - Participant and Booth UI must feature high contrast (sunlight readable), large touch targets (minimum 48x48px), and instant feedback sounds/visual cues upon successful scan/deduction/transfer.
+7. **Peer-to-Peer Transfer Integrity:**
+   - Participants can transfer credit to another registered, active participant.
+   - Self-transfers (`sender_qr_code === recipient_qr_code`) are strictly forbidden (`SELF_TRANSFER_NOT_ALLOWED`).
+   - Transfer amount cannot exceed the sender's available balance (`INSUFFICIENT_BALANCE`). Minimum transfer amount is Rp1.
+   - Both sender and recipient must have `ACTIVE` status; blocked accounts cannot send or receive credit.
+   - Transfers create two immutable ledger records in a single atomic database transaction:
+     - `TRANSFER_OUT` for sender with negative net effect, capturing balance before/after and recipient info in notes.
+     - `TRANSFER_IN` for recipient with positive net effect, capturing balance before/after, sender info in notes, and linked via `reference_id`.
+   - Both participant wallet history and Admin "Detail & Riwayat Peserta" must render transfer records with distinct indicators and counterparty details.
 
 ---
 
@@ -302,15 +328,16 @@ All REST API endpoints adhere to the project envelope format:
 
 ### 7.2 Required Test Suites
 1. **Unit Tests:**
-   - Validation schema checks (valid, invalid payloads, boundary values).
-   - Domain service logic: balance calculations, refund eligibility, status validation.
+   - Validation schema checks (valid, invalid payloads, boundary values, self-transfer rejection).
+   - Domain service logic: balance calculations, refund eligibility, transfer eligibility, status validation.
 2. **Integration Tests (API Level):**
-   - Full HTTP lifecycle: login, wallet lookup, booth scan, deduction, transaction listing, refunds, admin reports.
+   - Full HTTP lifecycle: login, wallet lookup, booth scan, deduction, transfer execution, transaction listing, refunds, admin reports.
    - Error responses asserting envelope structure and HTTP status codes (400, 401, 403, 404, 409, 422).
 3. **Concurrency & Race Condition Tests:**
-   - Simultaneous deduction attempts on a single participant wallet with insufficient balance for both (e.g., Balance = 100k, two concurrent 80k requests -> exactly 1 succeeds, 1 fails).
+   - Simultaneous deduction and transfer attempts on a single participant wallet with insufficient balance for both.
+   - Deadlock-free concurrent reciprocal transfers between two participants (A transfers to B while B transfers to A simultaneously).
 4. **Frontend Unit & Component Tests:**
-   - Participant wallet view rendering, affordability badges ("Available" vs "Insufficient balance"), QR display, booth scanning workflows, error state alerts.
+   - Participant wallet view rendering, transfer button, transfer scanner modal (camera & manual token fallback), recipient preview, amount input limits, and transfer ledger display in participant and admin views.
 
 ---
 
@@ -319,6 +346,7 @@ All REST API endpoints adhere to the project envelope format:
 ### 8.1 Always-Do Actions
 - Always use the `{ success, data, meta }` envelope for API responses.
 - Always wrap database mutations in Sequelize managed transactions.
+- Always lock multiple rows in deterministic order (e.g. sorted by ID) to prevent database deadlocks.
 - Always log significant events and transaction boundaries with Winston JSON logging.
 - Always format code with 2 spaces, semicolons, and max line length of 120 characters.
 - Always use custom hooks in React to encapsulate API calls and state management.
@@ -330,14 +358,15 @@ All REST API endpoints adhere to the project envelope format:
 
 ### 8.3 Never-Do Actions
 - Never allow participant balance to become negative.
-- Never allow participants to trigger wallet balance deductions directly.
+- Never allow participants to trigger wallet balance deductions for activities directly without staff auth.
 - Never update or delete existing rows in the `transactions` table.
 - Never put business logic, direct API calls, or database operations in controllers or React JSX components.
 - Never store plaintext passwords or hardcode secret keys.
 
 ### 8.4 Out-of-Scope Items
 - Cash top-ups, bank transfers, or payment gateway (Midtrans/Xendit) integration.
-- Cryptocurrency or peer-to-peer balance transfers between participants.
+- Offline peer-to-peer transfers without server connection.
+- Cryptocurrency integrations.
 - Native mobile app store distribution (iOS/Android native binaries).
 - Complex general ledger multi-entity enterprise accounting.
 
@@ -347,16 +376,20 @@ All REST API endpoints adhere to the project envelope format:
 
 | Area | Requirement | Acceptance Criterion | Verification Method |
 |---|---|---|---|
-| **Participant** | Wallet View | Displays Name, Rp1.000.000 starting credit, real-time balance, and spent amount. | Automated Component Test + E2E |
+| **Participant** | Wallet View | Displays Name, Rp1.000.000 starting credit, real-time balance, spent amount, and "Transfer Saldo" button. | Automated Component Test + E2E |
 | **Participant** | QR Display | Renders scannable high-resolution QR matching participant token. | Visual inspection & scanner test |
-| **Participant** | Catalog | Shows activities with dynamic "Available" / "Insufficient balance" badge based on remaining credit. | Unit test on calculation hook |
+| **Participant** | Transfer Scanner | Clicking "Transfer Saldo" opens scanner modal with camera viewfinder matching staff scanner UI plus manual token input below scanner. | Component test & manual test |
+| **Participant** | Transfer Recipient & Nominal Input | Scanning/entering valid recipient token shows recipient name/QR, displays available balance, enforces `1 <= amount <= current_balance`, and disables submit if exceeding balance or to self. | Component test & integration test |
+| **Participant** | Atomic Transfer Execution | Submitting transfer deducts sender, credits recipient, updates UI balance immediately, and creates immutable `TRANSFER_OUT` and `TRANSFER_IN` records. | Integration test & concurrency test |
+| **Participant** | Personal Tx History | Shows `TRANSFER_OUT` with recipient name/token & `-Rp...` (Transfer Keluar badge) and `TRANSFER_IN` with sender name/token & `+Rp...` (Transfer Masuk badge). | Component test & API verification |
 | **Booth** | QR Scanner | Instantly reads participant QR and loads balance/identity in < 500ms. | Integration test & manual camera test |
 | **Booth** | Deduction | Deducts exact activity price, updates balance atomically, creates immutable tx record. | Concurrency & Integration test |
 | **Booth** | Insufficient Balance | Rejects deduction if price > balance with clear visual alert. | Integration test (HTTP 422) |
 | **Admin** | Dashboard | Real-time totals of allocated credit, spent credit, activity counts, and full transaction feed. | Integration & Dashboard test |
+| **Admin** | Participant Detail & Ledger | Admin "Detail & Riwayat Peserta" displays all transfer transactions with correct sender/recipient notes and amount signs. | Integration test & UI test |
 | **Admin** | Participant CRUD | Full lifecycle management (Create, Read/Search, Update details, Safe Delete without tx, Reissue QR, Block/Unblock). | Unit, Integration & UI test |
 | **Admin** | QR Reissue | Generates new QR token; old QR immediately returns invalid; balance preserved. | Integration test |
 | **Admin** | Refund | Admin can refund a specific transaction; creates linked `REFUND` tx; balance restored. | Integration test & ledger check |
 | **Admin** | Export | Exports full participant balances and transactions to CSV/Excel matching DB ledger. | Unit & Integration test |
 | **Security** | Role Guard | Unauthorized users cannot access booth deduction or admin endpoints. | Auth Integration test (401/403) |
-| **Reliability** | Concurrency | Concurrent transactions on single wallet never produce negative balance or lost updates. | Concurrency race condition test |
+| **Reliability** | Concurrency | Concurrent transactions and reciprocal transfers on wallets never produce negative balance, lost updates, or database deadlocks. | Concurrency race condition test |
