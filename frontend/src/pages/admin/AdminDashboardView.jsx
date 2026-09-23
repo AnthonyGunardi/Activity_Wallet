@@ -115,7 +115,7 @@ export function AdminDashboardView() {
       >
         <SummaryMetricCard
           title="Total Kredit Peserta"
-          value={isLoadingSummary ? '...' : formatCurrency(summary?.total_allocated_credit || 0)}
+          value={isLoadingSummary ? '...' : formatCurrency(summary?.total_allocated_credit ?? summary?.total_credit_issued ?? 0)}
           subtitle={`${summary?.total_participants || 0} Peserta terdaftar`}
           icon={<Wallet size={20} />}
           color="var(--color-primary-600)"
@@ -124,8 +124,8 @@ export function AdminDashboardView() {
 
         <SummaryMetricCard
           title="Total Kredit Terpakai"
-          value={isLoadingSummary ? '...' : formatCurrency(summary?.total_spent_credit || 0)}
-          subtitle={`${summary?.total_deductions || 0} transaksi pemotongan`}
+          value={isLoadingSummary ? '...' : formatCurrency(summary?.total_spent_credit ?? summary?.total_credit_spent ?? 0)}
+          subtitle={`${summary?.total_deductions ?? 0} transaksi pemotongan`}
           icon={<TrendingDown size={20} />}
           color="var(--color-sport-orange)"
           bgColor="var(--color-sport-orange-bg)"
@@ -133,7 +133,7 @@ export function AdminDashboardView() {
 
         <SummaryMetricCard
           title="Total Saldo Tersisa"
-          value={isLoadingSummary ? '...' : formatCurrency(summary?.remaining_balance || 0)}
+          value={isLoadingSummary ? '...' : formatCurrency(summary?.remaining_balance ?? summary?.remaining_liability ?? 0)}
           subtitle="Saldo aktif siap pakai"
           icon={<Coins size={20} />}
           color="var(--color-success-primary)"
@@ -143,7 +143,7 @@ export function AdminDashboardView() {
         <SummaryMetricCard
           title="Peserta & Aktivitas"
           value={isLoadingSummary ? '...' : `${summary?.active_participants || 0} / ${summary?.total_participants || 0}`}
-          subtitle={`${summary?.active_activities || 0} Aktivitas aktif`}
+          subtitle={`${summary?.active_activities ?? summary?.active_activities_count ?? 0} Aktivitas aktif`}
           icon={<Users size={20} />}
           color="#8b5cf6"
           bgColor="rgba(139, 92, 246, 0.1)"

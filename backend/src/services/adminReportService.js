@@ -54,7 +54,11 @@ async function getDashboardSummary() {
     total_deductions: totalDeductions || 0,
     total_refunds: totalRefunds || 0,
     total_activities: totalActivities || 0,
-    active_activities: activeActivities || 0
+    active_activities: activeActivities || 0,
+    total_credit_issued: Number(totalAllocatedCredit) || 0,
+    total_credit_spent: Number(totalSpentCredit) || 0,
+    remaining_liability: Number(remainingBalance) || 0,
+    active_activities_count: activeActivities || 0
   };
 }
 
