@@ -92,6 +92,7 @@ function initTransaction(sequelize) {
       tableName: 'transactions',
       underscored: true,
       timestamps: true,
+      createdAt: 'created_at',
       updatedAt: false, // Immutable: write-once ledger
       indexes: [
         {

@@ -198,7 +198,7 @@ describe('Sequelize Domain Models Unit Tests', () => {
       expect(tx.id).toBeDefined();
       expect(tx.amount).toBe(150000);
       expect(tx.balance_after).toBe(850000);
-      expect(tx.createdAt).toBeDefined();
+      expect(tx.created_at).toBeDefined();
     });
 
     test('should throw error when attempting to update a Transaction (Immutable Invariant)', async () => {
