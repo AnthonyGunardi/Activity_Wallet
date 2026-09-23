@@ -158,7 +158,7 @@ export function BalanceCard({ participant, onOpenTransfer }) {
               cursor: 'pointer'
             }}
           >
-            <Send size={16} /> Transfer Saldo ke Peserta Lain
+            <Send size={16} /> Transfer Saldo
           </button>
         </div>
       )}

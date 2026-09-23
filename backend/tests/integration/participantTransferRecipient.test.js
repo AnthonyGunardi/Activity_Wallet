@@ -74,4 +74,14 @@ describe('GET /api/v1/participants/transfer/recipient/:qrCode Integration Tests'
     expect(res.body.success).toBe(false);
     expect(res.body.error.code).toBe('SELF_TRANSFER_NOT_ALLOWED');
   });
+
+  test('should return 400 when sender_qr_code query param fails schema validation', async () => {
+    const res = await request(app)
+      .get(`/api/v1/participants/transfer/recipient/${activeParticipant.qr_code}`)
+      .query({ sender_qr_code: 'AB' });
+
+    expect(res.status).toBe(400);
+    expect(res.body.success).toBe(false);
+    expect(res.body.error.code).toBe('VALIDATION_ERROR');
+  });
 });

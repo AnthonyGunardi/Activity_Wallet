@@ -10,6 +10,14 @@ const recipientParamSchema = Joi.object({
   })
 });
 
+const recipientQuerySchema = Joi.object({
+  sender_qr_code: Joi.string().trim().min(3).max(128).optional().messages({
+    'string.base': 'Kode QR pengirim harus berupa teks.',
+    'string.min': 'Kode QR pengirim minimal terdiri dari 3 karakter.',
+    'string.max': 'Kode QR pengirim maksimal terdiri dari 128 karakter.'
+  })
+});
+
 const transferPayloadSchema = Joi.object({
   sender_qr_code: Joi.string().trim().min(3).max(128).required().messages({
     'string.base': 'Kode QR pengirim harus berupa teks.',
@@ -25,7 +33,7 @@ const transferPayloadSchema = Joi.object({
     .messages({
       'string.base': 'Kode QR penerima harus berupa teks.',
       'string.empty': 'Kode QR penerima wajib diisi.',
-      'any.invalid': 'Tidak dapat mentransfer saldo ke akun sendiri (Self-transfer not allowed).',
+      'any.invalid': 'Tidak dapat mentransfer saldo ke akun sendiri.',
       'any.required': 'Kode QR penerima wajib diisi.'
     }),
   amount: Joi.number().integer().min(1).required().messages({
@@ -41,5 +49,6 @@ const transferPayloadSchema = Joi.object({
 
 module.exports = {
   recipientParamSchema,
+  recipientQuerySchema,
   transferPayloadSchema
 };

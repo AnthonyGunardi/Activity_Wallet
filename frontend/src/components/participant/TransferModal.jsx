@@ -207,7 +207,7 @@ export function TransferModal({ isOpen, onClose, sender, onTransferSuccess }) {
                 // Ignore DOM clear errors on unmount
               }
             })
-            .catch(() => {});
+            .catch(() => { });
         } else {
           try {
             instance.clear();
@@ -498,7 +498,7 @@ export function TransferModal({ isOpen, onClose, sender, onTransferSuccess }) {
             </div>
 
             <p style={{ textAlign: 'center', fontSize: '0.8125rem', color: 'var(--color-text-muted)', margin: '0 0 0.75rem 0' }}>
-              Arahkan kamera ke kode QR gelang / kartu peserta penerima
+              Arahkan kamera ke kode QR penerima
             </p>
 
             {/* Manual Token Input Divider */}
@@ -520,21 +520,41 @@ export function TransferModal({ isOpen, onClose, sender, onTransferSuccess }) {
             </div>
 
             {/* Manual Form */}
-            <form onSubmit={handleManualSubmit} style={{ display: 'flex', gap: '0.5rem' }}>
+            <form onSubmit={handleManualSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '0.625rem' }}>
               <input
                 type="text"
                 className="form-input"
                 placeholder="Contoh: SEPA-002"
+                aria-label="Kode peserta penerima"
                 value={manualCode}
                 onChange={(e) => setManualCode(e.target.value.toUpperCase())}
-                style={{ flex: 1, fontSize: '0.9375rem', textTransform: 'uppercase' }}
+                style={{
+                  width: '100%',
+                  padding: '0.75rem 1rem',
+                  fontSize: '0.9375rem',
+                  fontWeight: 600,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.025em'
+                }}
                 disabled={isSearching}
+                autoCapitalize="characters"
+                autoCorrect="off"
+                spellCheck="false"
               />
               <button
                 type="submit"
                 className="btn btn-primary"
                 disabled={isSearching || !manualCode.trim()}
-                style={{ display: 'inline-flex', alignItems: 'center', gap: '0.375rem', whiteSpace: 'nowrap' }}
+                style={{
+                  width: '100%',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '0.5rem',
+                  padding: '0.75rem 1rem',
+                  fontSize: '0.9375rem',
+                  fontWeight: 600
+                }}
               >
                 {isSearching ? <Loader2 size={16} className="loading-spin" /> : <Search size={16} />}
                 Cari Penerima

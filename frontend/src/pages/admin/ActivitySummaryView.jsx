@@ -173,7 +173,7 @@ export function ActivitySummaryView() {
             Rekapitulasi Transaksi per Aktivitas
           </h1>
           <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.875rem', color: 'var(--color-text-muted)' }}>
-            Ringkasan omzet, frekuensi main tiap aktivitas air, serta rincian mutasi transaksi detail peserta.
+            Ringkasan detail transaksi per aktivitas.
           </p>
         </div>
 

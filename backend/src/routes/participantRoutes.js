@@ -1,8 +1,12 @@
 const express = require('express');
 const participantController = require('../controllers/participantController');
-const { validateParams, validateBody } = require('../middleware/validate');
+const { validateParams, validateBody, validateQuery } = require('../middleware/validate');
 const { qrCodeParamSchema } = require('../schemas/participantSchemas');
-const { recipientParamSchema, transferPayloadSchema } = require('../schemas/transferSchemas');
+const {
+  recipientParamSchema,
+  recipientQuerySchema,
+  transferPayloadSchema
+} = require('../schemas/transferSchemas');
 
 const router = express.Router();
 
@@ -19,6 +23,7 @@ router.get('/wallet/:qrCode', validateParams(qrCodeParamSchema), participantCont
 router.get(
   '/transfer/recipient/:qrCode',
   validateParams(recipientParamSchema),
+  validateQuery(recipientQuerySchema),
   participantController.getRecipient
 );
 

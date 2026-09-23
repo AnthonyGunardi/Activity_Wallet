@@ -1,4 +1,8 @@
-const { recipientParamSchema, transferPayloadSchema } = require('../../src/schemas/transferSchemas');
+const {
+  recipientParamSchema,
+  recipientQuerySchema,
+  transferPayloadSchema
+} = require('../../src/schemas/transferSchemas');
 
 describe('transferSchemas Unit Tests', () => {
   describe('recipientParamSchema', () => {
@@ -17,6 +21,27 @@ describe('transferSchemas Unit Tests', () => {
     test('should reject empty or whitespace qrCode param', () => {
       const { error } = recipientParamSchema.validate({ qrCode: '   ' });
       expect(error).toBeDefined();
+    });
+  });
+
+  describe('recipientQuerySchema', () => {
+    test('should validate when sender_qr_code is provided', () => {
+      const { error, value } = recipientQuerySchema.validate({ sender_qr_code: 'SEPA-SENDER01' });
+      expect(error).toBeUndefined();
+      expect(value.sender_qr_code).toBe('SEPA-SENDER01');
+    });
+
+    test('should validate when sender_qr_code is omitted', () => {
+      const { error, value } = recipientQuerySchema.validate({});
+      expect(error).toBeUndefined();
+      expect(value.sender_qr_code).toBeUndefined();
+    });
+
+    test('should reject invalid length, empty string, or whitespace for sender_qr_code', () => {
+      expect(recipientQuerySchema.validate({ sender_qr_code: '' }).error).toBeDefined();
+      expect(recipientQuerySchema.validate({ sender_qr_code: '   ' }).error).toBeDefined();
+      expect(recipientQuerySchema.validate({ sender_qr_code: 'AB' }).error).toBeDefined();
+      expect(recipientQuerySchema.validate({ sender_qr_code: 'A'.repeat(129) }).error).toBeDefined();
     });
   });
 
@@ -53,7 +78,7 @@ describe('transferSchemas Unit Tests', () => {
       };
       const { error } = transferPayloadSchema.validate(payload);
       expect(error).toBeDefined();
-      expect(error.details[0].message).toMatch(/cannot be equal to|self-transfer/i);
+      expect(error.details[0].message).toMatch(/tidak dapat mentransfer saldo ke akun sendiri|cannot be equal to|self-transfer/i);
     });
 
     test('should reject non-positive amounts', () => {
