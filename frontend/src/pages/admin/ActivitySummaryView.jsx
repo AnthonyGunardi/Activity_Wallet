@@ -71,9 +71,13 @@ export function ActivitySummaryView() {
         search: txSearch.trim() || undefined
       });
 
-      setTransactions(res.transactions || res.data?.transactions || []);
-      if (res.meta) {
-        setPagination(res.meta);
+      const rawTxList =
+        res?.transactions ||
+        res?.data?.transactions ||
+        (Array.isArray(res?.data) ? res.data : Array.isArray(res) ? res : []);
+      setTransactions(rawTxList);
+      if (res?.meta) {
+        setPagination(res.meta.pagination || res.meta);
       }
     } catch (err) {
       toast.showError(err.message || 'Gagal memuat detail transaksi aktivitas.');

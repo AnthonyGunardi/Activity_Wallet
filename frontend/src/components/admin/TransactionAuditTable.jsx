@@ -84,7 +84,7 @@ export function TransactionAuditTable({ transactions = [], onRefundClick }) {
                   {/* Timestamp & ID */}
                   <td style={{ padding: '1rem' }}>
                     <div style={{ fontWeight: 600, fontSize: '0.875rem', color: 'var(--color-text-main)' }}>
-                      {formatTransactionDate(tx.created_at)}
+                      {formatTransactionDate(tx.created_at || tx.createdAt)}
                     </div>
                     <div
                       style={{

@@ -41,9 +41,13 @@ export function useAdminLedger() {
         search: search.trim() || undefined
       });
 
-      setTransactions(res.transactions || res.data?.transactions || []);
-      if (res.meta) {
-        setPagination(res.meta);
+      const rawTxList =
+        res?.transactions ||
+        res?.data?.transactions ||
+        (Array.isArray(res?.data) ? res.data : Array.isArray(res) ? res : []);
+      setTransactions(rawTxList);
+      if (res?.meta) {
+        setPagination(res.meta.pagination || res.meta);
       }
     } catch (err) {
       setError(err.message || 'Gagal memuat riwayat transaksi.');
