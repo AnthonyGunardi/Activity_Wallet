@@ -4,17 +4,20 @@ import { MemoryRouter } from 'react-router-dom';
 import { AdminNavTabs } from '../../src/components/admin/AdminNavTabs';
 
 describe('AdminNavTabs Component Tests', () => {
-  it('should render Ringkasan, Rekap Wahana, Peserta & QR, and Daftar Aktivitas tabs', () => {
+  it('should render Ringkasan, Peserta & QR, Daftar Aktivitas, and Rekap Aktivitas tabs in order', () => {
     render(
       <MemoryRouter initialEntries={['/admin']}>
         <AdminNavTabs />
       </MemoryRouter>
     );
 
-    expect(screen.getByRole('link', { name: /ringkasan/i })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /rekap wahana/i })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /peserta & qr/i })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /daftar aktivitas/i })).toBeInTheDocument();
+    const links = screen.getAllByRole('link');
+    expect(links.map((link) => link.textContent.trim())).toEqual([
+      'Ringkasan',
+      'Peserta & QR',
+      'Daftar Aktivitas',
+      'Rekap Aktivitas'
+    ]);
     expect(screen.queryByRole('link', { name: /transaksi/i })).not.toBeInTheDocument();
   });
 });

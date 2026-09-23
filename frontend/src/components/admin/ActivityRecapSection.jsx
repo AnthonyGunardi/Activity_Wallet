@@ -22,8 +22,8 @@ export function ActivityRecapSection({
   summary = null,
   isLoading = false,
   activeFilterId = null,
-  onFilterLedger = () => {},
-  onClearFilter = () => {},
+  onFilterLedger = () => { },
+  onClearFilter = () => { },
   showFullAnalyticsLink = false,
   title = 'Rekapitulasi per Wahana',
   subtitle = 'Performa pemakaian kredit, frekuensi main, dan pendapatan bersih tiap wahana air.',
@@ -47,7 +47,7 @@ export function ActivityRecapSection({
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--color-primary-600)' }}>
             <Waves size={20} />
             <span style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-              Monitoring Wahana
+              Monitoring Aktivitas
             </span>
           </div>
           <h2 style={{ margin: '0.15rem 0 0 0', fontSize: '1.25rem', fontWeight: 800, color: 'var(--color-text-main)', display: 'flex', alignItems: 'center', gap: '0.625rem', flexWrap: 'wrap' }}>
@@ -230,7 +230,7 @@ export function ActivityRecapSection({
 
                   <div>
                     <span style={{ fontSize: '0.6875rem', color: 'var(--color-text-muted)', display: 'block' }}>
-                      Peserta Unik
+                      Partisipan
                     </span>
                     <strong style={{ fontSize: '0.9375rem', color: 'var(--color-text-main)', display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}>
                       <Users size={12} style={{ color: 'var(--color-primary-600)' }} />
@@ -240,7 +240,7 @@ export function ActivityRecapSection({
 
                   <div style={{ gridColumn: 'span 2', borderTop: '1px solid var(--color-border)', paddingTop: '0.4rem' }}>
                     <span style={{ fontSize: '0.6875rem', color: 'var(--color-text-muted)', display: 'block' }}>
-                      Pendapatan Bersih (Net)
+                      Pemakaian Kredit
                     </span>
                     <strong style={{ fontSize: '1rem', color: 'var(--color-primary-600)' }}>
                       {formatCurrency(act.net_amount)}

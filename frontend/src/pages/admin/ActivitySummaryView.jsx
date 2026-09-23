@@ -6,6 +6,7 @@ import { SummaryMetricCard } from '../../components/admin/SummaryMetricCard';
 import { ActivityRecapSection } from '../../components/admin/ActivityRecapSection';
 import { TransactionAuditTable } from '../../components/admin/TransactionAuditTable';
 import { RefundModal } from '../../components/admin/RefundModal';
+import { TransactionTypeFilter } from '../../components/admin/TransactionTypeFilter';
 import { useToast } from '../../hooks/useToast';
 import { downloadReport } from '../../utils/downloadHelper';
 import { formatCurrency } from '../../utils/formatters';
@@ -27,7 +28,7 @@ import {
 /**
  * ActivitySummaryView Page
  * Master-detail hub for water activity performance recap and transactional audit ledger.
- * Enables supervisors to inspect high-level wahana financial KPIs and drill down into
+ * Enables supervisors to inspect high-level activity financial KPIs and drill down into
  * granular participant transaction mutations with search, filtering, refunding, and exports.
  */
 export function ActivitySummaryView() {
@@ -75,7 +76,7 @@ export function ActivitySummaryView() {
         setPagination(res.meta);
       }
     } catch (err) {
-      toast.showError(err.message || 'Gagal memuat detail transaksi wahana.');
+      toast.showError(err.message || 'Gagal memuat detail transaksi aktivitas.');
     } finally {
       setIsLoadingTx(false);
     }
@@ -96,16 +97,16 @@ export function ActivitySummaryView() {
     fetchTransactions(page);
   };
 
-  // Export wahana recap summary report
+  // Export activity recap summary report
   const handleExportRecap = async (format) => {
     setIsExportingRecap(format);
     try {
       const endpoint = adminApi.getActivitiesExportUrl({ format });
       const ext = format === 'excel' ? 'xls' : 'csv';
       await downloadReport(endpoint, `activities-recap-report.${ext}`);
-      toast.showSuccess(`Laporan Rekap Wahana (${format.toUpperCase()}) berhasil diunduh.`);
+      toast.showSuccess(`Laporan Rekap Aktivitas (${format.toUpperCase()}) berhasil diunduh.`);
     } catch (err) {
-      toast.showError(err.message || 'Gagal mengunduh laporan rekap wahana.');
+      toast.showError(err.message || 'Gagal mengunduh laporan rekap aktivitas.');
     } finally {
       setIsExportingRecap(null);
     }
@@ -158,10 +159,10 @@ export function ActivitySummaryView() {
           justifyContent: 'space-between',
           alignItems: 'center',
           gap: '1rem',
-          marginBottom: '1.5rem'
+          marginBottom: '2rem'
         }}
       >
-        <div>
+        <div style={{ flex: '1 1 320px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', color: 'var(--color-primary-600)' }}>
             <Waves size={24} />
             <span style={{ fontSize: '0.8125rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
@@ -169,14 +170,14 @@ export function ActivitySummaryView() {
             </span>
           </div>
           <h1 style={{ margin: '0.25rem 0 0 0', fontSize: '1.75rem', fontWeight: 800, color: 'var(--color-text-main)' }}>
-            Rekapitulasi Transaksi per Wahana
+            Rekapitulasi Transaksi per Aktivitas
           </h1>
           <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.875rem', color: 'var(--color-text-muted)' }}>
-            Ringkasan omzet, frekuensi main tiap wahana air, serta rincian mutasi transaksi detail peserta.
+            Ringkasan omzet, frekuensi main tiap aktivitas air, serta rincian mutasi transaksi detail peserta.
           </p>
         </div>
 
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', alignItems: 'center' }}>
+        <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', alignItems: 'center' }}>
           <button
             type="button"
             className="btn btn-secondary"
@@ -185,21 +186,6 @@ export function ActivitySummaryView() {
             style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.875rem' }}
           >
             <RefreshCw size={16} className={isLoadingSummary || isLoadingTx ? 'loading-spin' : ''} /> Refresh
-          </button>
-
-          <button
-            type="button"
-            className="btn btn-secondary"
-            disabled={Boolean(isExportingRecap) || isLoadingSummary}
-            onClick={() => handleExportRecap('csv')}
-            style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.875rem' }}
-          >
-            {isExportingRecap === 'csv' ? (
-              <Loader2 size={16} className="loading-spin" />
-            ) : (
-              <FileText size={16} style={{ color: 'var(--color-primary-600)' }} />
-            )}
-            Ekspor Rekap (CSV)
           </button>
 
           <button
@@ -232,7 +218,7 @@ export function ActivitySummaryView() {
         }}
       >
         <SummaryMetricCard
-          title="Total Pendapatan Bersih"
+          title="Total Pemakaian Kredit"
           value={isLoadingSummary ? '...' : formatCurrency(summary?.total_net_amount || 0)}
           subtitle={`Kotor: ${formatCurrency(summary?.total_gross_amount || 0)}`}
           icon={<TrendingUp size={20} />}
@@ -250,9 +236,9 @@ export function ActivitySummaryView() {
         />
 
         <SummaryMetricCard
-          title="Peserta Unik Terlayani"
+          title="Partisipan"
           value={isLoadingSummary ? '...' : `${summary?.total_unique_participants || 0} Orang`}
-          subtitle="Partisipan aktif wahana"
+          subtitle="Partisipan aktif aktivitas"
           icon={<Users size={20} />}
           color="var(--color-success-primary)"
           bgColor="var(--color-success-bg)"
@@ -267,8 +253,8 @@ export function ActivitySummaryView() {
         activeFilterId={selectedActivityId}
         onFilterLedger={(actId) => setSelectedActivityId(actId)}
         onClearFilter={() => setSelectedActivityId('')}
-        title="Ringkasan Performa per Wahana"
-        subtitle="Pilih salah satu wahana di bawah untuk melihat rincian omzet dan mutasi detail transaksinya."
+        title="Ringkasan per Aktivitas"
+        subtitle="Pilih salah satu aktivitas di bawah untuk melihat detail transaksinya."
         filterButtonText="Lihat Detail Transaksi"
         selectedButtonText="Sedang Ditampilkan"
         showFullAnalyticsLink={false}
@@ -281,11 +267,11 @@ export function ActivitySummaryView() {
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--color-primary-600)' }}>
               <ActivityIcon size={20} />
               <span style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                Detail Audit Mutasi
+                Riwayat Transaksi
               </span>
             </div>
             <h2 style={{ margin: '0.15rem 0 0 0', fontSize: '1.25rem', fontWeight: 800, color: 'var(--color-text-main)', display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
-              <span>Detail Transaksi: {selectedActivity ? selectedActivity.name : 'Semua Wahana'}</span>
+              <span>Detail Transaksi: {selectedActivity ? selectedActivity.name : 'Semua Aktivitas'}</span>
               {selectedActivity && (
                 <span
                   style={{
@@ -304,8 +290,8 @@ export function ActivitySummaryView() {
             </h2>
             <p style={{ margin: '0.15rem 0 0 0', fontSize: '0.875rem', color: 'var(--color-text-muted)' }}>
               {selectedActivity
-                ? `Menampilkan seluruh mutasi pemotongan dan pengembalian dana untuk wahana ${selectedActivity.name}.`
-                : 'Menampilkan riwayat transaksi untuk seluruh wahana air.'}
+                ? `Mutasi pemotongan dan pengembalian dana untuk aktivitas ${selectedActivity.name}.`
+                : 'Menampilkan riwayat transaksi untuk seluruh aktivitas air.'}
             </p>
           </div>
 
@@ -356,7 +342,10 @@ export function ActivitySummaryView() {
             gap: '1rem',
             alignItems: 'center',
             justifyContent: 'space-between',
-            marginBottom: '1.25rem'
+            marginBottom: '1.25rem',
+            overflow: 'visible',
+            position: 'relative',
+            zIndex: 10
           }}
         >
           <div style={{ position: 'relative', flex: '1 1 280px' }}>
@@ -397,7 +386,7 @@ export function ActivitySummaryView() {
                 }}
               >
                 <span>
-                  Wahana: <strong>{selectedActivity.name}</strong>
+                  Aktivitas : <strong>{selectedActivity.name}</strong>
                 </span>
                 <button
                   type="button"
@@ -411,23 +400,17 @@ export function ActivitySummaryView() {
                     padding: 0,
                     color: 'var(--color-primary-700)'
                   }}
-                  title="Hapus filter wahana"
+                  title="Hapus filter aktivitas"
                 >
                   <X size={14} />
                 </button>
               </div>
             )}
 
-            <select
-              className="form-input"
+            <TransactionTypeFilter
               value={txType}
               onChange={(e) => setTxType(e.target.value)}
-              style={{ fontSize: '0.875rem', width: '180px', padding: '0.5rem 0.75rem' }}
-            >
-              <option value="">Semua Jenis Transaksi</option>
-              <option value="DEDUCTION">DEDUCTION (Pemotongan)</option>
-              <option value="REFUND">REFUND (Pengembalian)</option>
-            </select>
+            />
           </div>
         </div>
 
@@ -445,7 +428,7 @@ export function ActivitySummaryView() {
           >
             <RefreshCw size={28} className="loading-spin" style={{ color: 'var(--color-primary-600)', marginBottom: '0.5rem' }} />
             <p style={{ margin: 0, color: 'var(--color-text-muted)', fontSize: '0.875rem' }}>
-              Memuat data transaksi {selectedActivity ? selectedActivity.name : 'wahana'}...
+              Memuat data transaksi {selectedActivity ? selectedActivity.name : 'aktivitas'}...
             </p>
           </div>
         ) : (

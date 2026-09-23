@@ -301,7 +301,7 @@ async function generateTransactionsExport({
 }
 
 /**
- * Generates an export report for activity recap summary (per wahana)
+ * Generates an export report for activity recap summary (per aktivitas)
  * containing transaction statistics, gross/net revenue, unique participants, and share %.
  *
  * @param {Object} query
@@ -334,7 +334,7 @@ async function generateActivitiesRecapExport({
     'Total Kotor (Rp)',
     'Total Refund (Rp)',
     'Total Bersih (Rp)',
-    'Peserta Unik',
+    'Partisipan',
     'Pangsa (%)'
   ];
 
@@ -357,7 +357,7 @@ async function generateActivitiesRecapExport({
 
   if (isExcel) {
     return {
-      data: buildXmlSpreadsheet('Rekap Wahana', headers, rows),
+      data: buildXmlSpreadsheet('Rekap Aktivitas', headers, rows),
       contentType: 'application/vnd.ms-excel; charset=utf-8',
       filename: `activities-recap-report-${timestamp}.xls`
     };

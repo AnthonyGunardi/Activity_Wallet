@@ -114,7 +114,7 @@ describe('ActivitySummaryView Page Integration Tests', () => {
     setupMockFetch();
     renderComponent();
 
-    expect(screen.getByText('Rekapitulasi Transaksi per Wahana')).toBeInTheDocument();
+    expect(screen.getByText('Rekapitulasi Transaksi per Aktivitas')).toBeInTheDocument();
 
     await waitFor(() => {
       expect(screen.getByRole('heading', { name: 'Jetski Pro' })).toBeInTheDocument();
@@ -128,7 +128,7 @@ describe('ActivitySummaryView Page Integration Tests', () => {
     });
   });
 
-  it('selects a wahana card and filters detail transactions specifically for that wahana', async () => {
+  it('selects an activity card and filters detail transactions specifically for that activity', async () => {
     setupMockFetch();
     renderComponent();
 
@@ -145,11 +145,11 @@ describe('ActivitySummaryView Page Integration Tests', () => {
     });
 
     // Reset filter
-    const removeBtn = screen.getByTitle('Hapus filter wahana');
+    const removeBtn = screen.getByTitle('Hapus filter aktivitas');
     fireEvent.click(removeBtn);
 
     await waitFor(() => {
-      expect(screen.getByText('Detail Transaksi: Semua Wahana')).toBeInTheDocument();
+      expect(screen.getByText('Detail Transaksi: Semua Aktivitas')).toBeInTheDocument();
     });
   });
 
@@ -169,7 +169,7 @@ describe('ActivitySummaryView Page Integration Tests', () => {
     });
   });
 
-  it('triggers CSV and Excel export downloads for activity recap summary', async () => {
+  it('triggers Excel export download for activity recap summary and confirms CSV recap is removed', async () => {
     const downloadSpy = vi.spyOn(downloadHelper, 'downloadReport').mockResolvedValue();
     setupMockFetch();
     renderComponent();
@@ -178,15 +178,7 @@ describe('ActivitySummaryView Page Integration Tests', () => {
       expect(screen.getByRole('heading', { name: 'Jetski Pro' })).toBeInTheDocument();
     });
 
-    const csvBtn = screen.getByRole('button', { name: /ekspor rekap \(csv\)/i });
-    fireEvent.click(csvBtn);
-
-    await waitFor(() => {
-      expect(downloadSpy).toHaveBeenCalledWith(
-        expect.stringContaining('format=csv'),
-        'activities-recap-report.csv'
-      );
-    });
+    expect(screen.queryByRole('button', { name: /ekspor rekap \(csv\)/i })).not.toBeInTheDocument();
 
     const excelBtn = screen.getByRole('button', { name: /ekspor rekap \(excel\)/i });
     fireEvent.click(excelBtn);

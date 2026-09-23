@@ -5,6 +5,7 @@ import { TransactionAuditTable } from '../../components/admin/TransactionAuditTa
 import { RefundModal } from '../../components/admin/RefundModal';
 import { AdminNavTabs } from '../../components/admin/AdminNavTabs';
 import { ExportToolbar } from '../../components/admin/ExportToolbar';
+import { TransactionTypeFilter } from '../../components/admin/TransactionTypeFilter';
 import { useToast } from '../../hooks/useToast';
 import { formatCurrency } from '../../utils/formatters';
 import {
@@ -164,7 +165,7 @@ export function AdminDashboardView() {
         </div>
       </div>
 
-      {/* Filter and Search Bar */}
+      {/* Transaction Controls / Filter */}
       <div
         className="sport-card"
         style={{
@@ -177,7 +178,10 @@ export function AdminDashboardView() {
           gap: '1rem',
           alignItems: 'center',
           justifyContent: 'space-between',
-          marginBottom: '1.5rem'
+          marginBottom: '1.5rem',
+          overflow: 'visible',
+          position: 'relative',
+          zIndex: 10
         }}
       >
         <div style={{ position: 'relative', flex: '1 1 280px' }}>
@@ -202,16 +206,10 @@ export function AdminDashboardView() {
         </div>
 
         <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap' }}>
-          <select
-            className="form-input"
+          <TransactionTypeFilter
             value={typeFilter}
             onChange={(e) => setTypeFilter(e.target.value)}
-            style={{ fontSize: '0.875rem', width: '180px', padding: '0.5rem 0.75rem' }}
-          >
-            <option value="">Semua Jenis Transaksi</option>
-            <option value="DEDUCTION">DEDUCTION (Pemotongan)</option>
-            <option value="REFUND">REFUND (Pengembalian)</option>
-          </select>
+          />
         </div>
       </div>
 

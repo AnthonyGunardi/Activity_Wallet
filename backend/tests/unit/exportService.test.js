@@ -253,14 +253,14 @@ describe('ExportService Unit Tests', () => {
       await User.destroy({ where: {}, truncate: true });
 
       const staff = await User.create({
-        name: 'Staff Wahana',
+        name: 'Staff Aktivitas',
         username: 'staff_w',
         password_hash: 'hash',
         role: UserRole.STAFF
       });
 
       const participant = await Participant.create({
-        name: 'Budi Wahana',
+        name: 'Budi Aktivitas',
         qr_code: 'SEPA-W1',
         initial_credit: 1000000,
         current_balance: 350000,
@@ -299,7 +299,7 @@ describe('ExportService Unit Tests', () => {
       const result = await generateActivitiesRecapExport({ format: 'excel' });
       expect(result.contentType).toBe('application/vnd.ms-excel; charset=utf-8');
       expect(result.filename).toMatch(/^activities-recap-report-.*\.xls$/);
-      expect(result.data).toContain('<Worksheet ss:Name="Rekap Wahana">');
+      expect(result.data).toContain('<Worksheet ss:Name="Rekap Aktivitas">');
       expect(result.data).toContain('Jetski Pro');
     });
   });

@@ -172,7 +172,7 @@ describe('Admin Activity Summary & Export Integration Tests', () => {
       expect(res.status).toBe(200);
       expect(res.headers['content-type']).toContain('application/vnd.ms-excel');
       expect(res.headers['content-disposition']).toContain('.xls');
-      expect(res.text).toContain('<Worksheet ss:Name="Rekap Wahana">');
+      expect(res.text).toContain('<Worksheet ss:Name="Rekap Aktivitas">');
       expect(res.text).toContain('Jetski Sea');
     });
 

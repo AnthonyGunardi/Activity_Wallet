@@ -48,26 +48,6 @@ export function AdminNavTabs() {
       </Link>
 
       <Link
-        to="/admin/activity-summary"
-        style={{
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: '0.5rem',
-          padding: '0.75rem 1.125rem',
-          textDecoration: 'none',
-          fontWeight: 700,
-          fontSize: '0.875rem',
-          color: isActivitySummaryActive ? 'var(--color-primary-600)' : 'var(--color-text-muted)',
-          borderBottom: isActivitySummaryActive ? '2px solid var(--color-primary-600)' : '2px solid transparent',
-          marginBottom: '-1px',
-          whiteSpace: 'nowrap',
-          transition: 'all 0.15s ease'
-        }}
-      >
-        <BarChart3 size={16} /> Rekap Wahana
-      </Link>
-
-      <Link
         to="/admin/participants"
         style={{
           display: 'inline-flex',
@@ -105,6 +85,26 @@ export function AdminNavTabs() {
         }}
       >
         <Waves size={16} /> Daftar Aktivitas
+      </Link>
+
+      <Link
+        to="/admin/activity-summary"
+        style={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: '0.5rem',
+          padding: '0.75rem 1.125rem',
+          textDecoration: 'none',
+          fontWeight: 700,
+          fontSize: '0.875rem',
+          color: isActivitySummaryActive ? 'var(--color-primary-600)' : 'var(--color-text-muted)',
+          borderBottom: isActivitySummaryActive ? '2px solid var(--color-primary-600)' : '2px solid transparent',
+          marginBottom: '-1px',
+          whiteSpace: 'nowrap',
+          transition: 'all 0.15s ease'
+        }}
+      >
+        <BarChart3 size={16} /> Rekap Aktivitas
       </Link>
     </div>
   );
