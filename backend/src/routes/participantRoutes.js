@@ -1,8 +1,8 @@
 const express = require('express');
 const participantController = require('../controllers/participantController');
-const { validateParams } = require('../middleware/validate');
+const { validateParams, validateBody } = require('../middleware/validate');
 const { qrCodeParamSchema } = require('../schemas/participantSchemas');
-const { recipientParamSchema } = require('../schemas/transferSchemas');
+const { recipientParamSchema, transferPayloadSchema } = require('../schemas/transferSchemas');
 
 const router = express.Router();
 
@@ -20,6 +20,16 @@ router.get(
   '/transfer/recipient/:qrCode',
   validateParams(recipientParamSchema),
   participantController.getRecipient
+);
+
+/**
+ * @route POST /api/v1/participants/transfer
+ * @desc Atomically transfer activity credit between participants
+ */
+router.post(
+  '/transfer',
+  validateBody(transferPayloadSchema),
+  participantController.transfer
 );
 
 module.exports = router;

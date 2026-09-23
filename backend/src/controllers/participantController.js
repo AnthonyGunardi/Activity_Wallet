@@ -1,4 +1,5 @@
 const participantService = require('../services/participantService');
+const transferService = require('../services/transferService');
 const { formatSuccess } = require('../utils/responseEnvelope');
 
 /**
@@ -38,8 +39,26 @@ async function getRecipient(req, res, next) {
   }
 }
 
+/**
+ * Handles peer-to-peer balance transfer between participants.
+ * POST /api/v1/participants/transfer
+ *
+ * @param {import('express').Request} req
+ * @param {import('express').Response} res
+ * @param {import('express').NextFunction} next
+ */
+async function transfer(req, res, next) {
+  try {
+    const result = await transferService.executeTransfer(req.body);
+    return res.status(200).json(formatSuccess(result));
+  } catch (error) {
+    return next(error);
+  }
+}
+
 module.exports = {
   getWallet,
-  getRecipient
+  getRecipient,
+  transfer
 };
 
