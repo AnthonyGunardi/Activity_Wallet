@@ -148,6 +148,29 @@ describe('Admin Export Reports Integration Tests', () => {
       expect(res.text).toContain('Snorkeling Trip');
     });
 
+    it('downloads CSV report including peer-to-peer transfer transactions with null activity and staff', async () => {
+      await Transaction.create({
+        participant_id: sampleParticipant.id,
+        activity_id: null,
+        staff_id: null,
+        type: TransactionType.TRANSFER_OUT,
+        amount: 150000,
+        balance_before: 700000,
+        balance_after: 550000,
+        notes: 'Transfer ke Budi (SEPA-002) - Patungan Jet Ski'
+      });
+
+      const res = await request(app)
+        .get('/api/v1/admin/reports/transactions/export?format=csv&type=TRANSFER_OUT')
+        .set('Authorization', `Bearer ${adminToken}`);
+
+      expect(res.status).toBe(200);
+      expect(res.text).toContain('TRANSFER_OUT');
+      expect(res.text).toContain('150000');
+      expect(res.text).toContain('Transfer ke Budi (SEPA-002) - Patungan Jet Ski');
+      expect(res.text).toContain('"N/A"');
+    });
+
     it('handles unexpected service error in exportParticipants gracefully', async () => {
       const exportService = require('../../src/services/exportService');
       jest.spyOn(exportService, 'generateParticipantsExport').mockRejectedValueOnce(new Error('Export crash'));

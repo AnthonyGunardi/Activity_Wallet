@@ -253,8 +253,11 @@ export function ParticipantDetailModal({ isOpen, participantId, fetchDetail, onC
                     }}
                   >
                     {data.transactions.map((tx) => {
-                      const isDeduction = tx.type === 'DEDUCTION';
                       const isRefund = tx.type === 'REFUND';
+                      const isAdjustment = tx.type === 'ADJUSTMENT';
+                      const isTransferOut = tx.type === 'TRANSFER_OUT';
+                      const isTransferIn = tx.type === 'TRANSFER_IN';
+                      const isPositive = isRefund || isTransferIn;
 
                       return (
                         <div
@@ -275,27 +278,55 @@ export function ParticipantDetailModal({ isOpen, participantId, fetchDetail, onC
                                 width: '28px',
                                 height: '28px',
                                 borderRadius: 'var(--radius-sm)',
-                                background: isDeduction
-                                  ? 'rgba(239, 68, 68, 0.1)'
-                                  : isRefund
-                                    ? 'rgba(34, 197, 94, 0.1)'
-                                    : 'rgba(14, 165, 233, 0.1)',
-                                color: isDeduction
-                                  ? 'var(--color-danger-600, #ef4444)'
-                                  : isRefund
-                                    ? 'var(--color-success-600, #16a34a)'
-                                    : 'var(--color-primary-600)',
+                                background: isPositive
+                                  ? 'rgba(34, 197, 94, 0.1)'
+                                  : isTransferOut
+                                    ? 'rgba(245, 158, 11, 0.1)'
+                                    : isAdjustment
+                                      ? 'rgba(14, 165, 233, 0.1)'
+                                      : 'rgba(239, 68, 68, 0.1)',
+                                color: isPositive
+                                  ? 'var(--color-success-600, #16a34a)'
+                                  : isTransferOut
+                                    ? 'var(--color-warning-600, #d97706)'
+                                    : isAdjustment
+                                      ? 'var(--color-primary-600)'
+                                      : 'var(--color-danger-600, #ef4444)',
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center'
                               }}
                             >
-                              {isDeduction ? <ArrowDownRight size={16} /> : <ArrowUpRight size={16} />}
+                              {isPositive ? <ArrowUpRight size={16} /> : <ArrowDownRight size={16} />}
                             </div>
 
                             <div>
-                              <div style={{ fontWeight: 700, fontSize: '0.875rem', color: 'var(--color-text-main)' }}>
-                                {tx.activity ? tx.activity.name : tx.type}
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                <span style={{ fontWeight: 700, fontSize: '0.875rem', color: 'var(--color-text-main)' }}>
+                                  {tx.activity ? tx.activity.name : (tx.notes || (isTransferOut ? 'Transfer Keluar' : isTransferIn ? 'Transfer Masuk' : tx.type))}
+                                </span>
+                                <span
+                                  className={`badge ${
+                                    isPositive
+                                      ? 'badge-success'
+                                      : isTransferOut
+                                        ? 'badge-warning'
+                                        : isAdjustment
+                                          ? 'badge-blue'
+                                          : 'badge-danger'
+                                  }`}
+                                  style={{ fontSize: '0.625rem', padding: '0.125rem 0.375rem' }}
+                                >
+                                  {isRefund
+                                    ? 'Refund'
+                                    : isAdjustment
+                                      ? 'Penyesuaian'
+                                      : isTransferIn
+                                        ? 'Transfer Masuk'
+                                        : isTransferOut
+                                          ? 'Transfer Keluar'
+                                          : 'Debit'}
+                                </span>
                               </div>
                               <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>
                                 {formatDateTime(tx.created_at)}
@@ -308,10 +339,14 @@ export function ParticipantDetailModal({ isOpen, participantId, fetchDetail, onC
                               style={{
                                 fontWeight: 800,
                                 fontSize: '0.875rem',
-                                color: isDeduction ? 'var(--color-danger-600, #dc2626)' : 'var(--color-success-600, #16a34a)'
+                                color: isPositive
+                                  ? 'var(--color-success-600, #16a34a)'
+                                  : isTransferOut
+                                    ? 'var(--color-warning-700, #b45309)'
+                                    : 'var(--color-danger-600, #dc2626)'
                               }}
                             >
-                              {isDeduction ? '-' : '+'}{formatCurrency(tx.amount)}
+                              {isPositive ? '+' : '-'}{formatCurrency(tx.amount)}
                             </div>
                             <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>
                               Saldo: {formatCurrency(tx.balance_after)}

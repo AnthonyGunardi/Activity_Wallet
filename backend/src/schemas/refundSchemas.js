@@ -10,7 +10,9 @@ const listTransactionsQuerySchema = Joi.object({
   type: Joi.string().valid(
     TransactionType.DEDUCTION,
     TransactionType.REFUND,
-    TransactionType.ADJUSTMENT
+    TransactionType.ADJUSTMENT,
+    TransactionType.TRANSFER_OUT,
+    TransactionType.TRANSFER_IN
   ).optional(),
   start_date: Joi.date().iso().optional(),
   end_date: Joi.date().iso().optional(),

@@ -38,12 +38,12 @@
   - [x] Task 11.3: Frontend Dedicated "Rekap Aktivitas" Tab (`ActivitySummaryView`), AdminNavTabs & Export Integration
   - [x] Task 11.4: Comprehensive Automated Test Suite & Fullstack Verification
 
-- [ ] **Checkpoint G: Transfer Saldo Kredit Aktivitas Antar Peserta**
+- [x] **Checkpoint G: Transfer Saldo Kredit Aktivitas Antar Peserta**
   - [x] Task 12.1: Backend Transfer Database Schema, Enums, Validation Schemas & Recipient Verification API
   - [x] Task 12.2: Backend Atomic Peer-to-Peer Transfer Engine & Concurrency Locking
   - [x] Task 12.3: Frontend Transfer Modal with Scanner & Manual Token Input Fallback
   - [x] Task 12.4: Frontend Participant Portal Integration & Transaction History Ledger Reflection
-  - [ ] Task 12.5: Admin Participant Detail Ledger Reflection & Full System Verification
+  - [x] Task 12.5: Admin Participant Detail Ledger Reflection & Full System Verification
 
 
 

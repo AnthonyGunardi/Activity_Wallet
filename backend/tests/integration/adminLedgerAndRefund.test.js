@@ -109,6 +109,27 @@ describe('Admin Ledger & Refund API Integration Tests', () => {
       expect(res.status).toBe(200);
       expect(res.body.data.transactions.every((tx) => tx.type === 'DEDUCTION')).toBe(true);
     });
+
+    test('should support filtering ledger by TRANSFER_OUT type', async () => {
+      await Transaction.create({
+        participant_id: testParticipant.id,
+        activity_id: null,
+        staff_id: null,
+        type: TransactionType.TRANSFER_OUT,
+        amount: 50000,
+        balance_before: 825000,
+        balance_after: 775000,
+        notes: 'Transfer ke Budi'
+      });
+
+      const res = await request(app)
+        .get('/api/v1/admin/transactions?type=TRANSFER_OUT')
+        .set('Authorization', `Bearer ${adminToken}`);
+
+      expect(res.status).toBe(200);
+      expect(res.body.data.transactions.length).toBeGreaterThanOrEqual(1);
+      expect(res.body.data.transactions.every((tx) => tx.type === 'TRANSFER_OUT')).toBe(true);
+    });
   });
 
   describe('POST /api/v1/admin/transactions/:id/refund', () => {
