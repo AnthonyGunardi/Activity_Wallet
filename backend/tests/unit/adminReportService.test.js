@@ -260,7 +260,15 @@ describe('AdminReportService Unit Tests', () => {
         status: ActivityStatus.ACTIVE
       });
       expect(activeOnly.summary.total_activities).toBe(1);
+      expect(activeOnly.summary.total_unique_participants).toBe(1);
       expect(activeOnly.activities[0].id).toBe(act1.id);
+
+      // Filter status INACTIVE with no inactive transactions
+      const inactiveOnly = await adminReportService.getActivityTransactionsSummary({
+        status: ActivityStatus.INACTIVE
+      });
+      expect(inactiveOnly.summary.total_activities).toBe(1);
+      expect(inactiveOnly.summary.total_unique_participants).toBe(0);
 
       // Filter date range after 2026-09-21
       const dateFiltered = await adminReportService.getActivityTransactionsSummary({

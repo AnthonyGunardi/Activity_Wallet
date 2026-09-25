@@ -110,8 +110,28 @@ async function getActivityTransactionsSummary({ start_date, end_date, status } =
     activityWhere.status = status;
   }
 
+  const activities = await Activity.findAll({
+    where: activityWhere,
+    order: [['name', 'ASC']]
+  });
+
+  if (activities.length === 0) {
+    return {
+      summary: {
+        total_activities: 0,
+        total_deductions: 0,
+        total_refunds: 0,
+        total_gross_amount: 0,
+        total_refund_amount: 0,
+        total_net_amount: 0,
+        total_unique_participants: 0
+      },
+      activities: []
+    };
+  }
+
   const txWhere = {
-    activity_id: { [Op.ne]: null }
+    activity_id: { [Op.in]: activities.map((a) => a.id) }
   };
 
   if (start_date || end_date) {
@@ -120,11 +140,7 @@ async function getActivityTransactionsSummary({ start_date, end_date, status } =
     if (end_date) txWhere.created_at[Op.lte] = new Date(end_date);
   }
 
-  const [activities, txStats, uniqueParticipantStats, overallUniqueResult] = await Promise.all([
-    Activity.findAll({
-      where: activityWhere,
-      order: [['name', 'ASC']]
-    }),
+  const [txStats, uniqueParticipantStats, overallUniqueResult] = await Promise.all([
     Transaction.findAll({
       where: txWhere,
       attributes: [
