@@ -16,7 +16,7 @@ async function seedDatabase(force = false) {
     {
       username: 'admin',
       password_hash: 'admin123',
-      name: 'Event Supervisor (Sepa)',
+      name: 'Event Admin',
       role: UserRole.ADMIN,
       status: 'ACTIVE'
     },

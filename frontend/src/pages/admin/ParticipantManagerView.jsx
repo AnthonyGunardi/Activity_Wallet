@@ -135,7 +135,7 @@ export function ParticipantManagerView() {
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', color: 'var(--color-primary-600)' }}>
             <Users size={24} />
             <span style={{ fontSize: '0.8125rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-              Activity Admin
+              Kelola Peserta
             </span>
           </div>
           <h1 style={{ margin: '0.25rem 0 0 0', fontSize: '1.75rem', fontWeight: 800, color: 'var(--color-text-main)' }}>

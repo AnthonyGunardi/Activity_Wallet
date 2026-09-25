@@ -75,7 +75,7 @@ export const LoginView = () => {
           </div>
           <h1 style={{ fontSize: '1.75rem', marginBottom: '0.5rem', fontWeight: 800 }}>Login Staff</h1>
           <p style={{ color: 'var(--color-text-muted)', fontSize: '0.875rem' }}>
-            Masuk untuk mengakses Scanner Aktivitas atau Dashboard Supervisor.
+            Masuk untuk mengakses Scanner Aktivitas atau Dashboard Admin.
           </p>
         </div>
 
@@ -200,7 +200,7 @@ export const LoginView = () => {
               className="badge badge-warning"
               style={{ cursor: 'pointer', padding: '0.375rem 0.75rem', minHeight: '36px' }}
             >
-              <ShieldCheck size={14} /> Admin Supervisor
+              <ShieldCheck size={14} /> Admin Event
             </button>
             <button
               type="button"
