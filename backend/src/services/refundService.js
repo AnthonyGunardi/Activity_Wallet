@@ -59,37 +59,51 @@ async function listTransactions({
 
   const hasSearch = Boolean(search && search.trim());
 
-  const { rows, count } = await Transaction.findAndCountAll({
-    where,
-    include: [
-      {
-        model: Participant,
-        as: 'participant',
-        attributes: ['id', 'name', 'qr_code'],
-        where: hasSearch ? participantWhere : undefined,
-        required: hasSearch
-      },
-      {
-        model: Activity,
-        as: 'activity',
-        attributes: ['id', 'name', 'price']
-      },
-      {
-        model: User,
-        as: 'staff',
-        attributes: ['id', 'name', 'username', 'role']
-      },
-      {
-        model: Transaction,
-        as: 'refund_transactions',
-        attributes: ['id', 'type', 'amount', 'created_at']
-      }
-    ],
-    order: [['created_at', 'DESC']],
-    limit,
-    offset,
-    distinct: true
-  });
+  const [count, rows] = await Promise.all([
+    Transaction.count({
+      where,
+      include: hasSearch
+        ? [
+            {
+              model: Participant,
+              as: 'participant',
+              where: participantWhere,
+              required: true
+            }
+          ]
+        : []
+    }),
+    Transaction.findAll({
+      where,
+      include: [
+        {
+          model: Participant,
+          as: 'participant',
+          attributes: ['id', 'name', 'qr_code'],
+          where: hasSearch ? participantWhere : undefined,
+          required: hasSearch
+        },
+        {
+          model: Activity,
+          as: 'activity',
+          attributes: ['id', 'name', 'price']
+        },
+        {
+          model: User,
+          as: 'staff',
+          attributes: ['id', 'name', 'username', 'role']
+        },
+        {
+          model: Transaction,
+          as: 'refund_transactions',
+          attributes: ['id', 'type', 'amount', 'created_at']
+        }
+      ],
+      order: [['created_at', 'DESC']],
+      limit,
+      offset
+    })
+  ]);
 
   return {
     transactions: rows,

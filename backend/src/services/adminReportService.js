@@ -1,5 +1,5 @@
 const { Op } = require('sequelize');
-const { Participant, Activity, Transaction } = require('../models');
+const { Participant, Activity, Transaction, sequelize } = require('../models');
 const { ParticipantStatus, ActivityStatus, TransactionType } = require('../constants/enums');
 
 /**
@@ -20,45 +20,54 @@ const { ParticipantStatus, ActivityStatus, TransactionType } = require('../const
  * }>}
  */
 async function getDashboardSummary() {
-  const [
-    totalParticipants,
-    activeParticipants,
-    totalAllocatedCredit,
-    totalSpentCredit,
-    remainingBalance,
-    totalTransactions,
-    totalDeductions,
-    totalRefunds,
-    totalActivities,
-    activeActivities
-  ] = await Promise.all([
-    Participant.count(),
-    Participant.count({ where: { status: ParticipantStatus.ACTIVE } }),
-    Participant.sum('initial_credit'),
-    Participant.sum('total_spent'),
-    Participant.sum('current_balance'),
-    Transaction.count(),
-    Transaction.count({ where: { type: TransactionType.DEDUCTION } }),
-    Transaction.count({ where: { type: TransactionType.REFUND } }),
-    Activity.count(),
-    Activity.count({ where: { status: ActivityStatus.ACTIVE } })
+  const [participantSummary, transactionSummary, activitySummary] = await Promise.all([
+    Participant.findOne({
+      attributes: [
+        [sequelize.fn('COUNT', sequelize.col('id')), 'total'],
+        [sequelize.fn('SUM', sequelize.literal("CASE WHEN status = 'ACTIVE' THEN 1 ELSE 0 END")), 'active'],
+        [sequelize.fn('SUM', sequelize.col('initial_credit')), 'total_allocated_credit'],
+        [sequelize.fn('SUM', sequelize.col('total_spent')), 'total_spent_credit'],
+        [sequelize.fn('SUM', sequelize.col('current_balance')), 'remaining_balance']
+      ],
+      raw: true
+    }),
+    Transaction.findOne({
+      attributes: [
+        [sequelize.fn('COUNT', sequelize.col('id')), 'total'],
+        [sequelize.fn('SUM', sequelize.literal("CASE WHEN type = 'DEDUCTION' THEN 1 ELSE 0 END")), 'deductions'],
+        [sequelize.fn('SUM', sequelize.literal("CASE WHEN type = 'REFUND' THEN 1 ELSE 0 END")), 'refunds']
+      ],
+      raw: true
+    }),
+    Activity.findOne({
+      attributes: [
+        [sequelize.fn('COUNT', sequelize.col('id')), 'total'],
+        [sequelize.fn('SUM', sequelize.literal("CASE WHEN status = 'ACTIVE' THEN 1 ELSE 0 END")), 'active']
+      ],
+      raw: true
+    })
   ]);
 
+  const totalAllocatedCredit = Number(participantSummary && participantSummary.total_allocated_credit) || 0;
+  const totalSpentCredit = Number(participantSummary && participantSummary.total_spent_credit) || 0;
+  const remainingBalance = Number(participantSummary && participantSummary.remaining_balance) || 0;
+  const activeActivities = Number(activitySummary && activitySummary.active) || 0;
+
   return {
-    total_participants: totalParticipants || 0,
-    active_participants: activeParticipants || 0,
-    total_allocated_credit: Number(totalAllocatedCredit) || 0,
-    total_spent_credit: Number(totalSpentCredit) || 0,
-    remaining_balance: Number(remainingBalance) || 0,
-    total_transactions: totalTransactions || 0,
-    total_deductions: totalDeductions || 0,
-    total_refunds: totalRefunds || 0,
-    total_activities: totalActivities || 0,
-    active_activities: activeActivities || 0,
-    total_credit_issued: Number(totalAllocatedCredit) || 0,
-    total_credit_spent: Number(totalSpentCredit) || 0,
-    remaining_liability: Number(remainingBalance) || 0,
-    active_activities_count: activeActivities || 0
+    total_participants: Number(participantSummary && participantSummary.total) || 0,
+    active_participants: Number(participantSummary && participantSummary.active) || 0,
+    total_allocated_credit: totalAllocatedCredit,
+    total_spent_credit: totalSpentCredit,
+    remaining_balance: remainingBalance,
+    total_transactions: Number(transactionSummary && transactionSummary.total) || 0,
+    total_deductions: Number(transactionSummary && transactionSummary.deductions) || 0,
+    total_refunds: Number(transactionSummary && transactionSummary.refunds) || 0,
+    total_activities: Number(activitySummary && activitySummary.total) || 0,
+    active_activities: activeActivities,
+    total_credit_issued: totalAllocatedCredit,
+    total_credit_spent: totalSpentCredit,
+    remaining_liability: remainingBalance,
+    active_activities_count: activeActivities
   };
 }
 
@@ -101,11 +110,6 @@ async function getActivityTransactionsSummary({ start_date, end_date, status } =
     activityWhere.status = status;
   }
 
-  const activities = await Activity.findAll({
-    where: activityWhere,
-    order: [['name', 'ASC']]
-  });
-
   const txWhere = {
     activity_id: { [Op.ne]: null }
   };
@@ -116,25 +120,60 @@ async function getActivityTransactionsSummary({ start_date, end_date, status } =
     if (end_date) txWhere.created_at[Op.lte] = new Date(end_date);
   }
 
-  const transactions = await Transaction.findAll({
-    where: txWhere,
-    attributes: ['id', 'participant_id', 'activity_id', 'type', 'amount', 'created_at']
-  });
+  const [activities, txStats, uniqueParticipantStats, overallUniqueResult] = await Promise.all([
+    Activity.findAll({
+      where: activityWhere,
+      order: [['name', 'ASC']]
+    }),
+    Transaction.findAll({
+      where: txWhere,
+      attributes: [
+        'activity_id',
+        'type',
+        [sequelize.fn('COUNT', sequelize.col('id')), 'count'],
+        [sequelize.fn('SUM', sequelize.col('amount')), 'total_amount']
+      ],
+      group: ['activity_id', 'type'],
+      raw: true
+    }),
+    Transaction.findAll({
+      where: {
+        ...txWhere,
+        type: TransactionType.DEDUCTION
+      },
+      attributes: [
+        'activity_id',
+        [sequelize.literal('COUNT(DISTINCT participant_id)'), 'unique_count']
+      ],
+      group: ['activity_id'],
+      raw: true
+    }),
+    Transaction.findOne({
+      where: {
+        ...txWhere,
+        type: TransactionType.DEDUCTION
+      },
+      attributes: [
+        [sequelize.literal('COUNT(DISTINCT participant_id)'), 'total_unique']
+      ],
+      raw: true
+    })
+  ]);
 
-  const txByActivity = new Map();
-  for (const act of activities) {
-    txByActivity.set(act.id, []);
+  const statsMap = new Map();
+  for (const stat of txStats) {
+    if (!statsMap.has(stat.activity_id)) {
+      statsMap.set(stat.activity_id, {});
+    }
+    statsMap.get(stat.activity_id)[stat.type] = {
+      count: Number(stat.count) || 0,
+      total_amount: Number(stat.total_amount) || 0
+    };
   }
 
-  const overallDeductionParticipants = new Set();
-
-  for (const tx of transactions) {
-    if (txByActivity.has(tx.activity_id)) {
-      txByActivity.get(tx.activity_id).push(tx);
-    }
-    if (tx.type === TransactionType.DEDUCTION) {
-      overallDeductionParticipants.add(tx.participant_id);
-    }
+  const uniqueMap = new Map();
+  for (const u of uniqueParticipantStats) {
+    uniqueMap.set(u.activity_id, Number(u.unique_count) || 0);
   }
 
   let totalGrossAmount = 0;
@@ -143,26 +182,16 @@ async function getActivityTransactionsSummary({ start_date, end_date, status } =
   let totalRefunds = 0;
 
   const activityStats = activities.map((act) => {
-    const actTxs = txByActivity.get(act.id) || [];
-    let deductionCount = 0;
-    let refundCount = 0;
-    let grossAmount = 0;
-    let refundAmount = 0;
-    const uniqueParticipants = new Set();
+    const actData = statsMap.get(act.id) || {};
+    const deductionData = actData[TransactionType.DEDUCTION] || { count: 0, total_amount: 0 };
+    const refundData = actData[TransactionType.REFUND] || { count: 0, total_amount: 0 };
 
-    for (const tx of actTxs) {
-      const amt = Number(tx.amount) || 0;
-      if (tx.type === TransactionType.DEDUCTION) {
-        deductionCount += 1;
-        grossAmount += amt;
-        uniqueParticipants.add(tx.participant_id);
-      } else if (tx.type === TransactionType.REFUND) {
-        refundCount += 1;
-        refundAmount += amt;
-      }
-    }
-
+    const deductionCount = deductionData.count;
+    const grossAmount = deductionData.total_amount;
+    const refundCount = refundData.count;
+    const refundAmount = refundData.total_amount;
     const netAmount = grossAmount - refundAmount;
+    const uniqueParticipantsCount = uniqueMap.get(act.id) || 0;
 
     totalGrossAmount += grossAmount;
     totalRefundAmount += refundAmount;
@@ -179,7 +208,7 @@ async function getActivityTransactionsSummary({ start_date, end_date, status } =
       gross_amount: grossAmount,
       refund_amount: refundAmount,
       net_amount: netAmount,
-      unique_participants_count: uniqueParticipants.size,
+      unique_participants_count: uniqueParticipantsCount,
       share_percentage: 0
     };
   });
@@ -212,7 +241,7 @@ async function getActivityTransactionsSummary({ start_date, end_date, status } =
       total_gross_amount: totalGrossAmount,
       total_refund_amount: totalRefundAmount,
       total_net_amount: totalNetAmount,
-      total_unique_participants: overallDeductionParticipants.size
+      total_unique_participants: Number(overallUniqueResult && overallUniqueResult.total_unique) || 0
     },
     activities: activityStats
   };

@@ -112,6 +112,18 @@ function initTransaction(sequelize) {
         },
         {
           fields: ['created_at']
+        },
+        {
+          name: 'idx_tx_participant_created',
+          fields: ['participant_id', 'created_at']
+        },
+        {
+          name: 'idx_tx_staff_created',
+          fields: ['staff_id', 'created_at']
+        },
+        {
+          name: 'idx_tx_reference_type',
+          fields: ['reference_id', 'type']
         }
       ],
       hooks: {

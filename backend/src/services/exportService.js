@@ -134,7 +134,8 @@ async function generateParticipantsExport({ format = 'csv', search, status } = {
 
   const participants = await Participant.findAll({
     where,
-    order: [['created_at', 'DESC']]
+    order: [['created_at', 'DESC']],
+    raw: true
   });
 
   const headers = [
@@ -247,7 +248,9 @@ async function generateTransactionsExport({
         attributes: ['id', 'name', 'username', 'role']
       }
     ],
-    order: [['created_at', 'DESC']]
+    order: [['created_at', 'DESC']],
+    raw: true,
+    nest: true
   });
 
   const headers = [
@@ -270,14 +273,14 @@ async function generateTransactionsExport({
     t.id,
     t.created_at ? new Date(t.created_at).toISOString() : '',
     t.participant_id,
-    t.participant ? t.participant.name : '',
-    t.participant ? t.participant.qr_code : '',
-    t.activity ? t.activity.name : 'N/A',
+    (t.participant && t.participant.name) ? t.participant.name : '',
+    (t.participant && t.participant.qr_code) ? t.participant.qr_code : '',
+    (t.activity && t.activity.name) ? t.activity.name : 'N/A',
     t.type,
     t.amount,
     t.balance_before,
     t.balance_after,
-    t.staff ? t.staff.name || t.staff.username : 'N/A',
+    (t.staff && (t.staff.name || t.staff.username)) ? (t.staff.name || t.staff.username) : 'N/A',
     t.reference_id || '',
     t.notes || ''
   ]);

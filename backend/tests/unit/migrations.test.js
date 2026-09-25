@@ -25,18 +25,19 @@ describe('Sequelize Migrations Unit Tests', () => {
     }
   });
 
-  test('getMigrationFiles should return all 4 migration files in order', () => {
+  test('getMigrationFiles should return all 5 migration files in order', () => {
     const files = getMigrationFiles();
-    expect(files.length).toBe(4);
+    expect(files.length).toBe(5);
     expect(files[0]).toContain('create-users');
     expect(files[1]).toContain('create-participants');
     expect(files[2]).toContain('create-activities');
     expect(files[3]).toContain('create-transactions');
+    expect(files[4]).toContain('add-transaction-composite-indexes');
   });
 
   test('runMigrations should execute all migrations and create all tables', async () => {
     const applied = await runMigrations(testDb);
-    expect(applied.length).toBe(4);
+    expect(applied.length).toBe(5);
 
     const queryInterface = testDb.getQueryInterface();
     const tables = await queryInterface.showAllTables();
@@ -49,7 +50,7 @@ describe('Sequelize Migrations Unit Tests', () => {
     expect(tableNames).toContain('sequelizemeta');
 
     const recorded = await getAppliedMigrations(testDb);
-    expect(recorded.length).toBe(4);
+    expect(recorded.length).toBe(5);
   });
 
   test('runMigrations should be idempotent when no pending migrations exist', async () => {
@@ -61,17 +62,17 @@ describe('Sequelize Migrations Unit Tests', () => {
   test('undoLastMigration should revert the last applied migration', async () => {
     await runMigrations(testDb);
     const reverted = await undoLastMigration(testDb);
-    expect(reverted).toContain('create-transactions');
+    expect(reverted).toContain('add-transaction-composite-indexes');
 
     const applied = await getAppliedMigrations(testDb);
-    expect(applied.length).toBe(3);
-    expect(applied.some((f) => f.includes('create-transactions'))).toBe(false);
+    expect(applied.length).toBe(4);
+    expect(applied.some((f) => f.includes('add-transaction-composite-indexes'))).toBe(false);
   });
 
   test('resetMigrations should revert all applied migrations in reverse order', async () => {
     await runMigrations(testDb);
     const reverted = await resetMigrations(testDb);
-    expect(reverted.length).toBe(4);
+    expect(reverted.length).toBe(5);
 
     const applied = await getAppliedMigrations(testDb);
     expect(applied.length).toBe(0);

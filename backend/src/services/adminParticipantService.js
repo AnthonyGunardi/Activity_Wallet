@@ -99,21 +99,71 @@ async function createParticipant({ name, initial_credit = DEFAULT_INITIAL_CREDIT
  * @returns {Promise<{ created_count: number, participants: Array<Participant> }>}
  */
 async function bulkCreateParticipants(participantsList = []) {
-  return await sequelize.transaction(async (t) => {
+  const dbInstance = Participant.sequelize || sequelize;
+  return await dbInstance.transaction(async (t) => {
     const toInsert = [];
     const usedTokens = new Set();
+    const itemsNeedingTokens = [];
 
     for (const item of participantsList) {
-      let token = item.qr_code ? item.qr_code.trim().toUpperCase() : null;
+      const manualToken = item.qr_code ? item.qr_code.trim().toUpperCase() : null;
+      if (manualToken) {
+        usedTokens.add(manualToken);
+      } else {
+        itemsNeedingTokens.push(item);
+      }
+    }
 
-      if (!token) {
-        token = generateQrToken();
-        while (usedTokens.has(token) || (await Participant.findOne({ where: { qr_code: token }, transaction: t }))) {
-          token = generateQrToken();
+    if (itemsNeedingTokens.length > 0) {
+      const generatedTokens = [];
+      while (generatedTokens.length < itemsNeedingTokens.length) {
+        const candidate = generateQrToken();
+        if (!usedTokens.has(candidate)) {
+          usedTokens.add(candidate);
+          generatedTokens.push(candidate);
         }
       }
 
-      usedTokens.add(token);
+      let tokensToCheck = [...generatedTokens];
+      let existing = await Participant.findAll({
+        where: { qr_code: tokensToCheck },
+        attributes: ['qr_code'],
+        transaction: t,
+        raw: true
+      });
+
+      while (existing.length > 0) {
+        const existingSet = new Set(existing.map((e) => e.qr_code));
+        const replacementTokens = [];
+        for (let i = 0; i < tokensToCheck.length; i++) {
+          if (existingSet.has(tokensToCheck[i])) {
+            let nextToken = generateQrToken();
+            while (usedTokens.has(nextToken)) {
+              nextToken = generateQrToken();
+            }
+            usedTokens.add(nextToken);
+            tokensToCheck[i] = nextToken;
+            replacementTokens.push(nextToken);
+          }
+        }
+        existing = await Participant.findAll({
+          where: { qr_code: replacementTokens },
+          attributes: ['qr_code'],
+          transaction: t,
+          raw: true
+        });
+      }
+
+      for (let i = 0; i < itemsNeedingTokens.length; i++) {
+        itemsNeedingTokens[i]._assignedToken = tokensToCheck[i];
+      }
+    }
+
+    for (const item of participantsList) {
+      const token = item._assignedToken || (item.qr_code ? item.qr_code.trim().toUpperCase() : null);
+      if (item._assignedToken) {
+        delete item._assignedToken;
+      }
       const credit = typeof item.initial_credit === 'number' ? item.initial_credit : DEFAULT_INITIAL_CREDIT;
 
       toInsert.push({
