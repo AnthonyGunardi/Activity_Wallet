@@ -61,6 +61,27 @@ describe('ActivityManagerView Page Integration Tests', () => {
     });
   });
 
+  it('should display the alphabetical API catalog without reordering by activity id', async () => {
+    const activities = [
+      { id: 'act-4', name: 'Banana Boat', price: 125000, status: 'ACTIVE' },
+      { id: 'act-3', name: 'Double Waterbike', price: 300000, status: 'INACTIVE' },
+      { id: 'act-1', name: 'Jetski', price: 650000, status: 'ACTIVE' },
+      { id: 'act-2', name: 'Single Waterbike', price: 200000, status: 'ACTIVE' }
+    ];
+    global.fetch = vi.fn().mockResolvedValueOnce({
+      ok: true,
+      status: 200,
+      json: async () => ({ success: true, data: { activities } })
+    });
+
+    renderComponent();
+
+    await waitFor(() => {
+      const names = screen.getAllByRole('row').slice(1).map((row) => row.cells[0].textContent);
+      expect(names).toEqual(['Banana Boat', 'Double Waterbike', 'Jetski', 'Single Waterbike']);
+    });
+  });
+
   it('should open modal and create new activity', async () => {
     global.fetch = vi.fn()
       .mockResolvedValueOnce({

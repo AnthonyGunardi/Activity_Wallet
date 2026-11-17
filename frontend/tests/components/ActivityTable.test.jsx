@@ -60,19 +60,20 @@ describe('ActivityTable Component Tests', () => {
     expect(onToggleStatus).toHaveBeenCalledWith(mockActivities[1], 'ACTIVE');
   });
 
-  it('should render activities sorted by id ascending', () => {
-    const unsortedActivities = [
-      { id: 3, name: 'Snorkeling', price: 200000, status: 'ACTIVE' },
-      { id: 1, name: 'Banana Boat', price: 150000, status: 'ACTIVE' },
-      { id: 2, name: 'Donut Boat', price: 175000, status: 'ACTIVE' }
+  it.each([
+    ['numeric', [4, 3, 1, 2]],
+    ['string', ['act-4', 'act-3', 'act-1', 'act-2']]
+  ])('should preserve alphabetical catalog order regardless of %s ids', (_type, ids) => {
+    const alphabeticalActivities = [
+      { id: ids[0], name: 'Banana Boat', price: 125000, status: 'ACTIVE' },
+      { id: ids[1], name: 'Double Waterbike', price: 300000, status: 'INACTIVE' },
+      { id: ids[2], name: 'Jetski', price: 650000, status: 'ACTIVE' },
+      { id: ids[3], name: 'Single Waterbike', price: 200000, status: 'ACTIVE' }
     ];
 
-    render(<ActivityTable activities={unsortedActivities} onEdit={vi.fn()} onToggleStatus={vi.fn()} />);
+    render(<ActivityTable activities={alphabeticalActivities} onEdit={vi.fn()} onToggleStatus={vi.fn()} />);
 
-    const rows = screen.getAllByRole('row');
-    // Header is row 0, rows 1-3 are data rows
-    expect(rows[1]).toHaveTextContent('Banana Boat');
-    expect(rows[2]).toHaveTextContent('Donut Boat');
-    expect(rows[3]).toHaveTextContent('Snorkeling');
+    const names = screen.getAllByRole('row').slice(1).map((row) => row.cells[0].textContent);
+    expect(names).toEqual(['Banana Boat', 'Double Waterbike', 'Jetski', 'Single Waterbike']);
   });
 });

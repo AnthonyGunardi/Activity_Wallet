@@ -34,13 +34,6 @@ export function ActivityTable({ activities = [], onEdit, onToggleStatus }) {
     );
   }
 
-  const sortedActivities = [...activities].sort((a, b) => {
-    if (typeof a.id === 'number' && typeof b.id === 'number') {
-      return a.id - b.id;
-    }
-    return String(a.id || '').localeCompare(String(b.id || ''), undefined, { numeric: true });
-  });
-
   return (
     <div
       className="sport-card"
@@ -73,7 +66,7 @@ export function ActivityTable({ activities = [], onEdit, onToggleStatus }) {
             </tr>
           </thead>
           <tbody>
-            {sortedActivities.map((act) => {
+            {activities.map((act) => {
               const isInactive = act.status === 'INACTIVE';
 
               return (
