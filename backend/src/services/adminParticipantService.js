@@ -16,7 +16,7 @@ function generateQrToken(prefix = 'SEPA') {
 }
 
 /**
- * Lists participants with search, status filtering, and pagination metadata.
+ * Lists participants by participant code with search, status filtering, and pagination.
  *
  * @param {Object} query
  * @param {number} [query.page=1]
@@ -46,7 +46,7 @@ async function listParticipants({ page = 1, limit = 20, search, status } = {}) {
 
   const { rows, count } = await Participant.findAndCountAll({
     where,
-    order: [['created_at', 'DESC']],
+    order: [['qr_code', 'ASC']],
     limit,
     offset
   });

@@ -19,14 +19,7 @@ export function useAdminActivities() {
         status: statusFilter || undefined
       });
 
-      const raw = res.activities || res.data?.activities || [];
-      const sorted = [...raw].sort((a, b) => {
-        if (typeof a.id === 'number' && typeof b.id === 'number') {
-          return a.id - b.id;
-        }
-        return String(a.id || '').localeCompare(String(b.id || ''), undefined, { numeric: true });
-      });
-      setActivities(sorted);
+      setActivities(res.activities || res.data?.activities || []);
     } catch (err) {
       setError(err.message || 'Gagal memuat data aktivitas.');
     } finally {

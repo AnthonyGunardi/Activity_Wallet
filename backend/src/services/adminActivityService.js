@@ -4,7 +4,7 @@ const { ActivityStatus } = require('../constants/enums');
 const { AppError } = require('../utils/responseEnvelope');
 
 /**
- * Lists all activities, optionally filtered by status (ACTIVE / INACTIVE).
+ * Lists activities alphabetically, optionally filtered by status (ACTIVE / INACTIVE).
  *
  * @param {Object} [filter={}]
  * @param {string} [filter.status]
@@ -18,7 +18,7 @@ async function listActivities({ status } = {}) {
 
   const activities = await Activity.findAll({
     where,
-    order: [['id', 'ASC']]
+    order: [['name', 'ASC']]
   });
 
   return activities;

@@ -6,7 +6,7 @@ const { withKeyLock } = require('../utils/asyncLock');
 
 /**
  * Lists transactions from the immutable audit ledger with multi-criteria filtering,
- * search by participant details, and pagination metadata.
+ * search by participant details, and stable newest-first pagination.
  *
  * @param {Object} query
  * @param {number} [query.page=1]
@@ -99,7 +99,7 @@ async function listTransactions({
           attributes: ['id', 'type', 'amount', 'created_at']
         }
       ],
-      order: [['created_at', 'DESC']],
+      order: [['created_at', 'DESC'], ['id', 'DESC']],
       limit,
       offset
     })
